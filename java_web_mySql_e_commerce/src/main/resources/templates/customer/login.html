@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"> <!-- Thêm xmlns:th cho Thymeleaf -->
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In/Up</title> <!-- Sửa Title -->
+    <link rel="stylesheet" th:href="@{/assets_cus/css/login.css}"> <!-- Sử dụng th:href cho Thymeleaf -->
+    <style>
+        /* Thêm một chút CSS cho thông báo lỗi/thành công */
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .success-message {
+            color: green;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Sign in/up Form</h2>
+
+<!-- Hiển thị thông báo lỗi chung nếu có từ RedirectAttributes (ví dụ: email đã tồn tại khi đăng ký) -->
+<div th:if="${registrationError}" class="error-message" th:text="${registrationError}"></div>
+<div th:if="${registrationSuccess}" class="success-message" th:text="${registrationSuccess}"></div>
+
+<div class="container" id="container">
+    <div class="form-container sign-up-container">
+        <!-- Form Đăng Ký -->
+        <form th:action="@{/customer/register}" method="POST"> <!-- Sử dụng th:action -->
+            <h1>Create Account</h1>
+            <span>or use your email for registration</span>
+            <input type="text" name="name" placeholder="Name" required />
+            <input type="email" name="email" placeholder="Email" required /> <!-- name="email" cho đăng ký là ổn -->
+            <input type="password" name="password" placeholder="Password" required />
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+    <div class="form-container sign-in-container">
+        <!-- Form Đăng Nhập -->
+        <form th:action="@{/customer/loginCustomer}" method="POST"> <!-- Sử dụng th:action, URL này khớp với loginProcessingUrl -->
+            <h1>Sign In</h1>
+
+            <!-- Hiển thị thông báo lỗi từ Spring Security (param.error) -->
+            <div th:if="${param.error}" class="error-message">
+                Invalid email or password.
+            </div>
+
+            <!-- Hiển thị thông báo logout từ Spring Security (param.logout) -->
+            <div th:if="${param.logout}" class="success-message">
+                You have been logged out.
+            </div>
+
+            <!-- Hiển thị thông báo lỗi tùy chỉnh từ controller (nếu có) -->
+            <div th:if="${loginError}" class="error-message" th:text="${loginError}"></div>
+            <!-- Hiển thị thông báo đăng ký thành công nếu được truyền qua model/redirectAttributes -->
+            <div th:if="${message}" class="success-message" th:text="${message}"></div>
+
+
+            <span>or use your account</span>
+            <!-- THAY ĐỔI QUAN TRỌNG: name="username" cho trường email khi đăng nhập -->
+            <input type="email" name="username" placeholder="Email" required autofocus />
+            <!-- name="password" cho trường mật khẩu là đúng -->
+            <input type="password" name="password" placeholder="Password" required />
+            <a href="#">Forgot your password?</a> <!-- Bạn có thể triển khai chức năng này sau -->
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h1>Welcome Back!</h1>
+                <p>To keep connected with us please login with your personal info</p>
+                <button class="ghost" id="signIn">Sign In</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+                <h1>Hello, Friend!</h1>
+                <p>Enter your personal details and start journey with us</p>
+                <button class="ghost" id="signUp">Sign Up</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const signUpButton = document.getElementById('signUp');
+    const signInButton = document.getElementById('signIn');
+    const container = document.getElementById('container');
+
+    // Kiểm tra xem có lỗi đăng nhập hoặc thông báo đăng ký không để hiển thị đúng panel
+    // Ví dụ: nếu có lỗi đăng nhập, có thể muốn panel đăng nhập được active
+    // Hoặc nếu vừa đăng ký xong, có thể muốn panel đăng nhập được active
+    const urlParams = new URLSearchParams(window.location.search);
+    const loginError = urlParams.get('error');
+    // Bạn có thể thêm logic tương tự nếu có param cho biết đăng ký thành công và muốn chuyển qua signIn
+
+    if (signUpButton && signInButton && container) { // Thêm kiểm tra null
+        signUpButton.addEventListener('click', () => {
+            container.classList.add('right-panel-active');
+        });
+
+        signInButton.addEventListener('click', () => {
+            container.classList.remove('right-panel-active');
+        });
+
+        // Nếu có lỗi đăng nhập (tức là người dùng vừa thử đăng nhập và thất bại),
+        // đảm bảo panel đăng nhập được hiển thị (không phải panel đăng ký).
+        if (loginError === 'true') {
+            // container.classList.remove('right-panel-active'); // Bỏ comment nếu cần thiết
+        }
+        // Tương tự, nếu bạn có một param cho biết người dùng vừa đăng ký thành công
+        // và bạn muốn họ thấy form đăng nhập, bạn có thể thêm logic ở đây.
+        // Ví dụ: const registrationSuccess = urlParams.get('registrationSuccess');
+        // if (registrationSuccess === 'true') {
+        //     container.classList.remove('right-panel-active');
+        // }
+
+    } else {
+        console.error("One or more elements (signUp, signIn, container) not found.");
+    }
+</script>
+</body>
+</html>

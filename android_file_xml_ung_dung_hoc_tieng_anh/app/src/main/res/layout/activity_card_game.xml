@@ -1,0 +1,165 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_blue"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Nút quay lại và tiêu đề -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/baseline_keyboard_backspace_24"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="FlashCard"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <!-- ViewFlipper để hiển thị từ -->
+    <ViewFlipper
+        android:background="@drawable/rounded_background"
+        android:id="@+id/viewFlipper"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="20dp"
+        android:layout_weight="1">
+
+        <!-- Item trong ViewFlipper -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/wordText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="specialize"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/descriptionId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text=""
+                android:textColor="@color/black"
+                android:layout_marginBottom="40dp"
+                android:layout_marginTop="20dp"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+            <!-- Nút loa để phát âm -->
+            <ImageButton
+                android:id="@+id/soundButton"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Play pronunciation"
+                android:src="@drawable/baseline_volume_up_24" />
+
+            <!--            hinh anh tu vung-->
+            <androidx.cardview.widget.CardView
+                android:layout_gravity="center"
+                android:layout_width="200dp"
+                android:layout_height="300dp"
+                android:layout_margin="10dp"
+                app:cardBackgroundColor="@android:color/white">
+
+                <ImageView
+                    android:id="@+id/vocabularyImgId"
+                    android:layout_width="200dp"
+                    android:layout_height="300dp"
+                    android:background="@drawable/rounded_background" />
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/meaningButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Lật"
+                android:backgroundTint="#FFB84D"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="8dp"/>
+
+            <Button
+                android:id="@+id/nextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Next"
+                android:backgroundTint="#90EE90"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center" />
+        </LinearLayout>
+    </ViewFlipper>
+
+    <!-- Nút xem nghĩa -->
+
+
+    <!-- Thanh điều hướng dưới -->
+    <LinearLayout
+        android:id="@+id/navigationLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:gravity="center_vertical"
+        android:paddingTop="16dp">
+
+        <ImageButton
+            android:id="@+id/playButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_play_arrow_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Play" />
+
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="1 / 58"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_settings_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Settings" />
+    </LinearLayout>
+
+</LinearLayout>

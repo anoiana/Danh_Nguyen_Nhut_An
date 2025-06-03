@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <ImageView
+        android:layout_width="match_parent"
+        android:src="@drawable/incorrect2"
+        android:layout_height="300dp">
+
+    </ImageView>
+    <TextView
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#FD0C00"
+        android:text="Rất tiếc, bạn không trả lời đúng câu hỏi này"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/tv_correct_word"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#1E81A1"
+        android:text="Cat"
+        android:layout_height="wrap_content"/>
+
+
+</LinearLayout>

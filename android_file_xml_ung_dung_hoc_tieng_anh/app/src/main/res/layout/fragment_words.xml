@@ -1,0 +1,65 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".fragment.ChoicesFragment">
+
+    <!-- TextView phía trên -->
+    <TextView
+        android:id="@+id/footer_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Complete Words"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        android:textColor="@color/lavender"
+        android:gravity="center"
+        android:padding="16dp" />
+
+    <!-- ImageView -->
+    <androidx.cardview.widget.CardView
+        android:layout_gravity="center"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="150dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@android:color/white">
+
+        <ImageView
+            android:id="@+id/play_card_image"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/image_word"
+            android:scaleType="centerCrop" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- View ngang -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="30dp"
+        android:background="@color/lavender" />
+
+    <!-- Nội dung phía dưới -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select topic to play!"
+        android:textSize="15sp"
+        android:textStyle="italic"
+        android:textColor="@color/lavender"
+        android:gravity="center" />
+
+    <!-- RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/folder_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:layout_margin="16dp"
+        android:clipToPadding="false" />
+
+</LinearLayout>

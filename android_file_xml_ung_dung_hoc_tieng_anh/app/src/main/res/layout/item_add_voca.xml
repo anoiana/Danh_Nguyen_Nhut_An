@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="#394065"
+    android:id="@+id/add_voca"
+    android:elevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- TextView và EditText cho Thuật ngữ -->
+        <EditText
+            android:id="@+id/et_term"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tiếng anh"
+            android:backgroundTint="#394065"
+            android:textColorHint="#B0B0B0"
+            android:layout_marginTop="4dp" />
+
+        <!-- TextView và EditText cho Định nghĩa -->
+        <EditText
+            android:id="@+id/et_definition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nghĩa tiếng Việt"
+            android:backgroundTint="#394065"
+            android:textColorHint="#B0B0B0"
+            android:layout_marginTop="4dp" />
+
+        <!-- EditText mô tả từ -->
+        <EditText
+            android:id="@+id/et_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mô tả từ"
+            android:backgroundTint="#394065"
+            android:textColorHint="#B0B0B0"
+            android:layout_marginTop="4dp" />
+
+        <!-- ImageView để hiển thị ảnh -->
+        <ImageView
+            android:id="@+id/iv_image"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_placeholder" /> <!-- Placeholder image -->
+
+        <!-- Button hoặc FloatingActionButton để chọn ảnh -->
+        <Button
+            android:id="@+id/btn_add_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Thêm ảnh"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btn_delete_word"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Xóa" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

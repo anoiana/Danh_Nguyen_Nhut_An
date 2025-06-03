@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- basic -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- mobile metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <!-- site metas -->
+    <title>Eflyer</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- bootstrap css -->
+    <link rel="stylesheet" type="text/css" th:href="@{/assets_cus/css/bootstrap.min.css}">
+    <!-- style css -->
+    <link rel="stylesheet" type="text/css" th:href="@{/assets_cus/css/style.css}">
+    <!-- Responsive-->
+    <link rel="stylesheet" th:href="@{/assets_cus/css/responsive.css}">
+    <!-- fevicon -->
+    <link rel="icon" th:href="@{/assets_cus/images/fevicon.png}" type="image/gif" />
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" th:href="@{/assets_cus/css/jquery.mCustomScrollbar.min.css}">
+    <!-- Tweaks for older IEs-->
+    <link rel="stylesheet" th:href="@{https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css}">
+    <!-- fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+    <!-- font awesome -->
+    <link rel="stylesheet" type="text/css" th:href="@{https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css}">
+    <!-- owl stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Great+Vibes|Poppins:400,700&display=swap&subset=latin-ext" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/assets_cus/css/owl.carousel.min.css}">
+    <link rel="stylesheet" th:href="@{/assets_cus/css/owl.theme.default.min.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+</head>
+<body>
+<!-- banner bg main start -->
+<div class="banner_bg_main">
+    <!-- header top section start -->
+    <div class="container">
+        <div class="header_section_top">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="custom_menu">
+                        <ul>
+                            <li><a href="#">Best Sellers</a></li>
+                            <li><a href="#">Gift Ideas</a></li>
+                            <li><a href="#">New Releases</a></li>
+                            <li><a href="#">Today's Deals</a></li>
+                            <li><a href="#">Customer Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- header top section start -->
+    <!-- logo section start -->
+    <div class="logo_section">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="logo"><a href="index.html"><img th:src="@{/assets_cus/images/logo.png}"></a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- logo section end -->
+    <!-- header section start -->
+    <div class="header_section">
+        <div class="container">
+            <div class="containt_main">
+                <div id="mySidenav" class="sidenav">
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                    <a th:href="@{/customer}">Home</a>
+                    <a th:href="@{/customer/fashion}">Fashion</a>
+                    <a th:href="@{/customer/electronic}">Electronic</a>
+                    <a th:href="@{/customer/jewellery}">Jewellery</a>
+                </div>
+                <span class="toggle_icon" onclick="openNav()"><img th:src="@{/assets_cus/images/toggle-icon.png}"></span>
+                <!-- Dropdown for Search Category -->
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span id="selectedCategory">Search types</span>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#" onclick="setSearchCategory('Name')">Name</a>
+                        <a class="dropdown-item" href="#" onclick="setSearchCategory('Price')">Price</a>
+                        <a class="dropdown-item" href="#" onclick="setSearchCategory('Category')">Category</a>
+                    </div>
+                </div>
+
+                <!-- Search Form -->
+                <form action="/customer/search" class="main" method="get">
+                    <div class="input-group">
+                        <input type="hidden" name="search" id="searchCategory" value="All search"> <!-- Hidden field for category -->
+                        <input type="text" class="form-control" name="name" placeholder="Search products">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" type="submit" style="background-color: #f26522; border-color:#f26522">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="header_box">
+                    <div class="login_menu">
+                        <ul>
+                            <li>
+                                <a th:href="@{/customer/cart/view(customerId=${customerId})}">
+                                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                    <span class="padding_10">Cart</span>
+                                </a>
+                            </li>
+                            <!-- Hiển thị "Login" nếu customerId == null -->
+                            <li th:if="${customerId == null}">
+                                <a th:href="@{/customer/login}">
+                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                    <span class="padding_10">Login here</span>
+                                </a>
+                            </li>
+                            <!-- Hiển thị "Logout" nếu customerId != null -->
+                            <li th:if="${customerId != null}">
+                                <a th:href="@{/customer/login}">
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                    <span class="padding_10">Logout</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- header section end -->
+    <!-- banner section start -->
+    <div class="banner_section layout_padding">
+        <div class="container">
+            <div id="my_slider" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h1 class="banner_taital" >Welcome</h1>
+                                <h1 class="banner_taital" th:text=" (${customerName}?: 'Customer' + ' to our store!')">Welcome</h1>                     </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h1 class="banner_taital" >Welcome</h1>
+                                <h1 class="banner_taital" th:text=" (${customerName}?: 'Customer' + ' to our store!')">Welcome</h1>                     </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h1 class="banner_taital" >Welcome</h1>
+                                <h1 class="banner_taital" th:text=" (${customerName}?: 'Customer' + ' to our store!')">Welcome</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a class="carousel-control-prev" href="#my_slider" role="button" data-slide="prev">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                <a class="carousel-control-next" href="#my_slider" role="button" data-slide="next">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="h-100 h-custom fashion_section" style="background-color: #d2c9ff;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12">
+                <div class="card card-registration card-registration-2" style="border-radius: 15px;">
+                    <div class="card-body p-0">
+                        <div class="row g-0">
+                            <!-- Phần danh sách sản phẩm -->
+                            <div class="col-lg-8">
+                                <div class="p-5">
+                                    <div class="d-flex justify-content-between align-items-center mb-5">
+                                        <h1 class="fw-bold mb-0">Shopping Cart</h1>
+                                    </div>
+                                    <hr class="my-4">
+
+
+                                    <div>
+                                        <p>Your cart is empty.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phần tóm tắt giỏ hàng -->
+                            <div class="col-lg-4 bg-body-tertiary">
+                                <div class="p-5">
+                                    <h3 class="fw-bold mb-5 mt-2 pt-1">Summary</h3>
+                                    <hr class="my-4">
+
+                                    <div class="d-flex justify-content-between mb-4">
+                                        <h5 class="text-uppercase">Quantity: <span th:text="${totalQuantity}">0</span></h5>
+                                    </div>
+
+                                    <!--                  <h5 class="text-uppercase mb-3">Shipping</h5>-->
+                                    <!--                  <div class="mb-4 pb-2">-->
+                                    <!--                    <select data-mdb-select-init>-->
+                                    <!--                      <option value="1">Standard-Delivery- €5.00</option>-->
+                                    <!--                      <option value="2">Two</option>-->
+                                    <!--                      <option value="3">Three</option>-->
+                                    <!--                      <option value="4">Four</option>-->
+                                    <!--                    </select>-->
+                                    <!--                  </div>-->
+                                    <!--                  <hr class="my-4">-->
+
+                                    <div class="d-flex justify-content-between mb-5">
+                                        <h5 class="text-uppercase">Total price</h5>
+                                        <h5>€ <span th:text="${totalPrice}">0.00</span></h5>
+                                    </div>
+
+                                    <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-block btn-lg"
+                                            data-mdb-ripple-color="dark">PAYMENT</button>
+                                </div>
+                            </div>
+                            <!-- Kết thúc phần tóm tắt -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--<div th:if="${cart.cartProducts.size() > 0}">-->
+<!--  <div th:each="cartProduct : ${cart.cartProducts}" class="row mb-4 d-flex justify-content-between align-items-center">-->
+<!--    <div class="col-md-2 col-lg-2 col-xl-2">-->
+<!--      <img th:src="${cartProduct.product.linkImg}" class="img-fluid rounded-3" alt="Product Image">-->
+<!--    </div>-->
+<!--    <div class="col-md-3 col-lg-3 col-xl-3">-->
+<!--      <h6 class="text-muted" th:text="${cartProduct.product.category}">Category</h6>-->
+<!--      <h6 class="mb-0" th:text="${cartProduct.product.productName}">Product Name</h6>-->
+<!--    </div>-->
+
+<!--    <div class="col-md-3 col-lg-3 col-xl-2 d-flex">-->
+<!--      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-link px-2"-->
+<!--              onclick="this.parentNode.querySelector('input[type=number]').stepDown()">-->
+<!--        <i class="fas fa-minus"></i>-->
+<!--      </button>-->
+
+<!--      <input id="form1" min="0" name="quantity" value="1" type="number"-->
+<!--             class="form-control form-control-sm" />-->
+
+<!--      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-link px-2"-->
+<!--              onclick="this.parentNode.querySelector('input[type=number]').stepUp()">-->
+<!--        <i class="fas fa-plus"></i>-->
+<!--      </button>-->
+<!--    </div>-->
+
+<!--    <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">-->
+<!--      <h6 class="mb-0">€ <span th:text="${cartProduct.product.price}">Price</span></h6>-->
+<!--    </div>-->
+<!--    <div class="col-md-1 col-lg-1 col-xl-1 text-end">-->
+<!--      <a href="#!" class="text-muted"><i class="fas fa-times"></i></a>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<div th:if="${cart.cartProducts.size() == 0}">-->
+<!--  <p>Your cart is empty.</p>-->
+<!--</div>-->
+
+
+
+
+
+<!-- footer section start -->
+<div class="footer_section layout_padding">
+    <div class="container">
+        <div class="footer_logo"><a href="index.html"><img th:src="@{/assets_cus/images/footer-logo.png}"></a></div>
+        <div class="input_bt">
+            <input type="text" class="mail_bt" placeholder="Your Email" name="Your Email">
+            <span class="subscribe_bt" id="basic-addon2"><a href="#">Subscribe</a></span>
+        </div>
+        <div class="footer_menu">
+            <ul>
+                <li><a href="#">Best Sellers</a></li>
+                <li><a href="#">Gift Ideas</a></li>
+                <li><a href="#">New Releases</a></li>
+                <li><a href="#">Today's Deals</a></li>
+                <li><a href="#">Customer Service</a></li>
+            </ul>
+        </div>
+        <div class="location_main">Help Line  Number : <a href="#">+1 1800 1200 1200</a></div>
+    </div>
+</div>
+<!-- footer section end -->
+<!-- copyright section start -->
+<div class="copyright_section">
+    <div class="container">
+        <p class="copyright_text">© 2020 All Rights Reserved. Design by <a href="https://html.design">Free html  Templates</a></p>
+    </div>
+</div>
+<!-- copyright section end -->
+<!-- Javascript files-->
+<script th:src="@{/assets_cus/js/jquery.min.js}"></script>
+<script th:src="@{/assets_cus/js/popper.min.js}"></script>
+<script th:src="@{/assets_cus/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets_cus/js/jquery-3.0.0.min.js}"></script>
+<script th:src="@{/assets_cus/js/plugin.js}"></script>
+<!-- sidebar -->
+<script th:src="@{/assets_cus/js/jquery.mCustomScrollbar.concat.min.js}"></script>
+<script th:src="@{/assets_cus/js/custom.js}"></script>
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+</script>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const productRows = document.querySelectorAll(".product-row");
+
+        productRows.forEach(row => {
+            const decreaseBtn = row.querySelector(".decreaseQuantity");
+            const increaseBtn = row.querySelector(".increaseQuantity");
+            const quantityInput = row.querySelector(".quantityInput");
+
+            // Lấy ID giỏ hàng và sản phẩm từ các thuộc tính Thymeleaf
+            const cartId = /*[[${cart.idCart}]]*/;
+            const productId = parseInt(row.getAttribute("data-product-id"));
+            const maxStock = parseInt(row.getAttribute("data-max-stock"));
+
+            // Hàm gửi request cập nhật quantity
+            const updateCartQuantity = (quantity) => {
+                fetch('/customer/cart/updateQuantity', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cartId, productId, quantity }),
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Cart quantity updated successfully');
+                        } else {
+                            console.error('Failed to update cart quantity');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            };
+
+            // Xử lý giảm số lượng
+            decreaseBtn.addEventListener("click", function () {
+                let quantity = parseInt(quantityInput.value);
+                if (quantity > 1) {
+                    quantity--;
+                    quantityInput.value = quantity;
+                    updateCartQuantity(quantity); // Gửi yêu cầu cập nhật
+                }
+            });
+
+            // Xử lý tăng số lượng
+            increaseBtn.addEventListener("click", function () {
+                let quantity = parseInt(quantityInput.value);
+                if (quantity < maxStock) {
+                    quantity++;
+                    quantityInput.value = quantity;
+                    updateCartQuantity(quantity); // Gửi yêu cầu cập nhật
+                } else {
+                    alert("Không thể vượt quá số lượng tối đa!");
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    function setSearchCategory(category) {
+        // Cập nhật nội dung hiển thị trong dropdown
+        document.getElementById('selectedCategory').textContent = category;
+
+        // Cập nhật giá trị của input hidden
+        document.getElementById('searchCategory').value = category;
+    }
+</script>
+
+</body>
+</html>

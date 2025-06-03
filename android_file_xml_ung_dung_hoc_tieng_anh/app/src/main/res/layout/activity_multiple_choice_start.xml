@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.MultipleChoiceStartActivity"
+    android:padding="20dp"
+    android:background="@drawable/bg_screen"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp"
+        >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <ImageView
+            android:id="@+id/goBackBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_arrow_back_24">
+
+        </ImageView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        >
+        <ImageView
+            android:id="@+id/myImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:src="@drawable/brain"
+            android:layout_marginTop="30dp"
+        />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/choices"
+            android:textColor="@color/primaryColor"
+            android:textStyle="bold"
+            android:textSize="32sp"
+            />
+    </LinearLayout>
+
+
+        <Button
+            android:id="@+id/answerInEnglishBtnId"
+            android:textAllCaps="false"
+            android:layout_marginTop="26dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/answer_english_word"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:backgroundTint="#228be6"
+            android:drawableStart="@drawable/choices"
+            android:padding="20dp"
+            android:textSize="18dp"
+            android:drawablePadding="8dp"
+            android:gravity="start|center_vertical"
+        />
+
+    <Button
+        android:id="@+id/answerInVietnameseBtnId"
+        android:textAllCaps="false"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/answer_vietnamese_word"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:backgroundTint="#228be6"
+        android:drawableStart="@drawable/choices"
+        android:padding="20dp"
+        android:textSize="18dp"
+        android:drawablePadding="8dp"
+        android:gravity="start|center_vertical"
+        />
+
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

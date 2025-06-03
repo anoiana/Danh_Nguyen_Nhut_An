@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/addTopic"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.AddTopicActivity">
+
+    <!-- Toolbar với tiêu đề và biểu tượng quay lại -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/lavender"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_keyboard_backspace_24"
+            android:paddingEnd="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Topic"
+            android:textSize="18dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"/>
+
+        <!-- Nút hoàn thành -->
+        <ImageView
+            android:id="@+id/btn_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_check_24"
+            android:layout_gravity="end"
+            android:paddingEnd="16dp" />
+
+        <ImageView
+            android:id="@+id/btn_upload_csv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_upload_24"
+            android:layout_gravity="end"
+            android:paddingEnd="16dp" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Tiêu đề (Chủ đề, chương, đơn vị) -->
+    <EditText
+        android:id="@+id/et_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tên chủ đề"
+        android:inputType="text"
+        android:padding="12dp"
+        android:layout_margin="10dp" />
+
+    <CheckBox
+        android:id="@+id/chbox_public"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:textSize="18sp"
+        android:text="Công khai chủ đề"/>
+
+    <!-- FrameLayout bao bọc RecyclerView và FAB -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp">
+
+        <!-- NestedScrollView bao quanh RecyclerView để hỗ trợ cuộn -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- RecyclerView cho danh sách thuật ngữ và định nghĩa -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Floating Action Button (FAB) để thêm thuật ngữ mới, đặt chồng lên trên RecyclerView -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_add_24"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/lavender"
+            android:tint="#FFFFFF" />
+    </FrameLayout>
+
+</LinearLayout>
