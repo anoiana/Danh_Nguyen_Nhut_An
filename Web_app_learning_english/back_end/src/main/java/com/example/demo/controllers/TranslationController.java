@@ -6,7 +6,7 @@ import com.example.demo.services.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-//ádasfsdfsd
+//ádasfsdfsdádas
 @RestController
 @RequestMapping("/api/translate")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
