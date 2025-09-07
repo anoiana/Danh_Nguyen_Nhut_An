@@ -1,0 +1,196 @@
+/* ========================================================= */
+/*                   CUSTOMERS.CSS - NÂNG CẤP GIAO DIỆN      */
+/* ========================================================= */
+
+/* --- Giao diện chung cho các trang khách hàng --- */
+.page-header {
+    margin-bottom: 25px;
+}
+
+/* --- Trang danh sách khách hàng (customers.html) --- */
+
+.data-table th {
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    background-color: var(--background-color-light);
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--background-color-hover);
+}
+
+/* Cải thiện cột thông tin khách hàng */
+.customer-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.customer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+    object-fit: cover; /* Đảm bảo ảnh đại diện không bị méo */
+}
+
+.customer-name {
+    font-weight: 600;
+    color: var(--text-color-primary);
+}
+
+/* Nút hành động trong bảng */
+.action-buttons-cell {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-action {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+/* --- Trang chi tiết & thêm mới (customer-detail.html & customer-add.html) --- */
+
+/* Cố định header để nút Lưu/Xóa luôn hiển thị */
+.product-form-header {
+    position: sticky;
+    top: 0;
+    background-color: var(--background-color);
+    z-index: 10;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 25px; /* Tạo khoảng cách với nội dung bên dưới */
+}
+
+.form-layout-main h4 {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: var(--text-color-primary);
+    border-bottom: 1px solid var(--border-color-light);
+    padding-bottom: 10px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* Cải thiện cột sidebar */
+.form-layout-sidebar .card {
+    position: sticky; /* Sidebar đi theo khi cuộn */
+    top: 110px; /* (Chiều cao header) + khoảng cách */
+}
+
+#customerSummaryCard {
+    padding: 24px;
+    text-align: center;
+}
+
+.summary-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: #fff;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 500;
+}
+
+#summaryUsername {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+#summaryEmail {
+    font-size: 0.9rem;
+    color: var(--text-color-secondary);
+    margin-bottom: 20px;
+}
+
+.summary-stats {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-size: 0.95rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--background-color-light);
+    border-radius: 8px;
+}
+
+.stat-item .label {
+    color: var(--text-color-secondary);
+}
+.stat-item .value {
+    font-weight: 600;
+}
+
+/* Cải thiện bảng lịch sử đơn hàng */
+.order-history-table td, .order-history-table th {
+    padding: 12px 15px;
+}
+
+/* Trạng thái đơn hàng (status badges) */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-pending { background-color: #ffeccf; color: #f39c12; }
+.status-processing { background-color: #d6eaff; color: #3498db; }
+.status-shipped { background-color: #e8dff5; color: #8e44ad; }
+.status-delivered { background-color: #d4edda; color: #28a745; }
+.status-cancelled { background-color: #f8d7da; color: #dc3545; }
+.status-default { background-color: #e9ecef; color: #6c757d; }
+
+/* Trang thêm mới khách hàng */
+#addCustomerForm .card {
+    padding: 30px;
+}
+#addCustomerForm .form-group {
+    margin-bottom: 20px;
+}

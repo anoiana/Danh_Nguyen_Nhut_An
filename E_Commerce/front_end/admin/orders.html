@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Đơn Hàng - Admin</title>
+
+    <!-- Font và Icon -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/admin-modern.css">
+    <link rel="stylesheet" href="css/orders.css">
+</head>
+<body class="admin-layout">
+    <!-- Component dùng chung -->
+    <div id="loading-overlay" style="display: none;"><div class="spinner"></div></div>
+    <div id="toast-container"></div>
+    
+    <!-- Sidebar sẽ được JS tự động chèn vào đây -->
+
+    <div class="admin-main-content">
+        <main>
+            <h1 class="page-title">Quản Lý Đơn Hàng</h1>
+            
+            <div class="order-filters">
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="orderSearch" placeholder="Tìm theo Mã ĐH, Tên khách...">
+                </div>
+                <select id="statusFilter">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="PENDING">Chờ xác nhận</option>
+                    <option value="PROCESSING">Đang xử lý</option>
+                    <option value="SHIPPED">Đang giao</option>
+                    <option value="DELIVERED">Đã giao</option>
+                    <option value="CANCELED">Đã hủy</option>
+                </select>
+            </div>
+            
+            <div class="form-card">
+                <table class="data-table" id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Mã ĐH</th>
+                            <th>Khách Hàng</th>
+                            <th>Ngày Đặt</th>
+                            <th>Tổng Tiền</th>
+                            <th>Trạng Thái</th>
+                            <th style="text-align: right;">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- JS sẽ tải đơn hàng vào đây -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal chi tiết đơn hàng -->
+    <div id="orderDetailModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content large" id="modalContent">
+             <!-- JS sẽ tải chi tiết đơn hàng vào đây -->
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="js/main-admin.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/orders.js"></script>
+</body>
+</html>

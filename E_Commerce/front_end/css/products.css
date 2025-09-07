@@ -1,0 +1,72 @@
+/* ========================================================= */
+/*             NỘI DUNG MỚI CHO PRODUCTS.CSS                 */
+/* ========================================================= */
+
+.page-header {
+    text-align: center;
+    padding: 40px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 40px;
+}
+
+#category-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+}
+
+/* Layout cho lưới sản phẩm và phân trang */
+.product-list-container {
+    padding-bottom: 60px;
+}
+
+/* --- PAGINATION (PHÂN TRANG) --- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
+    list-style: none;
+    margin: 50px 0 20px 0; /* Tăng khoảng cách trên */
+}
+
+.page-item .page-link {
+    position: relative;
+    display: block;
+    padding: 0.75rem 1rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: var(--primary-color);
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+.page-item:first-child .page-link {
+    margin-left: 0;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+.page-item:last-child .page-link {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+.page-item .page-link:hover {
+    z-index: 2;
+    color: #0056b3;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: auto;
+    background-color: #fff;
+    border-color: #dee2e6;
+}

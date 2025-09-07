@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin Panel</title>
+    <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-layout">
+    <div class="admin-main-content">
+        <main>
+            <h1 class="page-title">Bảng điều khiển</h1>
+
+            <!-- Các thẻ thống kê -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Doanh thu tháng này</h4>
+                    <p class="stat-number" id="revenue-stat">0 ₫</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Đơn hàng mới (hôm nay)</h4>
+                    <p class="stat-number" id="orders-stat">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Khách hàng mới (tháng này)</h4>
+                    <p class="stat-number" id="customers-stat">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Sản phẩm sắp hết hàng</h4>
+                    <p class="stat-number" id="low-stock-stat">0</p>
+                </div>
+            </div>
+
+            <!-- Biểu đồ và danh sách hoạt động gần đây -->
+            <div class="recent-activity-grid">
+                <div class="activity-card chart-card">
+                    <h4>Tổng quan doanh thu</h4>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="activity-card">
+                    <h4>Đơn hàng gần đây</h4>
+                    <ul id="recent-orders-list" class="activity-list">
+                        <!-- JS sẽ điền vào đây -->
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="js/main-admin.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+/* =========================================================
+   FILE: css/customer-detail.css (PHIÊN BẢN HOÀN CHỈNH)
+   Cập nhật bởi AI - Đã tích hợp Loading & Toast, tinh chỉnh UI
+========================================================= */
+
+/* --- BIẾN TOÀN CỤC (Để nhất quán) --- */
+:root {
+    --primary-color: #007bff;
+    --primary-hover-color: #0056b3;
+    --danger-color: #dc3545;
+    --danger-hover-color: #c82333;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-gray-color: #f8f9fa;
+    --border-color: #e9ecef;
+    --text-dark: #212529;
+    --text-secondary: #6c757d;
+}
+
+/* --- GHI ĐÈ LAYOUT CHUNG --- */
+.admin-main-content>main {
+    padding: 0;
+    background-color: var(--light-gray-color);
+}
+
+/* --- HEADER DÍNH CỦA TRANG --- */
+.product-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 12px 30px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1020; /* Tăng z-index để luôn ở trên */
+}
+
+.page-header-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.page-header-title-wrapper #formTitle {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.back-link:hover {
+    background-color: #f1f3f5;
+}
+
+.form-actions-header {
+    display: flex;
+    gap: 12px;
+}
+
+/* --- LAYOUT 2 CỘT --- */
+.product-form-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px; /* Cột phụ rộng hơn một chút */
+    gap: 30px;
+    padding: 30px;
+    align-items: start;
+}
+
+/* --- CARD & FORM ELEMENTS --- */
+.card.detail-section {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    padding: 24px;
+}
+
+.form-layout-main .card.detail-section:not(:last-child) {
+    margin-bottom: 30px;
+}
+
+.card.detail-section h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f3f5;
+    color: var(--text-dark);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.card.detail-section .form-group:last-child,
+.card.detail-section .form-grid:last-of-type {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #343a40;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    width: 100%;
+    height: 42px;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.form-control:disabled {
+    background-color: var(--light-gray-color);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* --- CARD TÓM TẮT BÊN PHẢI --- */
+.form-layout-sidebar {
+    position: sticky;
+    top: calc(65px + 30px); /* 65px header + 30px padding */
+}
+
+#customerSummaryCard {
+    text-align: center;
+    padding: 32px 24px;
+}
+
+.customer-summary-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #e9f2ff;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 2rem;
+    margin: 0 auto 16px auto;
+}
+
+.customer-summary-name {
+    margin-bottom: 4px;
+    font-size: 1.25rem;
+    color: var(--text-dark);
+}
+
+.customer-summary-email {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    word-break: break-all;
+}
+
+.form-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 20px 0;
+}
+
+.summary-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.summary-stat span {
+    color: var(--text-secondary);
+}
+
+.summary-stat strong {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* --- BẢNG LỊCH SỬ MUA HÀNG --- */
+.data-table-container {
+    overflow-x: auto;
+}
+
+.order-history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.order-history-table thead th {
+    padding: 10px 12px;
+    text-align: left;
+    background-color: var(--light-gray-color);
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid var(--border-color);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.order-history-table tbody td {
+    padding: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.9rem;
+}
+
+/* --- NHÃN TRẠNG THÁI (STATUS BADGE) - Cải tiến màu sắc --- */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+.status-PENDING { background-color: #fff3cd; color: #856404; }
+.status-CONFIRMED, .status-PROCESSING { background-color: #d1ecf1; color: #0c5460; }
+.status-SHIPPED { background-color: #e2e3e5; color: #383d41; }
+.status-DELIVERED, .status-COMPLETED { background-color: #d4edda; color: #155724; }
+.status-CANCELLED { background-color: #f8d7da; color: #721c24; }
+
+/* --- CÁC NÚT BẤM --- */
+.btn {
+    padding: 9px 18px; /* Giảm nhẹ padding */
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: var(--danger-hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220,53,69,0.2);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 1024px) {
+    .product-form-layout {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột */
+    }
+    .form-layout-sidebar {
+        order: -1; /* Đẩy card tóm tắt lên đầu */
+        position: static;
+        top: auto;
+    }
+}
+@media (max-width: 768px) {
+    .product-form-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    .form-actions-header {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .product-form-layout {
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+}
+
+/* =========================================================
+   LOADING OVERLAY & SPINNER (PHẦN THIẾU ĐÃ ĐƯỢC THÊM)
+========================================================= */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #e9ecef;
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =========================================================
+   TOAST NOTIFICATION (PHẦN THIẾU ĐÃ ĐƯỢC THÊM)
+========================================================= */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 350px;
+}
+
+.toast {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: slideInFromRight 0.4s ease forwards;
+    opacity: 0;
+}
+
+.toast.fade-out {
+    animation: slideOutToRight 0.5s ease forwards;
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+}
+
+.toast-message {
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.toast.success {
+    border-left-color: var(--success-color);
+}
+.toast.success .toast-icon {
+    color: var(--success-color);
+}
+
+.toast.error {
+    border-left-color: var(--danger-color);
+}
+.toast.error .toast-icon {
+    color: var(--danger-color);
+}
+
+@keyframes slideInFromRight {
+    from { transform: translateX(110%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutToRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(110%); opacity: 0; }
+}
+/* Thêm đoạn CSS này vào cuối file customer-detail.css */
+
+.status-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#statusLabel {
+    font-weight: 500;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #28a745;
+    /* Màu xanh lá cây */
+}
+
+input:checked+.slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}

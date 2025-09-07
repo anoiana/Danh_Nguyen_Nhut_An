@@ -1,0 +1,195 @@
+/* ========================================================= */
+/*                  NỘI DUNG CHO HEADER.CSS                  */
+/* ========================================================= */
+
+/* Áp dụng padding-top cho body nếu trang có header */
+body.has-fixed-header {
+    padding-top: var(--header-height);
+}
+
+/* --- HEADER CHUYÊN NGHIỆP --- */
+.main-header {
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 0;
+    height: var(--header-height);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.logo span {
+    color: var(--primary-color);
+}
+
+.main-nav ul {
+    display: flex;
+    gap: 30px;
+}
+
+.main-nav ul li a {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 10px 0;
+    position: relative;
+}
+
+.main-nav ul li a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.main-nav ul li a:hover::after,
+.main-nav ul li a.active::after {
+    width: 100%;
+}
+
+/* --- KHU VỰC HÀNH ĐỘNG TRÊN HEADER --- */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Biểu tượng giỏ hàng */
+.cart-icon {
+    position: relative;
+    color: var(--dark-color);
+}
+.cart-icon svg {
+    width: 26px;
+    height: 26px;
+}
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Khu vực User */
+#user-actions .btn {
+    font-size: 0.9rem;
+}
+
+#user-info-header {
+    display: flex;
+    align-items: center;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding-left: 5px;
+    color: #777;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 150%;
+    background-color: #fff;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    border-radius: 5px;
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: var(--text-color);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.dropdown-content a:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+/* Dropdown Menu trên Nav */
+.main-nav .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    min-width: 200px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 0 0 5px 5px;
+    padding: 10px 0;
+    z-index: 1000;
+    border: 1px solid #f0f0f0;
+    border-top: none;
+}
+
+.main-nav .dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.main-nav .dropdown-menu li {
+    width: 100%;
+}
+
+.main-nav .dropdown-menu a {
+    display: block;
+    padding: 10px 20px;
+    color: var(--text-color);
+    white-space: nowrap;
+}
+.main-nav .dropdown-menu a:hover {
+    background-color: #f5f5f5;
+    color: var(--primary-color);
+}
+.main-nav .dropdown-menu a::after {
+    display: none;
+}

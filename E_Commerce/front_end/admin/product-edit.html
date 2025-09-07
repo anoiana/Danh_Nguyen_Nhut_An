@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm/Sửa Sản Phẩm - Admin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin-modern.css">
+    <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+</head>
+
+<body class="admin-layout">
+    <div id="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    <div id="toast-container"></div>
+    <div class="admin-main-content">
+        <main>
+            <form id="productForm">
+                <div class="product-form-header">
+                    <div class="page-header-title-wrapper">
+                        <a href="products.html" class="back-link" title="Quay lại danh sách">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+                        <h3 id="form-title">Tạo sản phẩm mới</h3>
+                    </div>
+                    <div class="form-actions-header">
+                        <button type="button" id="cancelEditBtn" class="btn btn-secondary">Hủy</button>
+                        <button type="submit" id="submitProductBtn" class="btn btn-primary">
+                            <span class="btn-text">Lưu Sản Phẩm</span>
+                            <i class="fa-solid fa-spinner fa-spin" style="display: none;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="product-form-layout">
+                    <div class="form-layout-main">
+                        <div class="form-card">
+                            <h3>Thông tin sản phẩm</h3>
+                            <div class="form-group">
+                                <label for="productName">Tên sản phẩm</label>
+                                <input type="text" id="productName" required placeholder="Ví dụ: Áo thun Cotton Basic">
+                            </div>
+                            <div class="form-group">
+                                <label for="productDescription">Mô tả chi tiết</label>
+                                <textarea id="productDescription" rows="6"
+                                    placeholder="Nhập mô tả về chất liệu..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-card">
+                            <h3>Thư viện ảnh sản phẩm</h3>
+                            <p class="form-text-description">Ảnh đầu tiên sẽ được dùng làm ảnh đại diện.</p>
+                            <div class="form-group">
+                                <input type="file" id="mainImageInput" accept="image/*" class="image-input-hidden" multiple>
+                                <div id="main-image-gallery-container" class="image-gallery-container">
+                                    <div id="main-image-dropzone" class="dropzone-placeholder gallery-dropzone">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                        <span>Kéo & thả hoặc nhấn để chọn ảnh</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-card">
+                            <h3>Biến thể & Tồn kho</h3>
+                            <p class="form-text-description">Thêm các lựa chọn cho sản phẩm như màu sắc, kích thước.</p>
+                            <div id="variantsContainer" style="margin-top: 1.5rem;"></div>
+                            <button type="button" id="addVariantBtn" class="btn btn-secondary"
+                                style="margin-top: 10px;">
+                                <i class="fa-solid fa-plus"></i> Thêm Biến Thể
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-layout-sidebar">
+                        <div class="form-card">
+                            <h3>Phân loại & Giá</h3>
+                            <div class="form-group">
+                                <label for="productCategorySelect">Loại sản phẩm</label>
+                                <select id="productCategorySelect" required>
+                                    <option value="">-- Vui lòng chọn --</option>
+                                </select>
+                            </div>
+                            <hr class="form-divider">
+                            <div class="form-group">
+                                <label for="productSalePrice">Giá bán ra</label>
+                                <input type="number" id="productSalePrice" step="1000" min="0" required
+                                    placeholder="VD: 199000">
+                            </div>
+                            <div class="form-group">
+                                <label for="productImportPrice">Giá nhập hàng</label>
+                                <input type="number" id="productImportPrice" step="1000" min="0" required
+                                    placeholder="VD: 99000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="productId">
+            </form>
+        </main>
+    </div>
+    <script src="../js/config.js"></script>
+    <script src="js/main-admin.js"></script>
+    <script src="js/product-edit.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,193 @@
+/* === FILE: css/customers.css === */
+
+/* --- Page Header & Action Buttons --- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    margin-bottom: 0;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+
+/* --- Card Layout --- */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    overflow: hidden;
+}
+
+/* --- Table Toolbar & Search --- */
+.table-toolbar {
+    margin-bottom: 20px;
+}
+
+.search-wrapper {
+    position: relative;
+    max-width: 320px;
+}
+
+.search-wrapper .fa-search {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+    font-size: 0.9rem;
+}
+
+.search-wrapper .form-control {
+    width: 100%;
+    height: 40px;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-wrapper .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+/* --- Data Table Styling --- */
+.data-table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.data-table thead th {
+    padding: 12px 16px;
+    text-align: left;
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f5;
+    color: #212529;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* --- Specific Cell Styling --- */
+
+.customer-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.customer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e9f2ff;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.customer-cell .name {
+    font-weight: 500;
+}
+
+.action-buttons {
+    text-align: right;
+}
+
+.edit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #6c757d;
+    background-color: transparent;
+    border: none;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+    background-color: #e9ecef;
+    color: var(--primary-color);
+}
+
+/* --- Status Badge (PHẦN MỚI ĐƯỢC THÊM) --- */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    border-radius: 20px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.status-badge.status-ACTIVE {
+    background-color: #e6f7ec; /* Nền xanh lá nhạt */
+    color: #08a34f; /* Chữ xanh lá đậm */
+}
+
+.status-badge.status-DISABLED {
+    background-color: #f1f3f5; /* Nền xám nhạt */
+    color: #6c757d; /* Chữ xám đậm */
+}

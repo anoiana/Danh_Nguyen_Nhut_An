@@ -1,0 +1,100 @@
+/* Giao diện input có nút bấm bên trong */
+.input-with-button {
+    display: flex;
+    align-items: center;
+}
+
+.input-with-button input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    flex-grow: 1;
+}
+
+.input-with-button button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    text-transform: none;
+    /* Bỏ uppercase cho nút này */
+    box-shadow: none;
+}
+
+/* Badge trong bảng */
+.discount-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    background-color: #e0e7ff;
+    color: var(--primary-color);
+}
+
+.discount-badge.fixed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+}
+
+.status-badge.status-active {
+    background-color: var(--success-color);
+}
+
+.status-badge.status-inactive {
+    background-color: var(--secondary-color);
+}
+
+.data-table#couponsTable {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#couponsTable th, 
+#couponsTable td { 
+    vertical-align: middle; /* Căn giữa theo chiều dọc */
+    text-align: center;      /* Đặt căn giữa làm MẶC ĐỊNH cho tất cả các cột */
+}
+
+/* --- TÙY CHỈNH LẠI CHO CÁC CỘT ĐẶC BIỆT --- */
+
+/* Cột 1: Mã - Căn trái để dễ đọc */
+#couponsTable th:nth-child(1),
+#couponsTable td:nth-child(1) {
+    width: 20%; 
+}
+
+/* Cột 2: Giá trị */
+#couponsTable th:nth-child(2),
+#couponsTable td:nth-child(2) {
+    width: 15%; 
+}
+
+/* Cột 3: Lượt sử dụng */
+#couponsTable th:nth-child(3),
+#couponsTable td:nth-child(3) {
+    width: 20%;
+}
+
+/* Cột 4: Ngày hết hạn */
+#couponsTable th:nth-child(4),
+#couponsTable td:nth-child(4) {
+    width: auto; /* Chiếm không gian còn lại */
+}
+
+/* Cột 5: Trạng thái */
+#couponsTable th:nth-child(5),
+#couponsTable td:nth-child(5) {
+    width: 15%;
+}
+
+/* Cột 6: Hành động - Căn phải cho tiện thao tác */
+#couponsTable th:nth-child(6),
+#couponsTable td:nth-child(6) {
+    width: 15%; 
+    text-align: right;
+}

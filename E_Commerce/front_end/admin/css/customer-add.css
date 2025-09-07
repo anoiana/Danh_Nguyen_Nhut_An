@@ -1,0 +1,104 @@
+/* === FILE: css/customer-form.css (NỘI DUNG MỚI) === */
+
+/* --- Page Header --- */
+/* Style này đã có trong file customers.css nhưng thêm vào đây để trang này có thể hoạt động độc lập */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.page-header .page-title {
+    margin-bottom: 0;
+}
+
+
+/* --- Form Card Layout --- */
+#addCustomerForm .card {
+    max-width: 700px;
+    margin: 0 auto; /* Căn giữa card */
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 32px;
+}
+
+/* --- Form Elements Styling --- */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #343a40;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    height: 42px;
+    padding: 8px 12px;
+    font-size: 1rem;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.form-text-description {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* --- Form Actions Footer (KHU VỰC NÚT BẤM MỚI) --- */
+.form-actions-footer {
+    display: flex;
+    justify-content: flex-end; /* Đẩy các nút sang phải */
+    gap: 12px;
+    margin-top: 32px; /* Khoảng cách với trường nhập liệu cuối cùng */
+    padding-top: 24px;
+    border-top: 1px solid #f1f3f5; /* Thêm đường kẻ phân cách nhẹ */
+}
+
+/* --- General Button Styling --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #fff;
+    color: #495057;
+    border-color: #ced4da;
+}
+.btn-secondary:hover {
+    background-color: #f8f9fa;
+}

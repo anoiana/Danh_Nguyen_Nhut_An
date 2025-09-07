@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Khách Hàng - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/admin-modern.css">
+    <link rel="stylesheet" href="css/customers.css">
+</head>
+
+<body class="admin-layout">
+    <div id="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    <div id="toast-container"></div>
+    <div class="admin-main-content">
+        <main>
+            <div class="page-header">
+                <h1 class="page-title">Khách Hàng</h1>
+                <a href="customer-add.html" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Thêm Khách Hàng</span>
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="table-toolbar">
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="searchInput" class="form-control"
+                            placeholder="Tìm theo tên hoặc email...">
+                    </div>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>Khách Hàng</th>
+                                <th>Email</th>
+                                <th>Tổng chi tiêu</th>
+                                <th>Ngày tham gia</th>
+                                <!-- ▼▼▼ THÊM CỘT MỚI ▼▼▼ -->
+                                <th>Trạng thái</th>
+                                <!-- ▲▲▲ KẾT THÚC THÊM CỘT ▲▲▲ -->
+                                <th style="text-align: right;">Cập nhật thông tin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <!-- JS sẽ tải danh sách vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="js/main-admin.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/customers-list.js"></script>
+</body>
+
+</html>

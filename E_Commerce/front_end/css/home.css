@@ -1,0 +1,273 @@
+/* ========================================================= */
+/*                  NỘI DUNG MỚI CHO HOME.CSS                */
+/* ========================================================= */
+
+/* ========================================================= */
+/*                        HERO BANNER                        */
+/* ========================================================= */
+.hero {
+    background: url('https://images.unsplash.com/photo-1513884923967-4b182ef167ab?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+    height: 70vh;
+    min-height: 500px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    text-align: left; 
+    margin: 0;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 35px;
+    font-weight: 300;
+    max-width: 500px;
+}
+
+.hero-content .btn {
+    padding: 14px 35px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+/* ========================================================= */
+/*                      PRODUCT SECTION                      */
+/* ========================================================= */
+.product-section {
+    /* Giảm padding để các section gần nhau hơn */
+    /* 40px cho khoảng cách ở trên, 0 cho trái/phải, 60px cho khoảng cách ở dưới */
+    padding: 10px 0 10px 0;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.2rem;
+    margin-bottom: 50px; /* Giảm khoảng cách từ tiêu đề đến lưới sản phẩm */
+    position: relative;
+    font-weight: 600;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.2rem;
+    margin-bottom: 60px;
+    position: relative;
+    font-weight: 600;
+}
+
+.section-title::after {
+    content: '';
+    width: 80px;
+    height: 3px;
+    background: var(--primary-color);
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+/* DÁN THAY THẾ CHO PHẦN SLIDER CŨ TRONG FILE: css/home.css */
+
+/* ========================================================= */
+/*       PRODUCT SLIDER STYLING (SWIPERJS) - NÂNG CẤP        */
+/* ========================================================= */
+.product-slider-container {
+    position: relative;
+    /* Loại bỏ padding cũ để nút có thể nằm sát mép */
+}
+
+/* Các nút điều hướng < > */
+.swiper-button-next,
+.swiper-button-prev {
+    /* Kích thước */
+    width: 48px;
+    height: 48px;
+
+    /* Nền và màu sắc */
+    background-color: rgba(255, 255, 255, 0.9); /* Nền trắng mờ */
+    color: var(--dark-color); /* Màu mũi tên */
+    
+    /* Hình dạng và bóng đổ */
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    /* Hiệu ứng chuyển động */
+    transition: transform 0.2s ease, opacity 0.3s ease, background-color 0.2s ease;
+
+    /* Ẩn nút theo mặc định */
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+}
+
+/* Hiển thị nút khi người dùng di chuột vào khu vực slider */
+.product-slider-container:hover .swiper-button-next,
+.product-slider-container:hover .swiper-button-prev {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+/* Hiệu ứng khi di chuột vào từng nút */
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background-color: #fff;
+    transform: scale(1.1); /* Phóng to nhẹ */
+}
+
+/* Tùy chỉnh kích thước mũi tên bên trong */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Điều chỉnh vị trí của các nút */
+.swiper-button-prev {
+    left: 10px; /* Cách mép trái 10px */
+}
+.swiper-button-next {
+    right: 10px; /* Cách mép phải 10px */
+}
+
+/* Ẩn nút khi không thể trượt nữa */
+.swiper-button-disabled {
+    opacity: 0 !important; /* Dùng !important để ghi đè hiệu ứng hover */
+    visibility: hidden !important;
+    pointer-events: none;
+}
+
+/* Thanh phân trang (dấu chấm) - (tùy chọn, bạn có thể xóa nếu không dùng) */
+.swiper-pagination-bullet {
+    background-color: #ccc;
+    opacity: 1;
+}
+.swiper-pagination-bullet-active {
+    background-color: var(--primary-color);
+}
+.section-title {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 40px;
+}
+
+/* --- Section Giới thiệu (About Us) --- */
+.about-us {
+    padding: 80px 0;
+    background-color: #fff;
+}
+
+.about-content {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.about-image {
+    flex: 1;
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.about-text {
+    flex: 1;
+}
+
+.about-text .section-title {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* --- Section Liên hệ (Contact Info) --- */
+.contact-info {
+    padding: 80px 0;
+    background-color: #f8f9fa; /* Màu nền xám nhẹ để tách biệt */
+    text-align: center;
+}
+
+.contact-items {
+    display: flex;
+    justify-content: space-around;
+    gap: 30px;
+    flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+    margin-top: 50px;
+}
+
+.contact-item {
+    flex-basis: 300px; /* Chiều rộng cơ bản của mỗi item */
+}
+
+.contact-item i {
+    font-size: 2.5rem;
+    color: var(--primary-color); /* Sử dụng màu chính của trang */
+    margin-bottom: 20px;
+}
+
+.contact-item h3 {
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.contact-item p {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+
+/* --- Responsive cho các section mới --- */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 1.8rem;
+    }
+
+    .about-content {
+        flex-direction: column; /* Chuyển thành layout 1 cột trên mobile */
+    }
+
+    .about-text .section-title {
+        text-align: center;
+    }
+
+    .about-us, .contact-info {
+        padding: 60px 0;
+    }
+}

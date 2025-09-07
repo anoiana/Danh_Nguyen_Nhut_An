@@ -1,0 +1,153 @@
+/* NỘI DUNG MỚI VÀ HOÀN CHỈNH CHO: css/shared.css */
+
+/* --- PRODUCT GRID (DÙNG CHUNG) --- */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+/* --- PRODUCT CARD (DÙNG CHUNG) --- */
+.product-card {
+    background: #fff;
+    text-align: center;
+    position: relative;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+.product-card .image-container {
+    position: relative;
+    background-color: #f7f7f7;
+}
+.product-card .product-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1.2;
+    object-fit: cover;
+    display: block;
+}
+.product-card .badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    z-index: 2;
+}
+.product-card-content {
+    padding: 15px 10px;
+}
+.product-card-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    height: 38px;
+    overflow: hidden;
+    line-height: 1.25;
+}
+.product-card-content h3 a { color: var(--text-color); }
+.product-card-content h3 a:hover { color: var(--primary-color); }
+.product-card-content .rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    color: #666;
+}
+.product-card-content .rating .stars { color: #f5a623; font-size: 0.9rem; }
+.product-card-content .rating.no-reviews { color: #aaa; font-style: italic; font-size: 0.8rem; height: 18px; }
+.product-card-content .price { font-size: 1rem; font-weight: 500; }
+.product-card-content .price .new-price { color: var(--primary-color); font-weight: bold; }
+.product-card-content .price .old-price { text-decoration: line-through; color: #999; font-weight: 400; font-size: 0.85rem; margin-left: 6px; }
+
+/* ========================================================= */
+/*       CSS DÙNG CHUNG CHO TẤT CẢ PRODUCT SLIDER            */
+/* ========================================================= */
+/* TRONG FILE: css/shared.css */
+/* TÌM VÀ THAY THẾ TOÀN BỘ ĐOẠN NÀY */
+
+/* ========================================================= */
+/*       CSS DÙNG CHUNG CHO TẤT CẢ PRODUCT SLIDER            */
+/* ========================================================= */
+
+
+.product-slider-container {
+    position: relative;
+    padding: 0 5px; /* Thêm một chút padding để nút không quá sát */
+}
+
+/* Kích thước và style chung của nút */
+.swiper-button-next,
+.swiper-button-prev {
+    position: absolute;
+    top: 50%;
+    /* Dịch chuyển nút lên trên một nửa chiều cao của chính nó để căn giữa dọc */
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 10; /* Đảm bảo nút luôn nằm trên các slide */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-color);
+    transition: transform 0.2s ease, opacity 0.3s ease;
+
+    /* Ẩn nút theo mặc định */
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Hiển thị nút khi di chuột vào container */
+.product-slider-container:hover .swiper-button-next,
+.product-slider-container:hover .swiper-button-prev {
+    opacity: 1;
+    visibility: visible;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    transform: translateY(-50%) scale(1.1); /* Phóng to khi hover */
+}
+
+/* Vị trí cụ thể */
+.swiper-button-prev {
+    left: -15px; /* Đặt nút ra ngoài một chút về bên trái */
+}
+.swiper-button-next {
+    right: -15px; /* Đặt nút ra ngoài một chút về bên phải */
+}
+
+
+/* Tùy chỉnh icon mũi tên của Swiper */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Ẩn nút khi không thể trượt nữa */
+.swiper-button-disabled {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* Đảm bảo swiper không bị overflow hidden */
+.swiper {
+    overflow: visible;
+}

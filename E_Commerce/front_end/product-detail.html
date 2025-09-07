@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết sản phẩm</title>
+    <!-- CSS đã được tách riêng -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/product-detail.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+</head>
+
+<body class="has-fixed-header">
+    <!-- Header và Footer sẽ được JS chèn -->
+
+    <main>
+        <div class="container">
+            <!-- Khu vực chi tiết sản phẩm chính -->
+            <div id="product-detail-container" class="product-detail-grid">
+                <p id="loading-message">Đang tải chi tiết sản phẩm...</p>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--                  KHU VỰC MÔ TẢ SẢN PHẨM                  -->
+            <!-- ========================================================= -->
+            <section class="product-description-section">
+                <h2 class="section-title">Mô tả sản phẩm</h2>
+                <div id="product-long-description" class="description-content">
+                    <!-- JavaScript sẽ điền mô tả vào đây -->
+                </div>
+            </section>
+
+            <!-- ========================================================= -->
+            <!--                       KHU VỰC ĐÁNH GIÁ                     -->
+            <!-- ========================================================= -->
+            <div class="reviews-section">
+                <h2 class="section-title">Đánh giá sản phẩm</h2>
+
+                <!-- Phần thống kê -->
+                <div class="review-summary">
+                    <div class="summary-avg-rating">
+                        <div class="rating-score">
+                            <span id="avg-rating">0.0</span> trên 5
+                        </div>
+                        <div id="avg-stars" class="stars"></div>
+                    </div>
+                    <div class="summary-filters">
+                        <button class="filter-btn active" data-filter="all">Tất Cả</button>
+                        <button class="filter-btn" data-filter="5">5 Sao (<span data-count>0</span>)</button>
+                        <button class="filter-btn" data-filter="4">4 Sao (<span data-count>0</span>)</button>
+                        <button class="filter-btn" data-filter="3">3 Sao (<span data-count>0</span>)</button>
+                        <button class="filter-btn" data-filter="2">2 Sao (<span data-count>0</span>)</button>
+                        <button class="filter-btn" data-filter="1">1 Sao (<span data-count>0</span>)</button>
+                    </div>
+                </div>
+
+                <!-- Khu vực tương tác (thông báo và form) -->
+                <div id="review-interaction-area">
+                    <div id="review-status-message">
+                        <!-- JS sẽ điền thông báo vào đây -->
+                    </div>
+
+                    <!-- Form để viết/sửa đánh giá -->
+                    <div id="review-form-container" style="display: none;">
+                        <h4 id="review-form-title">Viết đánh giá của bạn</h4>
+                        <form id="review-form">
+                            <input type="hidden" id="review-id">
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5" /><label for="star5"
+                                    title="5 sao">★</label>
+                                <input type="radio" id="star4" name="rating" value="4" /><label for="star4"
+                                    title="4 sao">★</label>
+                                <input type="radio" id="star3" name="rating" value="3" /><label for="star3"
+                                    title="3 sao">★</label>
+                                <input type="radio" id="star2" name="rating" value="2" /><label for="star2"
+                                    title="2 sao">★</label>
+                                <input type="radio" id="star1" name="rating" value="1" /><label for="star1"
+                                    title="1 sao">★</label>
+                            </div>
+                            <textarea id="review-comment" placeholder="Hãy chia sẻ cảm nhận của bạn về sản phẩm..."
+                                required minlength="10"></textarea>
+                            <div class="form-actions">
+                                <button type="button" id="cancel-edit-review-btn" class="btn btn-secondary"
+                                    style="display: none;">Hủy</button>
+                                <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Danh sách các đánh giá đã có -->
+                <div id="reviews-list">
+                    <p>Đang tải đánh giá...</p>
+                </div>
+            </div>
+
+            <!-- Khu vực sản phẩm tương tự -->
+            <section id="related-products-section" class="product-section" style="display: none;">
+                <h2 class="section-title">Sản phẩm tương tự</h2>
+
+                <!-- Container chung cho cả slider và các nút -->
+                <div class="product-slider-container">
+
+                    <!-- Phần tử chính của Swiper -->
+                    <div class="swiper related-products-slider">
+                        <div class="swiper-wrapper" id="related-products-grid">
+                            <!-- JS sẽ điền các swiper-slide vào đây -->
+                        </div>
+                    </div>
+
+                    <!-- CÁC NÚT ĐIỀU HƯỚNG PHẢI NẰM Ở ĐÂY -->
+                    <!-- Ngang hàng với .related-products-slider, bên trong .product-slider-container -->
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Scripts phải theo đúng thứ tự -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/product-detail.js"></script>
+</body>
+
+</html>

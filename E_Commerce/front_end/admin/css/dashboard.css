@@ -1,0 +1,120 @@
+/* ========================================================= */
+/*       NỘI DUNG MỚI VÀ CHUYÊN NGHIỆP CHO DASHBOARD.CSS       */
+/* ========================================================= */
+
+/* Lưới thống kê */
+.stats-grid {
+    display: grid;
+    /* Tự động điều chỉnh số cột, mỗi cột tối thiểu 220px */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background-color: #fff;
+    padding: 20px 25px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+}
+
+.stat-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #777;
+    text-transform: uppercase;
+}
+
+.stat-card .stat-number {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+
+/* Lưới cho biểu đồ và hoạt động gần đây */
+.recent-activity-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Mặc định 1 cột */
+    gap: 20px;
+}
+
+/* 2 cột cho màn hình lớn hơn */
+@media (min-width: 992px) {
+    .recent-activity-grid {
+        grid-template-columns: 2fr 1fr; /* Biểu đồ chiếm 2/3, danh sách chiếm 1/3 */
+    }
+}
+
+.activity-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.activity-card h4 {
+    margin: 0 0 20px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Đảm bảo biểu đồ vừa vặn trong card */
+.chart-card {
+    display: flex;
+    flex-direction: column;
+}
+#revenueChart {
+    max-height: 350px;
+    flex-grow: 1;
+}
+
+
+/* Định dạng cho danh sách */
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-list li {
+    padding: 12px 5px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+.activity-list li:hover {
+    background-color: #f8f9fa;
+}
+
+.activity-list li:last-child {
+    border: none;
+}
+
+.activity-list li a {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.activity-list li span {
+    color: #777;
+}
+
+.activity-list li strong {
+    color: var(--dark-color);
+    white-space: nowrap;
+    padding-left: 10px;
+}

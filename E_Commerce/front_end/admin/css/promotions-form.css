@@ -1,0 +1,339 @@
+/* === FILE: css/promotion-form.css === */
+
+/* --- Ghi đè Layout chung để Header dính hoạt động tốt --- */
+.admin-main-content>main {
+    padding: 0;
+}
+
+/* --- Header dính của trang --- */
+.product-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 11.5px 30px;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.page-header-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.page-header-title-wrapper h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.back-link:hover {
+    background-color: #f1f3f5;
+}
+
+.form-actions-header {
+    display: flex;
+    gap: 12px;
+}
+
+/* --- Layout 2 cột --- */
+.product-form-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+    padding: 30px;
+}
+
+/* --- Card & Form chung --- */
+.form-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    margin-bottom: 30px;
+}
+
+.form-card:last-child {
+    margin-bottom: 0;
+}
+
+.form-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    /* Thêm dòng này để sửa lỗi tràn */
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* --- Component Product Transfer List --- */
+.product-transfer-list {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.product-list-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-list-box label {
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.product-count {
+    font-weight: 400;
+    color: #6c757d;
+}
+
+.search-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.search-wrapper .fa-search {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+}
+
+.product-search {
+    padding-left: 36px !important;
+}
+
+ul.product-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+}
+
+ul.product-list li {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    user-select: none;
+    /* Ngăn chọn text khi click đúp */
+}
+
+ul.product-list li:last-child {
+    border-bottom: none;
+}
+
+ul.product-list li:hover {
+    background-color: #e9ecef;
+}
+
+ul.product-list li.selected {
+    background-color: #e9f2ff;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.transfer-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.transfer-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.transfer-btn:hover {
+    background-color: #f1f3f5;
+    border-color: #adb5bd;
+}
+
+/* --- Switch Toggle --- */
+.switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: var(--primary-color);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* --- Các nút bấm --- */
+.btn {
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #fff;
+    color: #495057;
+    border-color: #ced4da;
+}
+
+.btn-secondary:hover {
+    background-color: #f8f9fa;
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+    .product-form-layout {
+        grid-template-columns: 1fr;
+        /* Chuyển thành 1 cột */
+    }
+}
+
+@media (max-width: 600px) {
+    .product-transfer-list {
+        flex-direction: column;
+    }
+
+    .transfer-buttons {
+        flex-direction: row;
+        margin: 16px 0;
+    }
+
+    .transfer-buttons .transfer-btn {
+        transform: rotate(90deg);
+    }
+}

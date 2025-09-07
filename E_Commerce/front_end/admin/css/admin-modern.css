@@ -1,0 +1,712 @@
+/* =========================================================
+   BIẾN TOÀN CỤC CHO GIAO DIỆN MỚI
+========================================================= */
+:root {
+    --primary-color: #4f46e5;
+    /* Màu tím hiện đại */
+    --primary-hover-color: #4338ca;
+    --secondary-color: #6b7280;
+    --danger-color: #ef4444;
+    --danger-hover-color: #dc2626;
+    --success-color: #22c55e;
+    --warning-color: #f59e0b;
+    --light-gray-color: #f3f4f6;
+    --border-color: #e5e7eb;
+    --text-color-dark: #111827;
+    --text-color-light: #6b7280;
+    --card-bg: #ffffff;
+    --body-bg: #f9fafb;
+
+    --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --border-radius: 8px;
+}
+
+/* =========================================================
+   THIẾT LẬP CƠ BẢN
+========================================================= */
+body {
+    font-family: var(--font-family-sans);
+    background-color: var(--body-bg);
+    color: var(--text-color-dark);
+}
+
+.admin-main-content main {
+    padding: 2rem;
+    /* Tăng padding */
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--text-color-dark);
+}
+
+/* =========================================================
+   NÂNG CẤP FORM
+========================================================= */
+.form-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.form-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color-dark);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--shadow-sm);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    /* Vòng sáng khi focus */
+}
+
+/* =========================================================
+   NÂNG CẤP KHU VỰC BIẾN THỂ (VARIANTS)
+========================================================= */
+.variant-group {
+    background-color: var(--light-gray-color);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.variant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.variant-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.size-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 0.75rem;
+    background-color: #fff;
+    padding: 0.75rem;
+    border-radius: 6px;
+}
+
+/* =========================================================
+   NÂNG CẤP NÚT BẤM (BUTTONS)
+========================================================= */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background-color: #58606b;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: var(--danger-hover-color);
+}
+
+.addSizeBtn {
+    background-color: var(--warning-color);
+    color: var(--text-color-dark);
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Nút xóa icon nhỏ */
+.btn-icon-danger {
+    background-color: transparent;
+    border: none;
+    color: var(--secondary-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-danger:hover {
+    background-color: #fee2e2;
+    color: var(--danger-color);
+}
+
+
+/* =========================================================
+   NÂNG CẤP BẢNG DỮ LIỆU
+========================================================= */
+.data-table {
+    border: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius);
+}
+
+.data-table th {
+    background-color: var(--light-gray-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    color: var(--text-color-light);
+}
+
+.data-table td {
+    vertical-align: middle;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.action-buttons button {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin-right: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+}
+
+.action-buttons .edit-btn {
+    color: var(--primary-color);
+}
+
+.action-buttons .edit-btn:hover {
+    background-color: #e0e7ff;
+}
+
+.action-buttons .delete-btn {
+    color: var(--danger-color);
+}
+
+.action-buttons .delete-btn:hover {
+    background-color: #fee2e2;
+}
+
+/* =========================================================
+   BỐ CỤC FORM SẢN PHẨM NÂNG CAO
+========================================================= */
+.product-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.product-form-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.form-actions-header {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.product-form-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.form-layout-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-layout-sidebar {
+    position: sticky;
+    top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .product-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .form-layout-sidebar {
+        position: static;
+    }
+}
+
+.form-text-description {
+    font-size: 0.9rem;
+    color: var(--text-color-light);
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 1.5rem 0;
+}
+
+
+/* =========================================================
+   CẢI TIẾN TRÌNH TẢI ẢNH (IMAGE UPLOADER) - PHIÊN BẢN NÂNG CẤP
+========================================================= */
+
+
+/* .image-uploader-container:hover {
+    border-color: var(--primary-color);
+    background-color: #f0f2ff;
+} */
+
+/* Kích thước khác nhau cho ảnh chính và ảnh biến thể */
+.image-uploader-container.main-uploader {
+    min-height: 220px;
+}
+
+.image-uploader-container.variant-uploader {
+    min-height: 160px;
+}
+
+/* Ẩn input file gốc */
+/* .image-input-hidden {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+} */
+
+/* Ảnh xem trước */
+#main-image-preview,
+.variant-image-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Luôn hiển thị trọn vẹn ảnh */
+    z-index: 5;
+    padding: 0;
+    border: none;
+}
+
+/* Placeholder khi chưa có ảnh */
+.dropzone-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-color-light);
+    text-align: center;
+    padding: 1rem;
+}
+
+.dropzone-placeholder i {
+    font-size: 2rem;
+    color: #9ca3af;
+}
+
+.dropzone-placeholder span {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Nút xóa ảnh trong uploader */
+.btn-remove-image {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 15;
+    transition: background-color 0.2s;
+}
+
+.btn-remove-image:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+
+/* Điều chỉnh lại nút thêm biến thể */
+#addVariantBtn {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    font-weight: 500;
+}
+
+#addVariantBtn:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    transform: none;
+    box-shadow: none;
+}
+
+.page-header-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--text-color-light);
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+.back-link:hover {
+    background-color: var(--light-gray-color);
+    color: var(--text-color-dark);
+}
+
+/* =========================================================
+   TOOLBAR VÀ Ô TÌM KIẾM CHO BẢNG
+========================================================= */
+.table-toolbar {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.search-wrapper {
+    position: relative;
+    max-width: 400px;
+    /* Giới hạn độ rộng của ô tìm kiếm */
+}
+
+.search-wrapper i.fa-search {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color-light);
+    pointer-events: none;
+    /* Icon không bắt sự kiện click */
+}
+
+#searchInput {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    /* Tăng padding trái để chừa chỗ cho icon */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    /* Bo góc tròn hơn */
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+/* =========================================================
+   NÂNG CẤP HEADER CỦA TRANG (PAGE HEADER)
+========================================================= */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    /* Đẩy tiêu đề và nút ra 2 phía */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+    margin-bottom: 2rem;
+    /* Tăng khoảng cách với nội dung bên dưới */
+    flex-wrap: wrap;
+    /* Cho phép xuống dòng trên màn hình siêu nhỏ */
+    gap: 1rem;
+    /* Khoảng cách nếu bị xuống dòng */
+}
+
+.page-header .page-title {
+    margin-bottom: 0;
+    /* Xóa margin-bottom mặc định của tiêu đề */
+}
+
+/* =========================================================
+   TINH CHỈNH LẠI NÚT PRIMARY (THÊM SẢN PHẨM MỚI)
+========================================================= */
+.page-header .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    /* Khoảng cách giữa icon và chữ */
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.8rem 1.5rem;
+    /* Tăng padding cho nút to và đẹp hơn */
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05), 0 1px 3px 1px rgb(0 0 0 / 0.1);
+    /* Thêm đổ bóng nhẹ */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Hiệu ứng chuyển động mượt mà */
+}
+
+.page-header .btn-primary:hover {
+    transform: translateY(-3px);
+    /* Hiệu ứng nhấc lên khi hover */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    /* Đổ bóng đậm hơn */
+}
+
+.page-header .btn-primary i {
+    font-size: 1rem;
+    /* Kích thước icon */
+}
+
+/* =========================================================
+   TỰ ĐỘNG THU GỌN NÚT TRÊN MÀN HÌNH NHỎ (RESPONSIVE)
+========================================================= */
+@media (max-width: 768px) {
+    .page-header .btn-primary span {
+        display: none;
+        /* Ẩn chữ "Thêm Sản Phẩm Mới" */
+    }
+
+    .page-header .btn-primary {
+        width: 44px;
+        /* Tạo thành nút hình vuông/tròn */
+        height: 44px;
+        padding: 0;
+        /* Reset padding */
+        justify-content: center;
+        /* Căn icon vào giữa */
+        border-radius: 50%;
+        /* Biến thành hình tròn cho đẹp */
+    }
+
+    .page-header .btn-primary i {
+        margin: 0;
+        /* Reset margin cho icon */
+    }
+}
+
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+
+    /* ▼▼▼ THÊM 2 DÒNG NÀY ĐỂ CĂN GIỮA CHÍNH XÁC ▼▼▼ */
+    padding-left: var(--sidebar-width);
+    /* Đẩy nội dung vào một khoảng bằng chiều rộng sidebar */
+    box-sizing: border-box;
+    /* Đảm bảo padding không làm tăng tổng chiều rộng */
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--light-gray-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   HỆ THỐNG THÔNG BÁO TOAST
+========================================================= */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 320px;
+}
+
+.toast {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: slideInFromRight 0.4s ease forwards;
+    opacity: 0;
+}
+
+.toast.fade-out {
+    animation: slideOutToRight 0.5s ease forwards;
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+}
+
+.toast.success {
+    border-left-color: var(--success-color);
+}
+
+.toast.success .toast-icon {
+    color: var(--success-color);
+}
+
+.toast.error {
+    border-left-color: var(--danger-color);
+}
+
+.toast.error .toast-icon {
+    color: var(--danger-color);
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(110%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(110%);
+        opacity: 0;
+    }
+}
+/* Thêm style cho nút View mới */
+.action-buttons .view-btn {
+    color: var(--secondary-color); /* Màu xám */
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+}
+.action-buttons .view-btn:hover {
+    background-color: #f1f5f9; /* Màu nền xám rất nhạt khi hover */
+    color: var(--text-color-dark);
+}
+.image-gallery-container {
+    position: relative; 
+}

@@ -1,0 +1,110 @@
+/* Tổng thể trang */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Khung chứa thẻ xác thực */
+.auth-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Tiêu đề */
+.auth-container h2 {
+    margin-bottom: 25px;
+    color: #1a2b4d;
+}
+
+/* Form */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Các ô nhập liệu */
+.auth-form input {
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* Nút bấm */
+.auth-form button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.auth-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Khu vực hiển thị thông báo */
+.message {
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 20px; /* Giữ không gian cố định */
+}
+
+.message.success {
+    color: #28a745;
+}
+
+.message.error {
+    color: #dc3545;
+}
+
+/* Các link điều hướng */
+.auth-links {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.auth-links a {
+    color: #007bff;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+/* Trang Home */
+.home-container {
+    text-align: left;
+}
+
+#user-info {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}

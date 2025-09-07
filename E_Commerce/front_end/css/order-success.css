@@ -1,0 +1,81 @@
+/* NỘI DUNG CHO FILE: css/order-success.css */
+
+.success-container {
+    max-width: 700px;
+    margin: 80px auto;
+    text-align: center;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.success-icon {
+    color: #28a745; /* Màu xanh lá cây */
+    margin-bottom: 20px;
+}
+
+.success-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0 0 15px 0;
+}
+
+.success-message {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.order-summary-box {
+    background-color: var(--light-color);
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 25px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.order-summary-box h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.order-summary-box p {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+.order-summary-box p strong {
+    color: var(--dark-color);
+}
+.order-summary-box p span {
+    color: #555;
+}
+
+.next-steps-info {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 40px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    padding: 12px 30px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}

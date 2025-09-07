@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán - MyShop</title>
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+    <!-- Header sẽ được JS tự động chèn vào đây -->
+    <main class="checkout-main">
+        <div class="checkout-layout">
+            
+            <!-- ========================================================= -->
+            <!--       CỘT TRÁI: THÔNG TIN NHẬN HÀNG VÀ THANH TOÁN        -->
+            <!-- ========================================================= -->
+            <div class="customer-info">
+                <div class="logo-checkout">MyShop</div>
+                <form id="checkout-form">
+                    <div class="form-section">
+                        <h2 class="section-title">Thông tin nhận hàng</h2>
+                        <div class="form-group">
+                            <input type="email" id="email" placeholder="Email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="fullName" placeholder="Họ và tên" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="phone" placeholder="Số điện thoại" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="address" placeholder="Địa chỉ (Số nhà, tên đường)" required>
+                        </div>
+                        <div class="form-group">
+                            <select id="province" required><option value="">Tỉnh / Thành phố</option></select>
+                        </div>
+                        <div class="form-group">
+                            <select id="district" required><option value="">Quận / Huyện</option></select>
+                        </div>
+                        <div class="form-group">
+                            <select id="ward" required><option value="">Phường / Xã</option></select>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="note" placeholder="Ghi chú (tùy chọn)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2 class="section-title">Vận chuyển</h2>
+                        <div id="shipping-method-container">
+                            <div class="shipping-placeholder">
+                                Vui lòng nhập thông tin giao hàng
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2 class="section-title">Thanh toán</h2>
+                        <div class="payment-method">
+                            <input type="radio" id="cod" name="payment" value="cod" checked>
+                            <label for="cod">Thanh toán khi giao hàng (COD)</label>
+                        </div>
+                        <div class="payment-method">
+                            <input type="radio" id="vnpay" name="payment" value="vnpay">
+                            <label for="vnpay">Thanh toán qua VNPAY-QR</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--                CỘT PHẢI: TÓM TẮT ĐƠN HÀNG                -->
+            <!-- ========================================================= -->
+            <div class="order-summary">
+                <h2 class="section-title">Đơn hàng (<span id="total-items-count">0</span> sản phẩm)</h2>
+                <div id="summary-items-container">
+                    <!-- JS sẽ điền sản phẩm vào đây -->
+                </div>
+                
+                <div class="promo-code">
+                    <input type="text" id="promo-code-input" placeholder="Nhập mã giảm giá">
+                    <button type="button" id="apply-promo-btn">Áp dụng</button>
+                </div>
+                <!-- Vùng hiển thị thông báo áp dụng mã -->
+                <p id="promo-message" class="message" style="min-height: 20px; text-align: left;"></p>
+
+                <div class="summary-calculation">
+                    <div class="calc-row">
+                        <span>Tạm tính</span>
+                        <span id="summary-subtotal">0đ</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Phí vận chuyển</span>
+                        <span id="summary-shipping">--</span>
+                    </div>
+                    <!-- Dòng này sẽ được JS hiển thị khi có giảm giá -->
+                    <div class="calc-row discount-row" style="display: none;">
+                        <span>Giảm giá (<span id="discount-code-text"></span>)</span>
+                        <span id="summary-discount">0đ</span>
+                    </div>
+                </div>
+
+                <div class="summary-total">
+                    <span>Tổng cộng</span>
+                    <span class="total-price" id="summary-total">0đ</span>
+                </div>
+                
+                <div class="summary-actions">
+                    <a href="cart.html" class="back-link">&lt; Quay về giỏ hàng</a>
+                    <button type="submit" form="checkout-form" class="btn-place-order">ĐẶT HÀNG</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/checkout.js"></script>
+</body>
+</html>

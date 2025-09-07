@@ -1,0 +1,415 @@
+.account-layout {
+    display: flex;
+    gap: 30px;
+    padding: 40px 0;
+    align-items: flex-start;
+}
+
+.account-sidebar {
+    flex: 0 0 250px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    position: sticky;
+    top: 100px;
+}
+
+.user-avatar {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.user-avatar img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #eee;
+}
+
+.user-avatar h4 {
+    margin: 10px 0 0 0;
+}
+
+.account-nav ul {
+    list-style: none;
+    padding: 10px 0;
+}
+
+.account-nav .nav-link {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.account-nav .nav-link:hover {
+    background-color: #f8f9fa;
+    color: var(--primary-color);
+}
+
+.account-nav .nav-link.active {
+    background-color: #e9f2ff;
+    color: var(--primary-color);
+    font-weight: 500;
+    border-left-color: var(--primary-color);
+}
+
+.account-content {
+    flex-grow: 1;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 30px;
+    min-height: 500px;
+}
+
+.content-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.content-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.content-header p {
+    margin: 5px 0 0 0;
+    color: #777;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-group input:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* Styles from my-orders.css (đã gộp vào đây) */
+.order-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.order-card-header {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+.order-card-body {
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+}
+
+.order-card.open .order-card-body {
+    max-height: 1000px;
+    padding: 25px 20px;
+}
+
+.order-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.order-item-link:hover {
+    background-color: #fafafa;
+}
+
+/* ... (các style khác của my-orders.css có thể gộp vào đây) ... */
+.my-orders-page {
+    padding: 40px 0;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.my-orders-page h1 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.order-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.order-card-header {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.order-card-header:hover {
+    background-color: #f1f1f1;
+}
+
+.order-info {
+    font-size: 0.9rem;
+}
+
+.order-info strong {
+    color: var(--dark-color);
+}
+
+.order-info span {
+    color: #555;
+}
+
+/* ========================================================= */
+/*            CSS MỚI CHO PHẦN CHI TIẾT ĐƠN HÀNG             */
+/* ========================================================= */
+.order-card-body {
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+}
+
+.order-card.open .order-card-body {
+    max-height: 1000px;
+    /* Chiều cao đủ lớn */
+    padding: 25px 20px;
+}
+
+.order-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+}
+
+@media (min-width: 768px) {
+    .order-detail-layout {
+        grid-template-columns: 3fr 2fr;
+    }
+}
+
+.order-detail-section h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    color: var(--dark-color);
+}
+
+/* Cột sản phẩm (trái) */
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-item:last-child {
+    border: none;
+    margin-bottom: 0;
+}
+
+.order-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.item-info {
+    flex-grow: 1;
+    line-height: 1.5;
+}
+
+.item-name {
+    font-weight: 500;
+}
+
+.item-variant {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.item-price-qty {
+    font-size: 0.95rem;
+    color: #555;
+    white-space: nowrap;
+}
+
+.order-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.order-item-link:hover {
+    background-color: #fafafa;
+}
+
+/* Cột thông tin (phải) */
+.customer-details p {
+    margin: 0 0 12px 0;
+    font-size: 0.95rem;
+    display: flex;
+}
+
+.customer-details strong {
+    color: #888;
+    display: inline-block;
+    min-width: 70px;
+}
+
+.customer-details span {
+    color: var(--dark-color);
+    font-weight: 500;
+}
+
+.order-summary-details {
+    margin-top: 30px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.95rem;
+}
+
+.summary-row.total {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--dark-color);
+    border-top: 1px solid #ccc;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.summary-row .discount {
+    color: #dc3545;
+}
+
+/* Thêm vào cuối file css/account.css */
+
+/* --- THANH TAB LỌC TRẠNG THÁI ĐƠN HÀNG --- */
+.order-status-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 25px;
+}
+
+.tab-link {
+    padding: 12px 20px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #555;
+    position: relative;
+    border-bottom: 3px solid transparent;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.tab-link:hover {
+    color: var(--primary-color);
+}
+
+.tab-link.active {
+    color: var(--primary-color);
+    font-weight: 500;
+    border-bottom-color: var(--primary-color);
+}
+
+/* Thêm vào cuối file css/account.css */
+.profile-avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+#profile-avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #eee;
+}
+
+.avatar-actions p {
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 10px;
+}
+
+/* Thêm vào cuối file css/account.css */
+
+.order-card-footer {
+    /* ... các style cũ ... */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cancel-order-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 4px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-order-btn:hover {
+    background-color: #f1b0b7;
+    border-color: #ed969e;
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách Khuyến mãi - Admin</title>
+
+    <!-- Font và Icon -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/admin-modern.css">
+    <link rel="stylesheet" href="css/promotions.css">
+</head>
+<body class="admin-layout">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" style="display: none;"><div class="spinner"></div></div>
+
+    <!-- Sidebar -->
+    <div class="admin-main-content">
+        <main>
+            <div class="page-header">
+                <h1 class="page-title">Chương trình Khuyến mãi</h1>
+                <a href="promotion-edit.html" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Tạo Khuyến mãi</span>
+                </a>
+            </div>
+
+            <div class="form-card">
+                <div class="table-toolbar">
+                     <div class="search-wrapper">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Tìm theo tên chương trình...">
+                    </div>
+                </div>
+                
+                <table class="data-table" id="promotionsTable">
+                    <thead>
+                        <tr>
+                            <th>Tên chương trình</th>
+                            <th>% Giảm</th>
+                            <th>Thời gian hiệu lực</th>
+                            <th>Trạng thái</th>
+                            <th style="text-align: right;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promotionsTableBody">
+                        <!-- JS sẽ điền dữ liệu vào đây -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+
+    <script src="../js/config.js"></script>
+
+    <!-- 2. Tải các file tiện ích, dùng chung. File chứa showLoader() phải ở đây -->
+    <script src="js/main-admin.js"></script>
+    <script src="js/toast.js"></script>
+    
+    <!-- 3. Tải file logic cụ thể của trang này CUỐI CÙNG -->
+    <script src="js/promotions-list.js"></script>
+</body>
+</html>

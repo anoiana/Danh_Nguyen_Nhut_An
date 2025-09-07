@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt hàng thành công - MyShop</title>
+    <!-- CSS dùng chung -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <!-- CSS riêng cho trang này -->
+    <link rel="stylesheet" href="css/order-success.css">
+</head>
+<body class="has-fixed-header">
+    
+    <!-- Header sẽ được JS tự động chèn vào -->
+
+    <main>
+        <div class="container">
+            <div class="success-container">
+                
+                <div class="success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+
+                <h1 class="success-title">Đặt hàng thành công!</h1>
+                
+                <p class="success-message">
+                    Cảm ơn bạn đã mua hàng tại MyShop. Đơn hàng của bạn đã được ghi nhận.
+                </p>
+                
+                <div class="order-summary-box">
+                    <h3>Thông tin đơn hàng</h3>
+                    <p><strong>Mã đơn hàng:</strong> <span id="order-id">Đang tải...</span></p>
+                    <p><strong>Ngày đặt hàng:</strong> <span id="order-date">Đang tải...</span></p>
+                    <p><strong>Tổng tiền:</strong> <span id="order-total">Đang tải...</span></p>
+                    <p><strong>Phương thức thanh toán:</strong> <span id="order-payment">Đang tải...</span></p>
+                </div>
+                
+                <p class="next-steps-info">
+                    Chúng tôi sẽ liên hệ với bạn để xác nhận đơn hàng trong thời gian sớm nhất.
+                    Bạn có thể theo dõi trạng thái đơn hàng trong trang <a href="account.html#orders">Tài khoản của tôi</a>.
+                </p>
+
+                <div class="action-buttons">
+                    <a href="home.html" class="btn btn-primary">Tiếp tục mua sắm</a>
+                    <a href="account.html#orders" class="btn btn-secondary">Xem lịch sử đơn hàng</a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer sẽ được JS tự động chèn vào đây -->
+    
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/order-success.js"></script>
+</body>
+</html>

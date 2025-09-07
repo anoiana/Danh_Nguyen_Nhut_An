@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css"> <!-- CSS cho Header -->
+    <link rel="stylesheet" href="css/shared.css"> <!-- CSS cho Product Card -->
+    <link rel="stylesheet" href="css/products.css"> <!-- CSS riêng của trang sản phẩm -->
+</head>
+
+<body class="has-fixed-header">
+    <!-- Header và Footer sẽ được JS chèn vào -->
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1 id="category-title">Đang tải...</h1>
+            </div>
+
+            <div id="product-list-grid" class="product-grid">
+                <p>Đang tải danh sách sản phẩm...</p>
+            </div>
+
+            <!-- THÊM KHU VỰC NÀY VÀO -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="pagination-container">
+                    <!-- JS sẽ tạo các nút phân trang ở đây -->
+                </ul>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/products.js"></script> <!-- JS riêng cho trang này -->
+</body>
+
+</html>

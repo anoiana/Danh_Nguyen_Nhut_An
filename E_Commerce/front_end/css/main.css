@@ -1,0 +1,132 @@
+/* ========================================================= */
+/*                   NỘI DUNG MỚI CHO MAIN.CSS               */
+/* ========================================================= */
+
+/* --- BIẾN VÀ RESET CƠ BẢN --- */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --dark-color: #212529;
+    --light-color: #f8f9fa;
+    --text-color: #343a40;
+    --header-height: 70px;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin: 0;
+    background-color: #fff;
+    /* Bỏ padding-top, sẽ xử lý riêng ở các trang cần thiết */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* --- CÁC NÚT BẤM (BUTTONS) DÙNG CHUNG --- */
+.btn {
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-secondary {
+    background: #f1f1f1;
+    color: var(--dark-color);
+    border-color: #ddd;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+/* --- FOOTER --- */
+.main-footer {
+    background: var(--dark-color);
+    color: #a0a0a0;
+    padding: 40px 0 20px 0;
+    margin-top: 50px;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 250px;
+}
+
+.footer-section h3 {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.footer-section .logo-text span {
+    color: var(--primary-color);
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+}
+
+.footer-section ul li a {
+    color: #a0a0a0;
+    transition: color 0.3s ease;
+}
+.footer-section ul li a:hover {
+    color: #fff;
+}
+
+.footer-section .text-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    background: #555;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #555;
+    font-size: 0.9rem;
+}
