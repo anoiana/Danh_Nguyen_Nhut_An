@@ -49,13 +49,11 @@ public class GameController {
     @Autowired
     private ReadingContentCacheRepository cacheRepository;
 
-
     @Autowired
     private ListeningGenerationService listeningGenerationService;
 
     @Autowired
     private ListeningContentCacheRepository listeningCacheRepository;
-
 
     @PostMapping("/generate-listening")
     @Transactional
@@ -64,17 +62,21 @@ public class GameController {
 
         // 1. Kiểm tra cache dựa trên cả gameSubType
         Optional<ListeningContentCache> cachedContentOpt = listeningCacheRepository
-                .findByFolderIdAndLevelAndTopicAndGameSubType(request.folderId(), request.level(), request.topic(), request.gameSubType());
+                .findByFolderIdAndLevelAndTopicAndGameSubType(request.folderId(), request.level(), request.topic(),
+                        request.gameSubType());
 
         if (cachedContentOpt.isPresent()) {
-            System.out.println("Listening content found in cache for folderId: " + request.folderId() + ", type: " + request.gameSubType());
+            System.out.println("Listening content found in cache for folderId: " + request.folderId() + ", type: "
+                    + request.gameSubType());
             try {
                 ListeningContentCache cached = cachedContentOpt.get();
                 JsonNode mcqNode = cached.getMcqJson() != null ? mapper.readTree(cached.getMcqJson()) : null;
                 JsonNode fitbNode = cached.getFitbJson() != null ? mapper.readTree(cached.getFitbJson()) : null;
-                return ResponseEntity.ok(new GameDTO.ListeningResponseDTO(cached.getPlainTranscript(), mcqNode, fitbNode));
+                return ResponseEntity
+                        .ok(new GameDTO.ListeningResponseDTO(cached.getPlainTranscript(), mcqNode, fitbNode));
             } catch (Exception e) {
-                System.err.println("Error parsing cached listening JSON: " + e.getMessage() + ". Will generate new content.");
+                System.err.println(
+                        "Error parsing cached listening JSON: " + e.getMessage() + ". Will generate new content.");
             }
         }
 
@@ -86,12 +88,12 @@ public class GameController {
         List<String> vocabWords = vocabularies.stream().map(Vocabulary::getWord).collect(Collectors.toList());
 
         try {
-            System.out.println("Generating new listening content for topic: " + request.topic() + ", type: " + request.gameSubType());
+            System.out.println("Generating new listening content for topic: " + request.topic() + ", type: "
+                    + request.gameSubType());
 
             // Truyền gameSubType vào service để nó chọn đúng prompt
             GameDTO.ListeningContentDTO generatedContent = listeningGenerationService.generateListeningTask(
-                    vocabWords, request.level(), request.topic(), request.gameSubType()
-            );
+                    vocabWords, request.level(), request.topic(), request.gameSubType());
 
             // 3. Lưu vào cache
             ListeningContentCache newCacheEntry = new ListeningContentCache();
@@ -113,8 +115,7 @@ public class GameController {
 
             // 4. Trả về response cho client
             return ResponseEntity.ok(new GameDTO.ListeningResponseDTO(
-                    generatedContent.transcript(), generatedContent.mcq(), generatedContent.fitb()
-            ));
+                    generatedContent.transcript(), generatedContent.mcq(), generatedContent.fitb()));
 
         } catch (IllegalArgumentException e) {
             // Bắt lỗi nếu gameSubType không hợp lệ
@@ -127,18 +128,20 @@ public class GameController {
         }
     }
 
-
     @PostMapping("/generate-reading")
     @Transactional
     public ResponseEntity<?> generateReading(@RequestBody GameDTO.ReadingRequestDTO request) {
         final ObjectMapper mapper = new ObjectMapper();
-        Optional<ReadingContentCache> cachedContentOpt = cacheRepository.findByFolderIdAndLevelAndTopic(request.folderId(), request.level(), request.topic());
+        Optional<ReadingContentCache> cachedContentOpt = cacheRepository
+                .findByFolderIdAndLevelAndTopic(request.folderId(), request.level(), request.topic());
         if (cachedContentOpt.isPresent()) {
-            System.out.println("Reading content found in cache for folderId: " + request.folderId() + ", level: " + request.level() + ", topic: " + request.topic());
+            System.out.println("Reading content found in cache for folderId: " + request.folderId() + ", level: "
+                    + request.level() + ", topic: " + request.topic());
             try {
                 String cachedJson = cachedContentOpt.get().getQuestionsJson();
                 JsonNode questionsNode = mapper.readTree(cachedJson);
-                return ResponseEntity.ok(new GameDTO.ReadingResponseDTO(cachedContentOpt.get().getStory(), questionsNode));
+                return ResponseEntity
+                        .ok(new GameDTO.ReadingResponseDTO(cachedContentOpt.get().getStory(), questionsNode));
             } catch (Exception e) {
                 System.err.println("Error parsing cached JSON: " + e.getMessage() + ". Will generate new content.");
             }
@@ -149,9 +152,10 @@ public class GameController {
         }
         List<String> vocabWords = vocabularies.stream().map(Vocabulary::getWord).collect(Collectors.toList());
         try {
-            System.out.println("Generating new reading content with Groq for topic: " + request.topic());
-            ReadingGenerationService.ReadingContent generatedContent = readingGenerationService.generateReadingPassage(vocabWords, request.level(), request.topic());
-            System.out.println("Groq succeeded.");
+            System.out.println("Generating new reading content with Gemini for topic: " + request.topic());
+            ReadingGenerationService.ReadingContent generatedContent = readingGenerationService
+                    .generateReadingPassage(vocabWords, request.level(), request.topic());
+            System.out.println("Gemini succeeded.");
             String questionsAsJsonString = mapper.writeValueAsString(generatedContent.questions());
             ReadingContentCache newCacheEntry = new ReadingContentCache();
             newCacheEntry.setFolderId(request.folderId());
@@ -163,7 +167,7 @@ public class GameController {
             JsonNode questionsNode = mapper.readTree(questionsAsJsonString);
             return ResponseEntity.ok(new GameDTO.ReadingResponseDTO(generatedContent.story(), questionsNode));
         } catch (Exception e) {
-            System.err.println("Groq API failed or JSON processing failed: " + e.getMessage());
+            System.err.println("Gemini API failed or JSON processing failed: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Dịch vụ AI hiện đang gặp sự cố. Vui lòng thử lại sau.");
         }
@@ -179,7 +183,8 @@ public class GameController {
             return ResponseEntity.badRequest().body("Cần ít nhất 4 từ vựng trong thư mục để chơi trắc nghiệm.");
         }
         String fullGameType = request.gameType() + (request.subType() != null ? "_" + request.subType() : "");
-        GameResult gameResult = gameResultRepository.findByUserIdAndFolderIdAndGameType(request.userId(), request.folderId(), fullGameType)
+        GameResult gameResult = gameResultRepository
+                .findByUserIdAndFolderIdAndGameType(request.userId(), request.folderId(), fullGameType)
                 .orElse(new GameResult());
         gameResult.setUserId(request.userId());
         gameResult.setFolderId(request.folderId());
@@ -190,9 +195,11 @@ public class GameController {
         GameResult savedGameResult = gameResultRepository.save(gameResult);
         if ("quiz".equals(request.gameType())) {
             if ("vi_en".equals(request.subType())) {
-                return ResponseEntity.ok(new GameDTO.ReverseQuizSessionDTO(savedGameResult.getId(), createReverseQuizQuestions(vocabularies)));
+                return ResponseEntity.ok(new GameDTO.ReverseQuizSessionDTO(savedGameResult.getId(),
+                        createReverseQuizQuestions(vocabularies)));
             } else {
-                return ResponseEntity.ok(new GameDTO.QuizSessionDTO(savedGameResult.getId(), createQuizQuestions(vocabularies)));
+                return ResponseEntity
+                        .ok(new GameDTO.QuizSessionDTO(savedGameResult.getId(), createQuizQuestions(vocabularies)));
             }
         } else {
             List<GameDTO.VocabularyDetailDTO> vocabDTOs = vocabularies.stream()
@@ -205,12 +212,14 @@ public class GameController {
 
     @PostMapping("/retry-wrong")
     @Transactional
-    public ResponseEntity<?> retryWrongAnswers(@RequestBody VocabularyDTO.GameRetryRequestDTO request) throws Exception {
+    public ResponseEntity<?> retryWrongAnswers(@RequestBody VocabularyDTO.GameRetryRequestDTO request)
+            throws Exception {
         GameResult previousResult = gameResultRepository.findById(request.gameResultId())
                 .orElseThrow(() -> new RuntimeException("GameResult not found with id: " + request.gameResultId()));
 
         ObjectMapper mapper = new ObjectMapper();
-        List<Long> wrongVocabIds = mapper.readValue(previousResult.getWrongAnswers(), new TypeReference<>() {});
+        List<Long> wrongVocabIds = mapper.readValue(previousResult.getWrongAnswers(), new TypeReference<>() {
+        });
         if (wrongVocabIds.isEmpty()) {
             return ResponseEntity.badRequest().body("Không có từ nào sai để ôn tập lại.");
         }
@@ -229,9 +238,11 @@ public class GameController {
         GameResult savedRetryResult = createNewRetryGameResult(previousResult);
         if ("quiz".equals(originalGameType)) {
             if (baseGameType.endsWith("vi_en")) {
-                return ResponseEntity.ok(new GameDTO.ReverseQuizSessionDTO(savedRetryResult.getId(), createReverseQuizQuestions(wrongVocabularies)));
+                return ResponseEntity.ok(new GameDTO.ReverseQuizSessionDTO(savedRetryResult.getId(),
+                        createReverseQuizQuestions(wrongVocabularies)));
             }
-            return ResponseEntity.ok(new GameDTO.QuizSessionDTO(savedRetryResult.getId(), createQuizQuestions(wrongVocabularies)));
+            return ResponseEntity
+                    .ok(new GameDTO.QuizSessionDTO(savedRetryResult.getId(), createQuizQuestions(wrongVocabularies)));
         } else {
             List<GameDTO.VocabularyDetailDTO> vocabDTOs = wrongVocabularies.stream()
                     .map(this::convertToDetailDTO)
@@ -250,10 +261,12 @@ public class GameController {
         String userAnswer = request.userAnswer();
 
         if (!userAnswer.toLowerCase().contains(correctWord)) {
-            return ResponseEntity.ok(new GameDTO.SentenceCheckResponseDTO(false, "Câu của bạn phải chứa từ khóa '" + vocab.getWord() + "'."));
+            return ResponseEntity.ok(new GameDTO.SentenceCheckResponseDTO(false,
+                    "Câu của bạn phải chứa từ khóa '" + vocab.getWord() + "'."));
         }
         if (!grammarService.isACompleteSentence(userAnswer)) {
-            return ResponseEntity.ok(new GameDTO.SentenceCheckResponseDTO(false, "Đây dường như không phải là một câu hoàn chỉnh. Một câu cần có động từ."));
+            return ResponseEntity.ok(new GameDTO.SentenceCheckResponseDTO(false,
+                    "Đây dường như không phải là một câu hoàn chỉnh. Một câu cần có động từ."));
         }
         List<String> grammarErrors = grammarService.getGrammarMistakes(userAnswer);
         if (!grammarErrors.isEmpty()) {
@@ -271,8 +284,7 @@ public class GameController {
                 vocab.getAudioUrl(),
                 vocab.getUserDefinedMeaning(),
                 vocab.getUserImageBase64(),
-                vocab.getMeanings()
-        );
+                vocab.getMeanings());
     }
 
     private String getOriginalGameType(String fullGameType) {
@@ -315,7 +327,8 @@ public class GameController {
                 options.add(wrongMeanings.get(i));
             }
             Collections.shuffle(options);
-            String partOfSpeech = correctVocab.getMeanings().isEmpty() ? "" : correctVocab.getMeanings().get(0).getPartOfSpeech();
+            String partOfSpeech = correctVocab.getMeanings().isEmpty() ? ""
+                    : correctVocab.getMeanings().get(0).getPartOfSpeech();
             return new GameDTO.QuizQuestionDTO(
                     correctVocab.getId(),
                     correctVocab.getWord(),
@@ -323,8 +336,7 @@ public class GameController {
                     partOfSpeech,
                     options,
                     correctVocab.getUserDefinedMeaning(),
-                    correctVocab.getUserImageBase64()
-            );
+                    correctVocab.getUserImageBase64());
         }).collect(Collectors.toList());
     }
 
@@ -348,7 +360,8 @@ public class GameController {
                         options.add(wrongWords.get(i));
                     }
                     Collections.shuffle(options);
-                    String partOfSpeech = correctVocab.getMeanings().isEmpty() ? "" : correctVocab.getMeanings().get(0).getPartOfSpeech();
+                    String partOfSpeech = correctVocab.getMeanings().isEmpty() ? ""
+                            : correctVocab.getMeanings().get(0).getPartOfSpeech();
                     return new GameDTO.ReverseQuizQuestionDTO(
                             correctVocab.getId(),
                             correctVocab.getUserDefinedMeaning(),
@@ -356,8 +369,7 @@ public class GameController {
                             partOfSpeech,
                             options,
                             correctVocab.getWord(),
-                            correctVocab.getUserImageBase64()
-                    );
+                            correctVocab.getUserImageBase64());
                 }).collect(Collectors.toList());
     }
 }

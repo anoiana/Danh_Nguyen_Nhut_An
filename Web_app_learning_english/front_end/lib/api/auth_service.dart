@@ -442,7 +442,7 @@ class ListeningFITB {
 
 class AuthService {
 
-  static const String _baseUrl = "http://localhost:8080/api";
+  static const String _baseUrl = "http://192.168.100.18:8080/api";
 
   // static const String _baseUrl = "https://5e6c5e02d0b3.ngrok-free.app/api";
 
