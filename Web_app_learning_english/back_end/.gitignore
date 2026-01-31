@@ -32,5 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-# Ignore the actual properties file with secrets
-src/main/resources/application.properties
+# Local secrets file (create from .example for local development)
+# Note: application.properties is now safe to commit since it uses ${ENV_VAR} placeholders
+
