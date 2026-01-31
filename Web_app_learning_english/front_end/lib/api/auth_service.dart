@@ -476,7 +476,8 @@ class AuthService {
       }
     }
   }
-
+      // asdasdasd
+  
   static Future<String> translateWord(String word) async {
     final url = Uri.parse('$_baseUrl/translate/$word');
     try {
