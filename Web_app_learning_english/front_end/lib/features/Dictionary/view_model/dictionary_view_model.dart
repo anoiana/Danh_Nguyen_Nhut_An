@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../../../core/base_view_model.dart';
 import '../../Vocabulary/service/vocabulary_service.dart';
+import '../service/dictionary_service.dart';
 import '../model/dictionary_entry.dart';
-import '../../Folders/model/folder.dart';
 
 class DictionaryViewModel extends BaseViewModel {
-  final VocabularyService _vocabularyService = VocabularyService();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   List<DictionaryEntry> _entries = [];
@@ -19,7 +18,7 @@ class DictionaryViewModel extends BaseViewModel {
     _currentWord = word;
     setBusy(true);
     try {
-      _entries = await _vocabularyService.lookupWord(word);
+      _entries = await DictionaryService.lookupWord(word);
       setBusy(false);
     } catch (e) {
       setError(e.toString());
@@ -47,7 +46,7 @@ class DictionaryViewModel extends BaseViewModel {
     double? imageAlignmentY,
   }) async {
     try {
-      await _vocabularyService.createVocabulary(
+      await VocabularyService.createVocabulary(
         entry: entry,
         folderId: folderId,
         userDefinedMeaning: userDefinedMeaning,

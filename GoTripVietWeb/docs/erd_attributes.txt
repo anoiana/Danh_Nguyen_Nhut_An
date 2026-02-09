@@ -1,0 +1,317 @@
+================================================================================
+              GOTRIPVIET - GIẢI THÍCH CHI TIẾT CÁC THUỘC TÍNH
+================================================================================
+
+
+I. BẢNG USER (Người dùng)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất (MongoDB ObjectId) |
+| email               | ✓           | Email đăng nhập, không trùng lặp         |
+| password_hash       | ✓           | Mật khẩu đã mã hóa (bcrypt)              |
+| fullName            |             | Họ tên đầy đủ                            |
+| phone               |             | Số điện thoại cá nhân                    |
+| roles[]             | ✓           | Vai trò: user, admin, partner, support   |
+| status              | ✓           | Trạng thái: ACTIVE, LOCKED, BANNED       |
+| preferences         |             | Sở thích du lịch (Object nhúng)          |
+|   ├─ travel_style   |             | Phong cách: adventure, relax, cultural   |
+|   ├─ interests[]    |             | Sở thích: beach, mountain, food...       |
+|   ├─ companions[]   |             | Đi cùng: family, solo, couple, friends   |
+|   ├─ budget_per_trip|             | Ngân sách mỗi chuyến (USD)               |
+|   └─ pace           |             | Tốc độ: fast, moderate, slow             |
+| partner_details     |             | Thông tin đối tác (nếu là Partner)       |
+|   ├─ company_name   |             | Tên công ty/thương hiệu                  |
+|   ├─ business_license|            | Mã số thuế/giấy phép kinh doanh          |
+|   ├─ contact_phone  |             | Hotline liên hệ                          |
+|   ├─ bank_account   |             | Thông tin ngân hàng nhận tiền            |
+|   ├─ is_approved    |             | Đã được Admin duyệt chưa (true/false)    |
+|   └─ approved_at    |             | Thời điểm được duyệt                     |
+| wallet_balance      | ✓           | Số dư ví (doanh thu Partner)             |
++---------------------+-------------+------------------------------------------+
+
+
+II. BẢNG PRODUCT (Tour du lịch)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| partner_id          | ✓           | ID Partner tạo tour (FK → User)          |
+| product_code        |             | Mã tour (VD: TOUR-DN-001)                |
+| title               | ✓           | Tên tour (VD: "Đà Nẵng 4N3Đ")            |
+| slug                | ✓           | URL thân thiện (da-nang-4n3d)            |
+| base_price          | ✓           | Giá cơ bản (VNĐ)                         |
+| status              | ✓           | Trạng thái duyệt:                        |
+|                     |             |   - draft: Bản nháp                      |
+|                     |             |   - pending: Chờ duyệt                   |
+|                     |             |   - active: Đang bán                     |
+|                     |             |   - rejected: Bị từ chối                 |
+|                     |             |   - hidden: Tạm ẩn                       |
+| rejection_reason    |             | Lý do từ chối (nếu rejected)             |
+| location_ids[]      |             | Danh sách địa điểm đi qua (FK → Location)|
+| category_ids[]      |             | Danh sách danh mục (FK → Category)       |
+| images[]            |             | Ảnh tour (url, public_id)                |
+| tags[]              |             | Thẻ tag: "biển", "núi", "gia đình"       |
+| description_short   |             | Mô tả ngắn (hiển thị danh sách)          |
+| description_long    |             | Mô tả chi tiết (trang chi tiết)          |
+| sustainability_score|             | Điểm bền vững (0-5)                      |
+| tour_details        |             | Chi tiết tour (Object nhúng):            |
+|   ├─ start_point    |             | Điểm xuất phát (VD: "TP.HCM")            |
+|   ├─ duration_days  |             | Số ngày tour                             |
+|   ├─ transport_type |             | Phương tiện: Máy bay, Xe, Tàu            |
+|   ├─ hotel_rating   |             | Sao khách sạn (1-5)                      |
+|   ├─ hotel_name     |             | Tên khách sạn                            |
+|   ├─ itinerary[]    |             | Lịch trình từng ngày                     |
+|   ├─ trip_highlights|             | Điểm nổi bật                             |
+|   └─ policy_notes[] |             | Chính sách, điều khoản                   |
++---------------------+-------------+------------------------------------------+
+
+
+III. BẢNG CATEGORY (Danh mục)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| name                | ✓           | Tên danh mục (VD: "Du lịch biển")        |
+| slug                | ✓           | URL thân thiện (du-lich-bien)            |
+| description         |             | Mô tả danh mục                           |
+| image               |             | Ảnh đại diện                             |
+| parent              |             | ID danh mục cha (FK → Category)          |
+| created_by          |             | ID người tạo (FK → User)                 |
+| status              | ✓           | Trạng thái: active, pending, rejected    |
++---------------------+-------------+------------------------------------------+
+
+
+IV. BẢNG LOCATION (Địa điểm)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| name                | ✓           | Tên địa điểm (VD: "Đà Nẵng")             |
+| slug                | ✓           | URL thân thiện                           |
+| country             |             | Quốc gia (VD: "Việt Nam")                |
+| description         |             | Mô tả địa điểm                           |
+| images[]            |             | Ảnh địa điểm                             |
+| tags[]              |             | Thẻ tag: "beach", "city", "mountain"     |
+| coordinates         |             | Tọa độ GPS (GeoJSON Point)               |
+|   ├─ type           |             | Luôn là "Point"                          |
+|   └─ coordinates[]  |             | [longitude, latitude]                    |
+| created_by          |             | ID người tạo (FK → User)                 |
+| status              | ✓           | Trạng thái: active, pending, rejected    |
++---------------------+-------------+------------------------------------------+
+
+
+V. BẢNG INVENTORY (Lịch khởi hành)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| product_id          | ✓           | ID tour (FK → Product)                   |
+| product_type        | ✓           | Loại: "tour" (có thể mở rộng)            |
+| price               | ✓           | Giá cho ngày này (có thể khác base_price)|
+| original_price      |             | Giá gốc (lưu khi revert sau event)       |
+| is_active           | ✓           | Còn bán không (true/false)               |
+| applied_event       |             | Event đang áp dụng (Object nhúng):       |
+|   ├─ event_id       |             | ID event (FK → Event)                    |
+|   ├─ name           |             | Tên event                                |
+|   ├─ discount_type  |             | Loại giảm: percentage, fixed_amount      |
+|   ├─ discount_value |             | Giá trị giảm (% hoặc số tiền)            |
+|   └─ applied_at     |             | Thời điểm áp event                       |
+| tour_details        |             | Chi tiết lịch khởi hành:                 |
+|   ├─ date           |             | Ngày khởi hành                           |
+|   ├─ total_slots    |             | Tổng số chỗ                              |
+|   ├─ booked_slots   |             | Số chỗ đã đặt                            |
+|   └─ transport_schedule|          | Lịch vận chuyển chi tiết                 |
++---------------------+-------------+------------------------------------------+
+
+
+VI. BẢNG EVENT (Sự kiện giảm giá)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| name                | ✓           | Tên event (VD: "Khuyến mãi Tết 2024")    |
+| slug                | ✓           | URL thân thiện                           |
+| description         |             | Mô tả chi tiết                           |
+| image               |             | Ảnh banner event                         |
+| discount_type       | ✓           | Loại giảm:                               |
+|                     |             |   - percentage: Giảm %                   |
+|                     |             |   - fixed_amount: Giảm số tiền cố định   |
+| discount_value      | ✓           | Giá trị (VD: 20 = 20% hoặc 500000 VNĐ)   |
+| is_yearly           | ✓           | Lặp lại hàng năm không (true/false)      |
+| start_month         | ✓           | Tháng bắt đầu (1-12)                     |
+| start_day           | ✓           | Ngày bắt đầu (1-31)                      |
+| end_month           | ✓           | Tháng kết thúc (1-12)                    |
+| end_day             | ✓           | Ngày kết thúc (1-31)                     |
+| applies_to_product_type| ✓        | Áp dụng cho loại: "tour"                 |
+| apply_to_all_tours  | ✓           | Áp cho tất cả tour (true/false)          |
+| tour_ids[]          |             | Danh sách tour cụ thể (nếu không all)    |
+| priority            | ✓           | Độ ưu tiên (số cao = ưu tiên hơn)        |
+| is_active           | ✓           | Đang hoạt động không                     |
++---------------------+-------------+------------------------------------------+
+
+
+VII. BẢNG PROMOTION (Mã khuyến mãi)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| code                | ✓           | Mã (VD: "SUMMER2024", "NEWYEAR50")       |
+| type                | ✓           | Loại giảm: percentage, fixed_amount      |
+| value               | ✓           | Giá trị giảm                             |
+| description         |             | Mô tả mã khuyến mãi                      |
+| total_quantity      | ✓           | Tổng số lần sử dụng được                 |
+| used_quantity       | ✓           | Số lần đã sử dụng                        |
+| is_active           | ✓           | Còn hoạt động không                      |
+| rules               |             | Điều kiện áp dụng:                       |
+|   ├─ valid_from     |             | Hiệu lực từ ngày                         |
+|   ├─ valid_to       |             | Hiệu lực đến ngày                        |
+|   ├─ applies_to_product_type|     | Áp dụng cho: tour, hotel, flight         |
+|   └─ min_spend      |             | Chi tiêu tối thiểu                       |
++---------------------+-------------+------------------------------------------+
+
+
+VIII. BẢNG BOOKING (Đơn đặt tour)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| user_id             | ✓           | ID khách đặt (FK → User)                 |
+| status              | ✓           | Trạng thái đơn:                          |
+|                     |             |   - pending: Chờ xác nhận                |
+|                     |             |   - confirmed: Đã xác nhận               |
+|                     |             |   - cancelled: Đã hủy                    |
+|                     |             |   - failed: Thất bại                     |
+|                     |             |   - completed: Hoàn thành                |
+| payment_status      | ✓           | Trạng thái thanh toán:                   |
+|                     |             |   - unpaid: Chưa thanh toán              |
+|                     |             |   - paid: Đã thanh toán                  |
+|                     |             |   - refunded: Đã hoàn tiền               |
+| pricing             | ✓           | Thông tin giá (Object nhúng):            |
+|   ├─ total_price_before_discount| | Tổng giá trước giảm                      |
+|   ├─ discount_amount|             | Số tiền được giảm                        |
+|   └─ final_price    |             | Giá cuối cùng phải trả                   |
+| promotion_id        |             | Mã KM đã dùng (FK → Promotion)           |
+| passengers[]        | ✓           | Danh sách hành khách:                    |
+|   ├─ type           |             | Loại: adult, child, toddler, infant      |
+|   ├─ fullName       |             | Họ tên                                   |
+|   ├─ gender         |             | Giới tính: Nam, Nữ, Khác                 |
+|   └─ dateOfBirth    |             | Ngày sinh                                |
+| items[]             | ✓           | Danh sách tour đặt (Embedded):           |
+|   ├─ product_id     |             | ID tour (FK → Product)                   |
+|   ├─ inventory_id   |             | ID lịch khởi hành (FK → Inventory)       |
+|   ├─ quantity       |             | Số lượng                                 |
+|   ├─ unit_price     |             | Đơn giá                                  |
+|   └─ snapshot       |             | Snapshot thông tin tour lúc đặt          |
+| payments[]          |             | Lịch sử thanh toán (Embedded):           |
+|   ├─ gateway        |             | Cổng: vnpay, momo                        |
+|   ├─ gateway_transaction_id|      | Mã giao dịch từ cổng                     |
+|   ├─ amount         |             | Số tiền                                  |
+|   ├─ status         |             | Trạng thái: pending, succeeded, failed   |
+|   └─ timestamp      |             | Thời điểm                                |
+| customer_details    |             | Thông tin liên hệ:                       |
+|   ├─ fullName       |             | Họ tên                                   |
+|   ├─ email          |             | Email                                    |
+|   ├─ phone          |             | SĐT                                      |
+|   ├─ address        |             | Địa chỉ                                  |
+|   └─ note           |             | Ghi chú                                  |
+| start_date          | ✓           | Ngày bắt đầu tour                        |
+| end_date            | ✓           | Ngày kết thúc tour                       |
++---------------------+-------------+------------------------------------------+
+
+
+IX. BẢNG PAYMENT (Thanh toán)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| booking_id          | ✓           | ID đơn hàng (FK → Booking)               |
+| user_id             |             | ID người thanh toán (FK → User)          |
+| amount              | ✓           | Số tiền thanh toán                       |
+| currency            | ✓           | Đơn vị tiền tệ (mặc định: "vnd")         |
+| status              | ✓           | Trạng thái:                              |
+|                     |             |   - pending: Đang xử lý                  |
+|                     |             |   - succeeded: Thành công                |
+|                     |             |   - failed: Thất bại                     |
+|                     |             |   - refunded: Đã hoàn tiền               |
+| gateway             | ✓           | Cổng thanh toán: "vnpay"                 |
+| gateway_transaction_id|           | Mã giao dịch từ VNPAY                   |
+| amount_refunded     |             | Số tiền đã hoàn                          |
+| refunded_at         |             | Thời điểm hoàn tiền                      |
+| transaction_date    | ✓           | Thời điểm giao dịch                      |
++---------------------+-------------+------------------------------------------+
+
+
+X. BẢNG TRANSACTION (Giao dịch ví Partner)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| partner_id          |             | ID Partner (FK → User)                   |
+| booking_id          |             | ID đơn hàng liên quan (FK → Booking)     |
+| type                | ✓           | Loại giao dịch:                          |
+|                     |             |   - INCOME: Thu nhập từ booking          |
+|                     |             |   - WITHDRAWAL: Rút tiền                 |
+|                     |             |   - REFUND: Hoàn tiền cho khách          |
+|                     |             |   - COMMISSION: Hoa hồng sàn (15%)       |
+|                     |             |   - VOUCHER_COST: Chi phí voucher        |
+| amount              | ✓           | Số tiền (+ hoặc -)                       |
+| description         |             | Mô tả giao dịch                          |
+| status              | ✓           | Trạng thái:                              |
+|                     |             |   - PENDING: Đang xử lý                  |
+|                     |             |   - COMPLETED: Hoàn thành                |
+|                     |             |   - FAILED: Thất bại                     |
+|                     |             |   - CANCELLED: Đã hủy                    |
+| balance_after       |             | Số dư ví sau giao dịch (để đối soát)     |
++---------------------+-------------+------------------------------------------+
+
+
+XI. BẢNG CHAT_SESSION (Phiên chat AI)
+================================================================================
+
++---------------------+-------------+------------------------------------------+
+| Thuộc tính          | Bắt buộc    | Giải thích                               |
++---------------------+-------------+------------------------------------------+
+| _id                 | ✓           | ID định danh duy nhất                    |
+| sessionId           | ✓           | ID phiên chat (unique, dùng UUID)        |
+| messages[]          | ✓           | Danh sách tin nhắn:                      |
+|   ├─ role           |             | Vai trò: user, assistant, system         |
+|   ├─ content        |             | Nội dung tin nhắn                        |
+|   ├─ createdAt      |             | Thời điểm gửi                            |
+|   └─ updatedAt      |             | Thời điểm cập nhật                       |
++---------------------+-------------+------------------------------------------+
+
+
+================================================================================
+                    CHÚ THÍCH KÝ HIỆU
+================================================================================
+
+✓ = Bắt buộc (NOT NULL / required: true)
+FK = Foreign Key (Khóa ngoại, tham chiếu đến bảng khác)
+PK = Primary Key (Khóa chính, định danh duy nhất)
+[] = Mảng (Array)
+{} = Object nhúng (Embedded Document)
+
+================================================================================
+                              HẾT TÀI LIỆU
+================================================================================

@@ -4,13 +4,11 @@ import '../../../core/base_view_model.dart';
 import '../../Vocabulary/model/vocabulary.dart';
 import '../model/game_session.dart';
 import '../service/study_mode_service.dart';
-import '../../../api/auth_service.dart';
 import '../../../api/sound_service.dart';
 
 enum FeedbackState { initial, correct, incorrect }
 
 class WritingViewModel extends BaseViewModel {
-  final StudyModeService _service = StudyModeService();
   final SoundService _soundService = SoundService();
 
   GameSession? _session;
@@ -43,7 +41,11 @@ class WritingViewModel extends BaseViewModel {
   Future<void> init(int userId, int folderId) async {
     setBusy(true);
     try {
-      _session = await _service.startGenericGame(userId, folderId, 'writing');
+      _session = await StudyModeService.startGenericGame(
+        userId,
+        folderId,
+        'writing',
+      );
       _resetState();
       setBusy(false);
     } catch (e) {
@@ -74,22 +76,21 @@ class WritingViewModel extends BaseViewModel {
     final correctAnswer = currentVocabulary!.word.trim().toLowerCase();
     final isCorrect = userAnswer == correctAnswer;
 
-    // Update UI immediately
-    notifyListeners();
-
     if (isCorrect) {
       _correctCount++;
       _feedbackState = FeedbackState.correct;
-      await _soundService.playCorrectAndWait();
+      _soundService.playCorrect();
     } else {
       _wrongCount++;
       _wrongAnswerVocabIds.add(currentVocabulary!.id);
       _wrongVocabularies.add(currentVocabulary!); // Track for retry
       _feedbackState = FeedbackState.incorrect;
-      await _soundService.playWrongAndWait();
+      _soundService.playWrong();
     }
 
+    // Update UI immediately
     notifyListeners();
+
     return isCorrect;
   }
 
@@ -119,7 +120,7 @@ class WritingViewModel extends BaseViewModel {
   Future<void> submitResult() async {
     if (_session == null) return;
     try {
-      await AuthService.updateGameResult(
+      await StudyModeService.updateGameResult(
         _session!.gameResultId,
         _correctCount,
         _wrongCount,
@@ -129,6 +130,4 @@ class WritingViewModel extends BaseViewModel {
       setError("Failed to submit result: $e");
     }
   }
-
-  // Retry mechanism if needed, can reuse startGenericGame logic
 }

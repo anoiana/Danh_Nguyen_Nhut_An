@@ -1,0 +1,90 @@
+/* src/styles/OrderDetail.css */
+
+/* Header kiểu vé máy bay/sự kiện */
+.ticket-header {
+  background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hiệu ứng răng cưa dưới đáy vé */
+.ticket-header::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background-image: radial-gradient(circle, transparent 50%, #ffffff 50%);
+  background-size: 20px 20px;
+  background-position: center bottom;
+}
+
+/* Icon tròn trong phần thông tin liên hệ */
+.info-icon {
+  width: 32px;
+  height: 32px;
+  background-color: #e9ecef;
+  color: #0d6efd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+/* --- Timeline (Thanh tiến trình) --- */
+.step-indicator {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+/* Đường kẻ ngang nối các bước */
+.step-indicator::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e9ecef;
+  z-index: 0;
+}
+
+.step-item {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  background: white;
+  padding: 0 10px;
+}
+
+.step-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e9ecef;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 5px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+/* Trạng thái Active */
+.step-item.active .step-circle {
+  background: #198754; /* Màu xanh success */
+  color: white;
+  box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.2);
+}
+
+.step-item.active span {
+  color: #198754;
+  font-weight: 600;
+}

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../api/auth_service.dart';
+import '../service/dictionary_service.dart';
 
 class PasteTranslateDialog extends StatefulWidget {
   const PasteTranslateDialog({super.key});
@@ -23,7 +23,7 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
   void _translate() {
     if (_textController.text.trim().isEmpty) return;
     setState(() {
-      _translationFuture = AuthService.translateWord(
+      _translationFuture = DictionaryService.translateWord(
         _textController.text.trim(),
       );
     });

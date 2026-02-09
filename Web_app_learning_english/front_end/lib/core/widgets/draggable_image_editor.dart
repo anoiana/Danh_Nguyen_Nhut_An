@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
+/// A widget that allows the user to drag an image within a container to adjust its alignment.
+/// Useful for cropping or focusing on a specific part of an image.
 class DraggableImageEditor extends StatefulWidget {
   final String? imageBase64;
   final ValueChanged<Alignment> onAlignmentChanged;
@@ -16,15 +18,15 @@ class DraggableImageEditor extends StatefulWidget {
 }
 
 class _DraggableImageEditorState extends State<DraggableImageEditor> {
-  // Vẫn dùng ValueNotifier để build lại UI một cách hiệu quả
+  // Use ValueNotifier to rebuild only the necessary part of the UI
   final ValueNotifier<Alignment> _alignmentNotifier = ValueNotifier(
     Alignment.center,
   );
 
-  // Biến tạm để lưu alignment mới nhất được tính toán
+  // Temporary variable to store the latest calculated alignment
   Alignment _currentAlignment = Alignment.center;
 
-  // Cờ để đảm bảo chúng ta chỉ lên lịch một lần cập nhật mỗi frame
+  // Flag to ensure we only schedule one update per frame/tick
   bool _isUpdateScheduled = false;
 
   @override
@@ -36,6 +38,7 @@ class _DraggableImageEditorState extends State<DraggableImageEditor> {
   @override
   void didUpdateWidget(covariant DraggableImageEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Reset alignment if the image changes
     if (widget.imageBase64 != null &&
         oldWidget.imageBase64 != widget.imageBase64) {
       _currentAlignment = Alignment.center;
@@ -43,39 +46,35 @@ class _DraggableImageEditorState extends State<DraggableImageEditor> {
     }
   }
 
+  /// Handles the drag gesture to update image alignment
   void _handlePanUpdate(DragUpdateDetails details) {
-    // Chỉ tính toán khi có ảnh
     if (widget.imageBase64 == null) return;
 
-    // Sử dụng context.size để lấy kích thước một cách an toàn
     final size = context.size;
     if (size == null) return;
 
     final containerWidth = size.width;
     final containerHeight = size.height;
 
-    // Tính toán delta
+    // Calculate delta normalized to [-1.0, 1.0] range
+    // Alignment coordinates: 0 is center, -1 is left/top, 1 is right/bottom
+    // We divide by (size/2) because alignment goes from -1 to 1 (range of 2)
     final dx = details.delta.dx / (containerWidth / 2);
     final dy = details.delta.dy / (containerHeight / 2);
 
-    // Cập nhật giá trị tạm thời ngay lập tức
+    // Update temporary value immediately
     _currentAlignment = Alignment(
       (_currentAlignment.x + dx).clamp(-1.0, 1.0),
       (_currentAlignment.y + dy).clamp(-1.0, 1.0),
     );
 
-    // Nếu chưa có lần cập nhật nào được lên lịch, hãy lên lịch một lần
+    // Throttle updates to avoid excessive rebuilding/callbacks
     if (!_isUpdateScheduled) {
       _isUpdateScheduled = true;
-      // Lên lịch để thực thi ở vòng lặp sự kiện tiếp theo
       Future.delayed(Duration.zero, () {
-        // Kiểm tra xem widget còn tồn tại không
         if (mounted) {
-          // Bây giờ mới cập nhật Notifier để trigger rebuild
           _alignmentNotifier.value = _currentAlignment;
-          // Gọi callback cho widget cha
           widget.onAlignmentChanged(_currentAlignment);
-          // Reset cờ để cho phép lần cập nhật tiếp theo được lên lịch
           _isUpdateScheduled = false;
         }
       });
@@ -84,91 +83,82 @@ class _DraggableImageEditorState extends State<DraggableImageEditor> {
 
   @override
   Widget build(BuildContext context) {
-    // Không cần LayoutBuilder nữa, vì context.size đã có sẵn trong build method
-    // của một stateful widget sau khi layout lần đầu.
     return SizedBox(
       height: 150,
       width: double.infinity,
       child: GestureDetector(
-        onPanUpdate: _handlePanUpdate, // Gọi hàm xử lý đã tách riêng
+        onPanUpdate: _handlePanUpdate,
         child: ValueListenableBuilder<Alignment>(
           valueListenable: _alignmentNotifier,
           builder: (context, alignment, child) {
             return Stack(
               alignment: Alignment.center,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFFF8BBD0),
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                    color: const Color(0xFFFCE4EC),
-                  ),
-                  child:
-                      widget.imageBase64 != null
-                          ? Builder(
-                            builder: (context) {
-                              try {
-                                String cleanBase64 = widget.imageBase64!;
-                                if (cleanBase64.contains(',')) {
-                                  cleanBase64 = cleanBase64.split(',').last;
-                                }
-                                final bytes = base64Decode(
-                                  cleanBase64.replaceAll(RegExp(r'\s+'), ''),
-                                );
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(7),
-                                  child: Image.memory(
-                                    bytes,
-                                    fit: BoxFit.cover,
-                                    alignment: alignment,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Center(
-                                              child: Icon(
-                                                Icons.broken_image,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                  ),
-                                );
-                              } catch (e) {
-                                return const Center(
-                                  child: Icon(
-                                    Icons.error_outline,
-                                    size: 40,
-                                    color: Colors.red,
-                                  ),
-                                );
-                              }
-                            },
-                          )
-                          : const Center(
-                            child: Icon(
-                              Icons.photo_size_select_actual_outlined,
-                              size: 40,
-                              color: Colors.grey,
-                            ),
-                          ),
-                ),
-                if (widget.imageBase64 != null)
-                  IgnorePointer(
-                    child: Icon(
-                      Icons.open_with_rounded,
-                      color: Colors.white.withOpacity(0.7),
-                      size: 40,
-                      shadows: const [
-                        Shadow(color: Colors.black54, blurRadius: 8),
-                      ],
-                    ),
-                  ),
+                _buildImageContainer(alignment),
+                if (widget.imageBase64 != null) _buildDragIndicator(),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildImageContainer(Alignment alignment) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFF8BBD0), width: 2),
+        borderRadius: BorderRadius.circular(8),
+        color: const Color(0xFFFCE4EC),
+      ),
+      child:
+          widget.imageBase64 != null
+              ? _buildImage(alignment)
+              : const Center(
+                child: Icon(
+                  Icons.photo_size_select_actual_outlined,
+                  size: 40,
+                  color: Colors.grey,
+                ),
+              ),
+    );
+  }
+
+  Widget _buildImage(Alignment alignment) {
+    try {
+      String cleanBase64 = widget.imageBase64!;
+      if (cleanBase64.contains(',')) {
+        cleanBase64 = cleanBase64.split(',').last;
+      }
+      final bytes = base64Decode(cleanBase64.replaceAll(RegExp(r'\s+'), ''));
+
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(6), // Slightly less than container
+        child: Image.memory(
+          bytes,
+          fit: BoxFit.cover,
+          alignment: alignment,
+          errorBuilder:
+              (context, error, stackTrace) =>
+                  _buildErrorIcon(Icons.broken_image),
+        ),
+      );
+    } catch (e) {
+      return _buildErrorIcon(Icons.error_outline, color: Colors.red);
+    }
+  }
+
+  Widget _buildErrorIcon(IconData icon, {Color color = Colors.grey}) {
+    return Center(child: Icon(icon, size: 40, color: color));
+  }
+
+  Widget _buildDragIndicator() {
+    return IgnorePointer(
+      child: Icon(
+        Icons.open_with_rounded,
+        color: Colors.white.withOpacity(0.7),
+        size: 40,
+        shadows: const [Shadow(color: Colors.black54, blurRadius: 8)],
       ),
     );
   }

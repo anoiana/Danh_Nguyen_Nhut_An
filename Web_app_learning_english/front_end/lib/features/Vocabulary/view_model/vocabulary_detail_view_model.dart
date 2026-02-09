@@ -1,7 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import '../../../core/base_view_model.dart';
 import '../../../api/tts_service.dart';
-import '../../../api/auth_service.dart';
+import '../../Dictionary/service/dictionary_service.dart';
 import '../model/vocabulary.dart';
 
 class VocabularyDetailViewModel extends BaseViewModel {
@@ -33,7 +33,7 @@ class VocabularyDetailViewModel extends BaseViewModel {
   }
 
   Future<String> translate(String text) async {
-    return await AuthService.translateWord(text);
+    return await DictionaryService.translateWord(text);
   }
 
   @override

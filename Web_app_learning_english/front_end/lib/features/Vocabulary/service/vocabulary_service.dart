@@ -1,35 +1,36 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:untitled/features/Dictionary/model/dictionary_entry.dart';
+import '../../Dictionary/model/dictionary_entry.dart';
 import '../../../core/app_constants.dart';
 import '../model/vocabulary.dart';
 
+/// Service for vocabulary-related API calls
 class VocabularyService {
-  final http.Client _client = http.Client();
+  static const String _baseUrl = AppConstants.baseUrl;
 
-  Future<List<DictionaryEntry>> lookupWord(String word) async {
+  /// Get vocabularies by folder with pagination
+  static Future<VocabularyPage> getVocabulariesByFolder(
+    int folderId, {
+    int page = 0,
+    int size = 15,
+    String search = '',
+  }) async {
     final url = Uri.parse(
-      'https://api.dictionaryapi.dev/api/v2/entries/en/$word',
+      '$_baseUrl/vocabularies/folder/$folderId?page=$page&size=$size&search=$search',
     );
-    try {
-      final response = await _client
-          .get(url)
-          .timeout(const Duration(seconds: 15));
+    final response = await http.get(url).timeout(const Duration(seconds: 15));
 
-      if (response.statusCode == 200) {
-        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        return body.map((e) => DictionaryEntry.fromJson(e)).toList();
-      } else if (response.statusCode == 404) {
-        return []; // Return empty list instead of exception for cleaner UI logic sometimes
-      } else {
-        throw Exception('Lỗi khi tra từ từ dịch vụ bên ngoài.');
-      }
-    } catch (e) {
-      throw Exception('Connection error: $e');
+    if (response.statusCode == 200) {
+      return VocabularyPage.fromJson(
+        jsonDecode(utf8.decode(response.bodyBytes)),
+      );
+    } else {
+      throw Exception('Failed to load vocabularies for folder $folderId');
     }
   }
 
-  Future<Vocabulary> createVocabulary({
+  /// Create a new vocabulary
+  static Future<Vocabulary> createVocabulary({
     required DictionaryEntry entry,
     required int folderId,
     required String userDefinedMeaning,
@@ -38,7 +39,7 @@ class VocabularyService {
     double? imageAlignmentX,
     double? imageAlignmentY,
   }) async {
-    final url = Uri.parse('${AppConstants.baseUrl}/vocabularies');
+    final url = Uri.parse('$_baseUrl/vocabularies');
 
     final body = {
       'userDefinedMeaning': userDefinedMeaning,
@@ -71,11 +72,12 @@ class VocabularyService {
               .toList(),
     };
 
-    final response = await _client.post(
+    final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
       body: jsonEncode(body),
     );
+
     if (response.statusCode == 200) {
       return Vocabulary.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
@@ -83,89 +85,94 @@ class VocabularyService {
     }
   }
 
-  Future<VocabularyPage> getVocabulariesByFolder(
-    int folderId, {
-    int page = 0,
-    int size = 20,
-    String search = '',
+  /// Update an existing vocabulary
+  static Future<void> updateVocabulary({
+    required int vocabularyId,
+    required String userDefinedMeaning,
+    String? userDefinedPartOfSpeech,
+    String? userImageBase64,
+    double? imageAlignmentX,
+    double? imageAlignmentY,
   }) async {
-    final url = Uri.parse(
-      '${AppConstants.baseUrl}/vocabularies/folder/$folderId?page=$page&size=$size&search=$search',
-    );
-    final response = await _client.get(
+    final url = Uri.parse('$_baseUrl/vocabularies/$vocabularyId');
+
+    final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({
+        'userDefinedMeaning': userDefinedMeaning,
+        'userDefinedPartOfSpeech': userDefinedPartOfSpeech,
+        'userImageBase64': userImageBase64 ?? '',
+        'image_alignment_x': imageAlignmentX,
+        'image_alignment_y': imageAlignmentY,
+      }),
     );
 
-    if (response.statusCode == 200) {
-      return VocabularyPage.fromJson(
-        jsonDecode(utf8.decode(response.bodyBytes)),
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update vocabulary: ${response.body}');
+    }
+  }
+
+  /// Update vocabulary image
+  static Future<void> updateVocabularyImage(
+    int vocabularyId,
+    String imageUrl,
+  ) async {
+    final url = Uri.parse('$_baseUrl/vocabularies/$vocabularyId/image');
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode(imageUrl),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update vocabulary image.');
+    }
+  }
+
+  /// Delete a single vocabulary
+  static Future<void> deleteVocabulary(int vocabularyId) async {
+    final url = Uri.parse('$_baseUrl/vocabularies/$vocabularyId');
+    final response = await http.delete(url);
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Failed to delete vocabulary. Server response: ${response.body}',
       );
-    } else {
-      throw Exception('Failed to load vocabularies');
     }
   }
 
-  Future<void> updateVocabulary({
-    required int id,
-    required String meaning,
-    String? partOfSpeech,
-    String? imageBase64,
-    double? alignX,
-    double? alignY,
-  }) async {
-    final url = Uri.parse('${AppConstants.baseUrl}/vocabularies/$id');
-    final body = {
-      'userDefinedMeaning': meaning,
-      'userDefinedPartOfSpeech': partOfSpeech,
-      'userImageBase64': imageBase64,
-      'image_alignment_x': alignX,
-      'image_alignment_y': alignY,
-    };
-
-    final response = await _client.put(
+  /// Delete multiple vocabularies
+  static Future<void> deleteVocabularies(List<int> vocabularyIds) async {
+    final url = Uri.parse('$_baseUrl/vocabularies/batch-delete');
+    final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode(body),
+      body: jsonEncode({'vocabularyIds': vocabularyIds}),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update vocabulary');
+      throw Exception('Failed to delete vocabularies: ${response.body}');
     }
   }
 
-  Future<void> deleteVocabulary(int id) async {
-    final url = Uri.parse('${AppConstants.baseUrl}/vocabularies/$id');
-    final response = await _client.delete(url);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to delete vocabulary');
-    }
-  }
-
-  Future<void> deleteVocabularies(List<int> ids) async {
-    final url = Uri.parse('${AppConstants.baseUrl}/vocabularies/bulk-delete');
-    final response = await _client.post(
+  /// Move vocabularies to another folder
+  static Future<void> moveVocabularies(
+    List<int> vocabularyIds,
+    int targetFolderId,
+  ) async {
+    final url = Uri.parse('$_baseUrl/vocabularies/batch-move');
+    final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode(ids),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to delete vocabularies');
-    }
-  }
-
-  Future<void> moveVocabularies(List<int> vocabIds, int targetFolderId) async {
-    final url = Uri.parse(
-      '${AppConstants.baseUrl}/vocabularies/move?folderId=$targetFolderId',
-    );
-    final response = await _client.post(
-      url,
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode(vocabIds), // Sending List<Integer>
+      body: jsonEncode({
+        'vocabularyIds': vocabularyIds,
+        'targetFolderId': targetFolderId,
+      }),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to move vocabularies');
+      throw Exception('Failed to move vocabularies: ${response.body}');
     }
   }
 }

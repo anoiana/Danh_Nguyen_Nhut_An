@@ -1,0 +1,115 @@
+/* ===================================================================
+   HEADER (nền xanh + logo + toplinks + categories)
+=================================================================== */
+.gv-header--blue {
+  background: #003580;
+  color: #fff;
+}
+
+.gv-header--blue .navbar {
+  background: transparent !important;
+}
+
+/* Logo header: responsive */
+.gv-brand {
+  display: block;
+  width: auto;
+  height: clamp(44px, 6vw, 80px);
+  object-fit: contain;
+}
+
+/* Toplink nhỏ: màu & hover */
+.gv-toplink {
+  color: #fff !important;
+  opacity: 0.85;
+}
+
+.gv-toplink:hover,
+.hover-underline:hover {
+  text-decoration: underline;
+}
+
+/* Dải categories (pills) */
+.gv-header-cats {
+  border-top: 0;
+}
+
+.gv-cat-pill {
+  background: #003580;
+  border: none;
+  color: #fff !important;
+  border-radius: 9999px;
+  padding: 0.45rem 0.95rem;
+  line-height: 1;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.gv-cat-pill .bi {
+  color: currentColor;
+}
+
+.gv-cat-pill:hover {
+  background: #1a4fb5;
+  color: #fff !important;
+  border: none;
+  text-decoration: none;
+}
+
+.gv-cat-pill.active {
+  background: #1a4fb5;
+  color: #fff !important;
+  border: 1px solid #fff;
+  text-decoration: none;
+}
+
+/* Nút hamburger (mobile toplinks) */
+.gv-hamburger {
+  border: 0;
+  background: #fff;
+  color: #003580;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gv-hamburger .bi {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+/* ===================================================================
+   FOOTER
+=================================================================== */
+.gv-footer {
+  background: #14323b;
+}
+
+.gv-footer-logo {
+  width: clamp(140px, 14vw, 220px);
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* ===================================================================
+   UTILITIES dùng chung header/footer
+=================================================================== */
+.opacity-85 {
+  opacity: 0.85;
+}
+
+/* ===================================================================
+   RESPONSIVE HEADER
+=================================================================== */
+@media (min-width: 1200px) {
+  .gv-header--blue .gv-brand {
+    height: 64px;
+  }
+}

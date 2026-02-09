@@ -14,6 +14,8 @@ import 'package:provider/provider.dart';
 import 'listening_type_selection_view.dart';
 import 'listening_level_selection_view.dart';
 import 'reading_level_selection_view.dart';
+import 'speaking_view.dart';
+import '../view_model/speaking_view_model.dart';
 
 // Theme Colors
 const Color primaryPink = Color(0xFFE91E63);
@@ -474,6 +476,33 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
                   Icons.menu_book,
                   () {
                     _navigateToReadingLevelSelection(context);
+                  },
+                  enabled: widget.vocabularyCount >= 1,
+                ),
+                _buildModeCard(
+                  'Luyện Nói',
+                  'Phát âm chuẩn',
+                  Icons.record_voice_over_rounded,
+                  () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    final userId = prefs.getInt('userId');
+                    if (userId == null) return;
+                    if (context.mounted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => ChangeNotifierProvider(
+                                create: (_) => SpeakingViewModel(),
+                                child: SpeakingView(
+                                  folderId: widget.folderId,
+                                  folderName: widget.folderName,
+                                  userId: userId,
+                                ),
+                              ),
+                        ),
+                      );
+                    }
                   },
                   enabled: widget.vocabularyCount >= 1,
                 ),

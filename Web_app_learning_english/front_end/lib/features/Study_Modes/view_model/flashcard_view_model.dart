@@ -20,8 +20,6 @@ class FlashcardSettings {
 }
 
 class FlashcardViewModel extends BaseViewModel {
-  final StudyModeService _service = StudyModeService();
-
   GameSession? _session;
   List<Vocabulary> _vocabularies = [];
   int _currentIndex = 0;
@@ -48,7 +46,11 @@ class FlashcardViewModel extends BaseViewModel {
   Future<void> init(int userId, int folderId) async {
     setBusy(true);
     try {
-      _session = await _service.startGenericGame(userId, folderId, 'flashcard');
+      _session = await StudyModeService.startGenericGame(
+        userId,
+        folderId,
+        'flashcard',
+      );
       _vocabularies = _session?.vocabularies ?? [];
       _currentIndex = 0;
       _isFlipped = _settings.startWithMeaningSide;

@@ -1,17 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../../../core/base_view_model.dart';
-import '../../../core/app_constants.dart';
-import '../../Folders/model/folder.dart';
 import '../model/vocabulary.dart';
 import '../service/vocabulary_service.dart';
 
 class VocabularyViewModel extends BaseViewModel {
-  final VocabularyService _vocabularyService = VocabularyService();
-  final http.Client _client =
-      http.Client(); // For other requests not yet migrated or simple
-
   // Data State
   List<Vocabulary> _vocabularies = [];
   List<Vocabulary> get vocabularies => _vocabularies;
@@ -70,7 +62,7 @@ class VocabularyViewModel extends BaseViewModel {
     }
 
     try {
-      final vocabPage = await _vocabularyService.getVocabulariesByFolder(
+      final vocabPage = await VocabularyService.getVocabulariesByFolder(
         _folderId,
         page: _currentPage,
         search: _searchQuery,
@@ -129,7 +121,7 @@ class VocabularyViewModel extends BaseViewModel {
   // CRUD Operations
   Future<bool> deleteVocabulary(int id) async {
     try {
-      await _vocabularyService.deleteVocabulary(id);
+      await VocabularyService.deleteVocabulary(id);
       _vocabularies.removeWhere((element) => element.id == id);
       _hasChanges = true;
       notifyListeners();
@@ -142,7 +134,7 @@ class VocabularyViewModel extends BaseViewModel {
 
   Future<bool> deleteSelectedVocabularies() async {
     try {
-      await _vocabularyService.deleteVocabularies(_selectedVocabIds.toList());
+      await VocabularyService.deleteVocabularies(_selectedVocabIds.toList());
       _hasChanges = true;
       toggleSelectionMode(); // Exit selection mode
       fetchVocabularies(refresh: true); // Reload
@@ -153,9 +145,6 @@ class VocabularyViewModel extends BaseViewModel {
     }
   }
 
-  // Update & Move logic needs to be moved to service first or implemented here using http
-  // Implementing update directly in service next step, using placeholder for now
-
   Future<bool> updateVocabulary({
     required int id,
     required String meaning,
@@ -165,13 +154,13 @@ class VocabularyViewModel extends BaseViewModel {
     double? alignY,
   }) async {
     try {
-      await _vocabularyService.updateVocabulary(
-        id: id,
-        meaning: meaning,
-        partOfSpeech: partOfSpeech,
-        imageBase64: imageBase64,
-        alignX: alignX,
-        alignY: alignY,
+      await VocabularyService.updateVocabulary(
+        vocabularyId: id,
+        userDefinedMeaning: meaning,
+        userDefinedPartOfSpeech: partOfSpeech,
+        userImageBase64: imageBase64,
+        imageAlignmentX: alignX,
+        imageAlignmentY: alignY,
       );
       _hasChanges = true;
       fetchVocabularies(refresh: true);
@@ -182,11 +171,9 @@ class VocabularyViewModel extends BaseViewModel {
     }
   }
 
-  // Helper for moving folders - Logic from AuthService needs migration
   Future<bool> moveVocabularies(int targetFolderId) async {
-    // Implement move logic
     try {
-      await _vocabularyService.moveVocabularies(
+      await VocabularyService.moveVocabularies(
         _selectedVocabIds.toList(),
         targetFolderId,
       );

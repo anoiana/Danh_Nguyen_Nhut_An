@@ -98,84 +98,240 @@ class _WritingViewState extends State<WritingView> {
       context: context,
       barrierDismissible: false,
       builder:
-          (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: const Row(
+          (ctx) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
               children: [
-                Icon(Icons.celebration, color: primaryPink),
-                SizedBox(width: 8),
-                Text('Hoàn thành!'),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Kết quả: ${_viewModel.correctCount}/${_viewModel.vocabularies.length}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(Icons.check, color: correctColor),
-                    Text('Đúng: ${_viewModel.correctCount}'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.close, color: wrongColor),
-                    Text('Sai: ${_viewModel.wrongCount}'),
-                  ],
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                child: const Text('Đóng'),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  Navigator.pop(context);
-                },
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryPink,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                // Main Card
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 30,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Hoàn thành!',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Bạn đã hoàn thành bài luyện tập.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Stats Row
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF0F5),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: primaryPink.withOpacity(0.1),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: [
+                                const Text(
+                                  'Đúng',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${_viewModel.correctCount}',
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 1,
+                              height: 40,
+                              color: primaryPink.withOpacity(0.2),
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  'Sai',
+                                  style: TextStyle(
+                                    color: Colors.red[700],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${_viewModel.wrongCount}',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.red[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                side: BorderSide(color: Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                foregroundColor: Colors.grey[700],
+                              ),
+                              onPressed: () {
+                                Navigator.of(ctx).pop();
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text(
+                                'Đóng',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryPink,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.of(ctx).pop();
+                                _loadData();
+                                _textController.clear();
+                                _focusNode.requestFocus();
+                              },
+                              child: const Text(
+                                'Chơi lại',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_viewModel.wrongVocabularies.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.orange[700],
+                                backgroundColor: Colors.orange[50],
+                                side: BorderSide(
+                                  color: Colors.orange.withOpacity(0.5),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.of(ctx).pop();
+                                _viewModel.startWrongWordsRetry();
+                                _textController.clear();
+                                _focusNode.requestFocus();
+                              },
+                              icon: const Icon(Icons.refresh_rounded, size: 20),
+                              label: const Text(
+                                'Ôn tập từ sai',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-                child: const Text('Luyện tập lại'),
-                onPressed: () {
-                  Navigator.pop(ctx); // Close dialog
-                  _loadData(); // Reload data/reset state
-                  _textController.clear();
-                  _focusNode.requestFocus();
-                },
-              ),
-              if (_viewModel.wrongVocabularies.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                // Floating Icon
+                Positioned(
+                  top: -50,
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFE91E63).withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFE91E63), Color(0xFFFF4081)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.emoji_events_rounded,
+                        size: 48,
+                        color: Colors.white,
                       ),
                     ),
-                    child: const Text('Ôn tập từ sai'),
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      _viewModel.startWrongWordsRetry();
-                      _textController.clear();
-                      _focusNode.requestFocus();
-                    },
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
     );
   }
@@ -323,87 +479,118 @@ class _WritingViewState extends State<WritingView> {
   Widget _buildQuestionCard(Vocabulary vocab) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(32), // Rounder corners
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE91E63).withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: const Color(0xFFE91E63).withOpacity(0.12),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: const EdgeInsets.only(bottom: 24),
             decoration: BoxDecoration(
               color: const Color(0xFFFFF0F5),
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: primaryPink.withOpacity(0.1)),
             ),
-            child: Text(
-              'Định nghĩa',
-              style: TextStyle(
-                color: primaryPink.withOpacity(0.8),
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                letterSpacing: 1,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.translate_rounded,
+                  size: 16,
+                  color: primaryPink,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Dịch sang Tiếng Anh',
+                  style: TextStyle(
+                    color: primaryPink.withOpacity(0.9),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ),
           ),
           Text(
             vocab.userDefinedMeaning ?? '(Chưa có nghĩa)',
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w800, // Bolder
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
               color: Color(0xFF333333),
               height: 1.3,
+              letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (vocab.meanings?.isNotEmpty == true)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                    horizontal: 20,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      colors: [Colors.blue.shade50, Colors.blue.shade100],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Text(
                     vocab.meanings!.first.partOfSpeech ?? 'Word',
-                    style: const TextStyle(
-                      color: Colors.blue,
+                    style: TextStyle(
+                      color: Colors.blue.shade700,
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: 15,
                     ),
                   ),
                 ),
-
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () => _ttsService.speak(vocab.word),
                   borderRadius: BorderRadius.circular(50),
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: primaryPink.withOpacity(0.1),
+                      color: Colors.white,
                       shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey.shade200),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: const Icon(
                       Icons.volume_up_rounded,
                       color: primaryPink,
-                      size: 28,
+                      size: 24,
                     ),
                   ),
                 ),
@@ -418,11 +605,13 @@ class _WritingViewState extends State<WritingView> {
   Widget _buildInputField() {
     return Container(
       decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFFE91E63).withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 5),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -430,41 +619,100 @@ class _WritingViewState extends State<WritingView> {
         controller: _textController,
         focusNode: _focusNode,
         enabled: !_viewModel.isSubmitted,
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.start,
         style: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: primaryPink,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF333333),
+          height: 1.4,
         ),
         decoration: InputDecoration(
           hintText: 'Nhập từ tiếng Anh...',
-          hintStyle: TextStyle(color: Colors.grey[400], fontSize: 18),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 24,
-            horizontal: 24,
+          hintStyle: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
           ),
+          filled: true,
+          fillColor: Colors.transparent,
+          contentPadding: const EdgeInsets.fromLTRB(24, 24, 60, 24),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(40),
+            borderRadius: BorderRadius.circular(28),
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(40),
-            borderSide: const BorderSide(color: Colors.white, width: 2),
+            borderRadius: BorderRadius.circular(28),
+            borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(40),
-            borderSide: const BorderSide(color: primaryPink, width: 2),
+            borderRadius: BorderRadius.circular(28),
+            borderSide: BorderSide(color: primaryPink.withOpacity(0.3)),
           ),
+          suffixIcon:
+              _viewModel.isSubmitted
+                  ? Icon(
+                    _viewModel.feedbackState == FeedbackState.correct
+                        ? Icons.check_circle_rounded
+                        : Icons.cancel_rounded,
+                    color:
+                        _viewModel.feedbackState == FeedbackState.correct
+                            ? correctColor
+                            : wrongColor,
+                    size: 28,
+                  )
+                  : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          if (_textController.text.trim().isNotEmpty) {
+                            _checkAnswer();
+                            FocusScope.of(context).unfocus();
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFE91E63), Color(0xFFFF4081)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: primaryPink.withOpacity(0.4),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.arrow_upward_rounded,
+                            size: 22,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
         ),
-        onSubmitted:
-            (_) => _viewModel.isSubmitted ? _nextWord() : _checkAnswer(),
+        onSubmitted: (_) {
+          if (!_viewModel.isSubmitted) {
+            _checkAnswer();
+          } else {
+            _nextWord();
+          }
+        },
       ),
     );
   }
 
   Widget _buildFooter(Vocabulary vocab) {
+    if (!_viewModel.isSubmitted) return const SizedBox.shrink();
+
     bool showFeedback = _viewModel.isSubmitted;
     Color color =
         _viewModel.feedbackState == FeedbackState.correct
@@ -473,15 +721,15 @@ class _WritingViewState extends State<WritingView> {
     String title =
         _viewModel.feedbackState == FeedbackState.correct
             ? 'Chính xác! 🎉'
-            : 'Opps! Chưa đúng rồi 💪';
+            : 'Tiếc quá! 😅';
     String subtitle =
         _viewModel.feedbackState == FeedbackState.correct
-            ? 'Bạn giỏi quá!'
-            : 'Đáp án là: ${vocab.word}';
+            ? 'Bạn giỏi lắm!'
+            : 'Đáp án đúng là:';
     IconData icon =
         _viewModel.feedbackState == FeedbackState.correct
             ? Icons.check_circle_rounded
-            : Icons.cancel_rounded;
+            : Icons.info_outline_rounded;
 
     return Container(
       decoration: BoxDecoration(
@@ -489,87 +737,108 @@ class _WritingViewState extends State<WritingView> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 25,
-            offset: const Offset(0, -5),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 30,
+            offset: const Offset(0, -10),
           ),
         ],
       ),
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder:
-                (child, animation) =>
-                    SizeTransition(sizeFactor: animation, child: child),
-            child:
-                showFeedback
-                    ? Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 20),
-                      padding: const EdgeInsets.all(16),
+          if (showFeedback)
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: color.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
+                        shape: BoxShape.circle,
                       ),
-                      child: Row(
+                      child: Icon(icon, color: color, size: 32),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(icon, color: color, size: 40),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  title,
-                                  style: TextStyle(
-                                    color: color,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  subtitle,
-                                  style: TextStyle(
-                                    color: Colors.grey[800],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
+                          Text(
+                            title,
+                            style: TextStyle(
+                              color: color,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 22,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            subtitle,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                              height: 1.4,
                             ),
                           ),
                         ],
                       ),
-                    )
-                    : const SizedBox.shrink(),
-          ),
-
+                    ),
+                  ],
+                ),
+                if (_viewModel.feedbackState != FeedbackState.correct) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: wrongColor.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: wrongColor.withOpacity(0.1)),
+                    ),
+                    child: Text(
+                      vocab.word,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: wrongColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          const SizedBox(height: 32),
           SizedBox(
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
               focusNode: _nextButtonFocusNode,
-              onPressed: _viewModel.isSubmitted ? _nextWord : _checkAnswer,
+              onPressed: _nextWord,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _viewModel.isSubmitted ? color : primaryPink,
+                backgroundColor: color,
                 foregroundColor: Colors.white,
+                elevation: 4,
+                shadowColor: color.withOpacity(0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
                 ),
-                elevation: 4,
-                shadowColor: (_viewModel.isSubmitted ? color : primaryPink)
-                    .withOpacity(0.4),
               ),
-              child: Text(
-                _viewModel.isSubmitted ? 'TIẾP THEO' : 'KIỂM TRA',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Tiếp theo',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(Icons.arrow_forward_rounded, size: 22),
+                ],
               ),
             ),
           ),

@@ -1,5 +1,3 @@
-import '../../Vocabulary/model/vocabulary.dart';
-
 class QuizQuestionV2 {
   final int vocabularyId;
   final String word;

@@ -1,0 +1,254 @@
+/* src/styles/partner/PartnerManageOrders.css */
+
+/* --- 1. LAYOUT CHUNG --- */
+.pmo-container {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1f2937;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  
+  /* Căn giữa trang và giới hạn chiều rộng để không bị "bè" */
+  max-width: 1200px; 
+  margin: 0 auto; 
+  padding: 0 20px 40px 20px; /* Thêm padding đáy */
+}
+
+/* --- 2. HEADER --- */
+.pmo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* Căn đáy để text và nút thẳng hàng hơn */
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 24px; /* Khoảng cách trên cùng */
+}
+
+.pmo-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.pmo-subtitle {
+  color: #6b7280;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+/* --- 3. STATS GRID (KHỐI THỐNG KÊ) --- */
+.pmo-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Chia đều 3 cột */
+  gap: 24px;
+}
+
+/* Responsive: Trên màn hình nhỏ thì xếp dọc */
+@media (max-width: 768px) {
+  .pmo-stats-grid {
+    grid-template-columns: 1fr; 
+  }
+}
+
+.pmo-stat-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pmo-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #e5e7eb;
+}
+
+.pmo-stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.pmo-stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1;
+}
+
+/* Màu riêng cho từng card */
+.pmo-stat-card.orange .pmo-stat-label { color: #b45309; }
+.pmo-stat-card.orange .pmo-stat-value { color: #d97706; }
+
+.pmo-stat-card.green .pmo-stat-label { color: #059669; }
+.pmo-stat-card.green .pmo-stat-value { color: #059669; }
+
+/* --- 4. FILTER TABS --- */
+.pmo-tabs-wrapper {
+  background: #ffffff;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display: inline-flex; /* Ôm sát nội dung */
+  width: fit-content;   /* Không kéo dài hết màn hình */
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pmo-tab {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.pmo-tab:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.pmo-tab.active {
+  background: #0b5fff;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(11, 95, 255, 0.2);
+}
+
+/* --- 5. TABLE --- */
+.pmo-table-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* Bo tròn góc bảng */
+}
+
+.pmo-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pmo-table thead {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.pmo-table th {
+  text-align: left;
+  padding: 16px 24px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #6b7280;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.pmo-table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.1s;
+}
+.pmo-table tbody tr:last-child {
+  border-bottom: none;
+}
+.pmo-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.pmo-table td {
+  padding: 16px 24px;
+  vertical-align: middle;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* Các cột đặc biệt */
+.pmo-code {
+  font-family: 'Monaco', monospace;
+  font-weight: 700;
+  color: #0b5fff;
+  background: #eff6ff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.pmo-product-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.pmo-price {
+  font-weight: 700;
+  color: #059669;
+  font-size: 15px;
+  font-family: sans-serif;
+}
+
+/* --- BADGES --- */
+.pmo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.pmo-badge-pending { background: #fffbeb; color: #b45309; border: 1px solid #fcd34d; }
+.pmo-badge-confirmed { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.pmo-badge-completed { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+.pmo-badge-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+/* --- BUTTONS --- */
+.pmo-btn-refresh {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  background: #fff; border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-weight: 600; color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pmo-btn-refresh:hover { background: #f3f4f6; border-color: #9ca3af; }
+
+.pmo-btn-detail {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff;
+  color: #0b5fff;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pmo-btn-detail:hover {
+  background: #0b5fff;
+  color: #fff;
+  border-color: #0b5fff;
+}
+
+.pmo-empty {
+  padding: 80px 0;
+  text-align: center;
+  color: #9ca3af;
+}

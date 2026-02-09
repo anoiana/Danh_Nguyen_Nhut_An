@@ -1,0 +1,235 @@
+@startuml GoTripViet_ERD_Balanced
+' ================================================
+' BALANCED ERD FOR PRESENTATION SLIDES
+' ================================================
+left to right direction
+scale 0.85
+
+skinparam {
+    backgroundColor #FFFFFF
+    defaultFontName "Segoe UI"
+    defaultFontSize 11
+    linetype ortho
+    nodesep 50
+    ranksep 60
+}
+
+skinparam entity {
+    BorderThickness 2
+    RoundCorner 8
+    AttributeFontSize 10
+}
+
+skinparam arrow {
+    Color #555555
+    Thickness 1.5
+}
+
+skinparam package {
+    Padding 15
+}
+
+hide circle
+
+title <size:20><b>GoTripViet - Entity Relationship Diagram</b></size>
+
+' ================================================
+' COLUMN 1: USER + AI
+' ================================================
+together {
+    package "User Service" #E8F5E9 {
+        entity "USER" as User #C8E6C9 {
+            * **_id** <<PK>>
+            --
+            * email <<unique>>
+            * password_hash
+            fullName
+            phone
+            roles[]
+            status
+            preferences
+            partner_details
+            wallet_balance
+        }
+    }
+
+    package "AI Service" #E0F7FA {
+        entity "CHAT_SESSION" as ChatSession #B2EBF2 {
+            * **_id** <<PK>>
+            --
+            sessionId <<unique>>
+            messages[]
+        }
+    }
+}
+
+' ================================================
+' COLUMN 2: CATALOG
+' ================================================
+together {
+    package "Catalog Service" #FFF8E1 {
+        entity "PRODUCT" as Product #FFE082 {
+            * **_id** <<PK>>
+            --
+            * **partner_id** <<FK>>
+            product_code <<unique>>
+            * title
+            slug <<unique>>
+            * base_price
+            status
+            **location_ids[]** <<FK>>
+            **category_ids[]** <<FK>>
+            tour_details
+        }
+        
+        entity "CATEGORY" as Category #FFECB3 {
+            * **_id** <<PK>>
+            --
+            * name <<unique>>
+            slug
+            **parent** <<FK>>
+            **created_by** <<FK>>
+            status
+        }
+        
+        entity "LOCATION" as Location #FFECB3 {
+            * **_id** <<PK>>
+            --
+            * name
+            slug <<unique>>
+            country
+            coordinates
+            **created_by** <<FK>>
+            status
+        }
+    }
+}
+
+' ================================================
+' COLUMN 3: INVENTORY
+' ================================================
+together {
+    package "Inventory Service" #FFEBEE {
+        entity "INVENTORY" as Inventory #FFCDD2 {
+            * **_id** <<PK>>
+            --
+            * **product_id** <<FK>>
+            * product_type
+            * price
+            original_price
+            applied_event
+            tour_details
+            is_active
+        }
+        
+        entity "EVENT" as Event #FFCDD2 {
+            * **_id** <<PK>>
+            --
+            * name
+            * discount_type
+            * discount_value
+            start/end_month
+            start/end_day
+            is_active
+        }
+        
+        entity "PROMOTION" as Promotion #FFCDD2 {
+            * **_id** <<PK>>
+            --
+            * code <<unique>>
+            * type
+            * value
+            total_quantity
+            used_quantity
+            is_active
+        }
+    }
+}
+
+' ================================================
+' COLUMN 4: BOOKING + PAYMENT
+' ================================================
+together {
+    package "Booking Service" #E3F2FD {
+        entity "BOOKING" as Booking #BBDEFB {
+            * **_id** <<PK>>
+            --
+            * **user_id** <<FK>>
+            **promotion_id** <<FK>>
+            status
+            payment_status
+            pricing
+            passengers[]
+            items[]
+            payments[]
+            * start_date
+            * end_date
+        }
+    }
+
+    package "Payment Service" #F3E5F5 {
+        entity "PAYMENT" as Payment #E1BEE7 {
+            * **_id** <<PK>>
+            --
+            * **booking_id** <<FK>>
+            **user_id** <<FK>>
+            * amount
+            gateway
+            status
+            gateway_txn_id
+        }
+        
+        entity "TRANSACTION" as Transaction #E1BEE7 {
+            * **_id** <<PK>>
+            --
+            **partner_id** <<FK>>
+            **booking_id** <<FK>>
+            * type
+            * amount
+            status
+            balance_after
+        }
+    }
+}
+
+' ================================================
+' RELATIONSHIPS - Standard ERD Crow's Foot
+' ================================================
+
+' User relationships
+User ||--o{ Product #2E7D32 : "partner_id"
+User ||--o{ Booking #2E7D32 : "user_id"
+User |o--o{ Category #2E7D32 : "created_by"
+User |o--o{ Location #2E7D32 : "created_by"
+
+' Catalog internal
+Category |o--o| Category #FF8F00 : "parent"
+Product }o--o{ Category #FFA000
+Product }o--o{ Location #FFA000
+
+' Product → Inventory
+Product ||--o{ Inventory #FFA000 : "product_id"
+
+' Inventory → Event
+Inventory }o--o| Event #E53935 : "applied_event"
+
+' Booking relationships
+Booking }o--o| Promotion #1565C0 : "promotion_id"
+Booking ||--o{ Payment #1565C0 : "booking_id"
+Booking ||--o{ Transaction #1565C0
+
+' Payment/Transaction → User
+Payment }o--|| User #9C27B0 : "user_id"
+Transaction }o--|| User #9C27B0 : "partner_id"
+
+' ================================================
+' COMPACT LEGEND
+' ================================================
+legend bottom
+  |= Ký hiệu |= Ý nghĩa |= Quan hệ |= Ý nghĩa |
+  | * | NOT NULL | \|\|--o{ | 1 : N |
+  | <<PK>> | Primary Key | }o--o{ | N : M |
+  | <<FK>> | Foreign Key | \|o--o\| | 0..1 : 0..1 |
+endlegend
+
+@enduml

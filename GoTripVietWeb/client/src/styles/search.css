@@ -1,0 +1,118 @@
+/* src/styles/UnifiedSearch.css */
+
+.search-bar-container {
+  background: white;
+  border-radius: 12px; /* Bo góc vuông hơn một chút để hợp với thanh dài (hoặc giữ 50px nếu thích tròn) */
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12); /* Đổ bóng rộng hơn */
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+  
+  /* [QUAN TRỌNG] Dòng này làm thanh dài ra hết cỡ */
+  width: 100%; 
+  min-height: 72px; /* Đảm bảo độ cao chuẩn */
+}
+
+/* Hiệu ứng khi bấm vào */
+.search-bar-container:focus-within {
+  border-color: #0194f3;
+  box-shadow: 0 8px 35px rgba(1, 148, 243, 0.15);
+}
+
+/* Các ô tìm kiếm con */
+.search-item {
+  position: relative !important;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* [QUAN TRỌNG] Phân chia độ rộng hợp lý khi thanh dài ra */
+.search-item.start-point { flex: 1.2; } /* Điểm đi rộng vừa */
+.search-item.destination { flex: 2; }   /* Điểm đến rộng nhất */
+.search-item.date-picker { flex: 1.2; } /* Ngày đi rộng vừa */
+.search-item.filter-opt  { flex: 1; }   /* Bộ lọc hẹp hơn chút */
+
+.search-item:hover {
+  background-color: #f7f9fa; /* Màu nền khi di chuột */
+}
+
+/* Đường gạch ngăn cách */
+.search-divider {
+  width: 1px;
+  height: 40px;
+  background-color: #e0e0e0;
+  margin: 0 4px;
+}
+
+/* Label nhỏ bên trên (Vd: ĐIỂM ĐẾN) */
+.search-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9eaab1; /* Màu xám nhạt hiện đại */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+/* Giá trị chính (Vd: Đà Nẵng) */
+.search-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #03121a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%; /* Cho phép dãn theo ô cha */
+}
+
+/* Input nhập liệu */
+.search-input {
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: #03121a;
+  width: 100%;
+  outline: none;
+  padding: 0;
+}
+.search-input::placeholder {
+  color: #9eaab1;
+  font-weight: 500;
+}
+
+/* Nút tìm kiếm */
+.btn-search-main {
+  border-radius: 8px; /* Bo góc đồng bộ với thanh */
+  padding: 0 32px;
+  height: 46px; /* Cao bằng thanh chứa */
+  font-weight: 700;
+  font-size: 16px;
+  background: #0194f3;
+  border: none;
+  color: white;
+  box-shadow: 0 4px 10px rgba(1, 148, 243, 0.3);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-search-main:hover {
+  background: #007ecc;
+  transform: translateY(-1px);
+}
+
+/* Ẩn input date */
+.hidden-date-input {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer; z-index: 10;
+}

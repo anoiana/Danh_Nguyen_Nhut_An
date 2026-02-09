@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import '../../../core/base_view_model.dart';
 import '../model/game_session.dart';
 import '../../Vocabulary/model/vocabulary.dart';
-import '../../../api/auth_service.dart';
-import '../../Study_Modes/service/study_mode_service.dart';
+import '../service/study_mode_service.dart';
 import '../../../api/sound_service.dart';
 import '../../../api/tts_service.dart';
 
 enum FeedbackState { initial, loading, correct, incorrect }
 
 class SentenceViewModel extends BaseViewModel {
-  final StudyModeService _service = StudyModeService();
   final TextToSpeechService _ttsService = TextToSpeechService();
   final SoundService _soundService = SoundService();
 
@@ -55,11 +53,15 @@ class SentenceViewModel extends BaseViewModel {
     try {
       // Try 'writing' mode first (generic fallback handling)
       try {
-        _session = await _service.startGenericGame(userId, folderId, 'writing');
+        _session = await StudyModeService.startGenericGame(
+          userId,
+          folderId,
+          'writing',
+        );
       } catch (e) {
         debugPrint('Writing mode failed ($e), falling back to flashcard...');
         // Fallback to 'flashcard'
-        _session = await _service.startGenericGame(
+        _session = await StudyModeService.startGenericGame(
           userId,
           folderId,
           'flashcard',
@@ -102,7 +104,7 @@ class SentenceViewModel extends BaseViewModel {
     notifyListeners();
 
     try {
-      final response = await AuthService.checkWritingSentence(
+      final response = await StudyModeService.checkWritingSentence(
         currentVocab!.id,
         answer.trim(),
       );
@@ -113,11 +115,11 @@ class SentenceViewModel extends BaseViewModel {
 
       if (response.isCorrect) {
         _correctCount++;
-        await _soundService.playCorrectAndWait();
+        _soundService.playCorrect();
       } else {
         _wrongCount++;
         _wrongAnswerVocabIds.add(currentVocab!.id);
-        await _soundService.playWrongAndWait();
+        _soundService.playWrong();
       }
 
       _ttsService.speak(currentVocab!.word);
@@ -128,7 +130,7 @@ class SentenceViewModel extends BaseViewModel {
       if (!_wrongAnswerVocabIds.contains(currentVocab!.id)) {
         _wrongAnswerVocabIds.add(currentVocab!.id);
       }
-      await _soundService.playWrongAndWait();
+      _soundService.playWrong();
     }
     notifyListeners();
   }
@@ -152,7 +154,7 @@ class SentenceViewModel extends BaseViewModel {
     setBusy(true);
     try {
       if (_session != null) {
-        final newSession = await AuthService.startRetryGame(
+        final newSession = await StudyModeService.startRetryGame(
           _session!.gameResultId,
         );
         if (newSession is GameSession) {
@@ -172,7 +174,7 @@ class SentenceViewModel extends BaseViewModel {
   Future<void> submitGameResult() async {
     if (_session == null) return;
     try {
-      await AuthService.updateGameResult(
+      await StudyModeService.updateGameResult(
         _session!.gameResultId,
         _correctCount,
         _wrongCount,

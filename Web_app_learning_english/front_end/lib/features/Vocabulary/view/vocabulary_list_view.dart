@@ -193,7 +193,7 @@ class _VocabularyListViewState extends State<VocabularyListView> {
                         TextButton.icon(
                           onPressed: () async {
                             final base64 =
-                                await ImageService.pickAndEncodeImage();
+                                await ImageUploadService.pickAndEncodeImage();
                             if (base64 != null) {
                               setDialogState(() => newImageBase64 = base64);
                             }

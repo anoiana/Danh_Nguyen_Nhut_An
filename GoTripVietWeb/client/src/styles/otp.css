@@ -1,0 +1,23 @@
+.otp-input {
+  width: clamp(46px, 8vw, 64px);
+  height: clamp(46px, 8vw, 64px);
+  font-size: clamp(20px, 4vw, 28px);
+  border-radius: 14px;
+  background: #e5e7eb;
+  border: 1px solid #9ca3af;
+}
+.otp-input:focus {
+  outline: none;
+  border-color: #53c3bf;
+  box-shadow: 0 0 0 0.25rem rgba(83, 195, 191, 0.25);
+}
+
+/* Giữ nút chính đồng bộ palette */
+.btn-teal {
+  background-color: #53c3bf;
+  border-color: #53c3bf;
+  color: #fff;
+}
+.btn-teal:disabled {
+  opacity: 0.65;
+}

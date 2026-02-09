@@ -1,0 +1,267 @@
+/* src/components/admin/InventoryManager.css */
+
+/* --- Main Container --- */
+.im-container {
+  margin-top: 20px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.im-header {
+  padding: 12px 20px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.im-title {
+  font-weight: 800;
+  color: #111827;
+  font-size: 16px;
+}
+
+.im-add-btn {
+  padding: 8px 16px;
+  background: #0b5fff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.im-add-btn:hover {
+  background: #004ecb;
+}
+
+/* --- List Items Grid --- */
+.im-grid {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.im-loading, .im-empty {
+  color: #9ca3af;
+  font-size: 13px;
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+}
+
+/* --- Individual Inventory Item --- */
+.im-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  position: relative;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.im-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.im-item.full {
+  background: #fef2f2;
+  border-color: #fee2e2;
+}
+
+.im-date {
+  font-weight: 800;
+  font-size: 15px;
+  color: #0b5fff;
+  margin-bottom: 8px;
+}
+
+.im-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.im-label {
+  color: #6b7280;
+}
+
+.im-val {
+  font-weight: 600;
+  color: #111827;
+}
+
+.im-transport-info {
+  font-size: 12px;
+  color: #4b5563;
+  background: #f3f4f6;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.im-status {
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #16a34a;
+}
+
+.im-status.full {
+  color: #dc2626;
+}
+
+.im-del-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  cursor: pointer;
+  color: #9ca3af;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.im-del-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* --- Modal Styles --- */
+.im-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.im-modal {
+  background: #fff;
+  width: 600px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.im-modal-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+  color: #111827;
+}
+
+.im-section-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0b5fff;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.im-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.im-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.im-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.im-input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.im-input:focus {
+  border-color: #0b5fff;
+  box-shadow: 0 0 0 3px rgba(11, 95, 255, 0.1);
+}
+
+.im-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+
+.im-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.im-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.im-btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.im-btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.im-btn-primary {
+  background: #0b5fff;
+  color: #fff;
+}
+
+.im-btn-primary:hover {
+  background: #004ecb;
+}

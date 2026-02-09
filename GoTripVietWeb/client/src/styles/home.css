@@ -1,0 +1,185 @@
+/* ===================================================================
+   THEME COLORS & BUTTONS
+=================================================================== */
+.btn-teal {
+  background: #53c3bf;
+  border-color: #53c3bf;
+  color: #fff;
+}
+
+.btn-outline-teal {
+  color: #53c3bf;
+  border-color: #53c3bf;
+  background: transparent;
+}
+
+.btn-outline-teal:hover {
+  background: #e6f7f6;
+  color: #3aa6a3;
+}
+
+/* ===================================================================
+   SEARCH (HotelSearch)
+=================================================================== */
+.gv-search {
+  background: #f5fbfb;
+  border: 1px solid #e6f3f3;
+}
+
+.gv-search .form-control:focus {
+  border-color: #53c3bf;
+  box-shadow: 0 0 0 0.2rem rgba(83, 195, 191, 0.15);
+}
+
+.gv-search .bi-caret-down-fill {
+  opacity: 0.6;
+}
+
+/* Popover look & sizing */
+.popover .popover-header {
+  background: #fbffff;
+  font-weight: 600;
+}
+
+#date-pop,
+#guests-pop,
+.gv-search .popover {
+  max-width: none;
+} /* không bó 276px */
+
+/* ===================================================================
+   EVENT / BANNER
+=================================================================== */
+.gv-event {
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gv-event::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.gv-event .gv-event-content {
+  position: relative;
+}
+
+.gv-banner-mobile {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+
+.gv-banner-mobile .gv-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.25));
+}
+
+.gv-qr {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.gv-store-badge {
+  height: 38px;
+  width: auto;
+}
+
+/* ===================================================================
+   UTILITIES
+=================================================================== */
+.opacity-85 {
+  opacity: 0.85;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* ===================================================================
+   RESPONSIVE
+=================================================================== */
+/* Button “Tìm” full-height cùng hàng trên desktop */
+@media (min-width: 992px) {
+  .gv-search .btn-teal {
+    height: 100%;
+  }
+}
+
+/* Button “Tìm” cao 48px trên mobile */
+@media (max-width: 991.98px) {
+  .gv-search .btn-teal {
+    height: 48px;
+  }
+}
+
+/* Date popover body cuộn mượt trên màn hình rất nhỏ */
+@media (max-width: 575.98px) {
+  #date-pop .popover-body {
+    max-height: 70vh;
+    overflow: auto;
+  }
+}
+
+/* Desktop: 1 hàng 6 cột như hiện tại */
+.taxi-search-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr 1fr 1fr 0.8fr 120px;
+}
+
+/* Tablet & mobile: xếp dọc, mỗi ô 1 dòng */
+@media (max-width: 992px) {
+  .taxi-search-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Đổi đường kẻ ngăn: bỏ kẻ dọc, thêm kẻ ngang */
+  .taxi-search-grid > .border-end {
+    border-right: none !important;
+    border-bottom: 1px solid #dde3ea;
+  }
+
+  .taxi-search-grid > .border-end:last-child {
+    border-bottom: none;
+  }
+
+  /* Cho nút Search full width dưới cùng */
+  .taxi-search-grid > div:last-child button {
+    border-radius: 0 0 0.75rem 0.75rem; /* bo góc dưới cho đẹp */
+  }
+}
+
+/* ===== RentCarSearch – layout cho màn hình lớn ===== */
+.rent-main-row .rent-main-item {
+  /* mỗi ô có thể co giãn, base 260px */
+  flex: 1 1 260px;
+}
+
+.rent-main-row .rent-main-search {
+  flex: 0 0 150px; /* ô nút "Tìm kiếm" hẹp hơn */
+}
+
+/* ===== Màn hình nhỏ (tablet, mobile) ===== */
+@media (max-width: 768px) {
+  .rent-main-row {
+    flex-direction: column;
+  }
+
+  .rent-main-row .rent-main-item {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0 !important; /* override minWidth inline */
+  }
+
+  .rent-main-row .rent-main-search button {
+    width: 100%; /* nút full chiều ngang */
+  }
+}

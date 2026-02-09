@@ -1,0 +1,221 @@
+/* src/styles/admin/CreateTour.css */
+
+.create-tour-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+  color: #374151;
+}
+
+/* HEADER */
+.ct-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.ct-h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+.ct-sub {
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* TABS (WIZARD STEPS) */
+.ct-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 30px;
+  background: #f9fafb;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow-x: auto;
+}
+
+.ct-tab {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.ct-tab.active {
+  background: white;
+  color: #0b5fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.ct-tab:hover:not(.active) {
+  background: #e5e7eb;
+}
+
+/* CARD CONTAINER */
+.ct-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  animation: fadeIn 0.3s ease;
+}
+
+.ct-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* FIELDS & INPUTS */
+.ct-field {
+  margin-bottom: 20px;
+}
+.ct-label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #4b5563;
+  display: block;
+}
+.ct-input, .ct-select, .ct-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.ct-input:focus, .ct-select:focus, .ct-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* GRIDS */
+.ct-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.ct-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+/* LIST BOX (For Itinerary/Policies) */
+.ct-list-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.ct-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* UPLOAD AREA */
+.ct-upload-box {
+  border: 2px dashed #e5e7eb;
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  background: #f9fafb;
+  transition: all 0.2s;
+}
+.ct-upload-box:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.ct-img-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.ct-img-wrapper {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+.ct-img-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ct-img-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(255,255,255,0.9);
+  color: #ef4444;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* BUTTONS */
+.ct-btn-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+}
+.ct-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ct-btn-primary {
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  background: #0b5fff;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(11, 95, 255, 0.2);
+}
+.ct-btn-primary:hover {
+  background: #004ecc;
+  transform: translateY(-1px);
+}
+.ct-btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

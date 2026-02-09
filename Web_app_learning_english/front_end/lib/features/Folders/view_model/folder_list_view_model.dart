@@ -5,8 +5,6 @@ import '../model/folder.dart';
 import '../service/folder_service.dart';
 
 class FolderListViewModel extends BaseViewModel {
-  final FolderService _folderService = FolderService();
-
   List<Folder> _folders = [];
   List<Folder> get folders => _folders;
 
@@ -45,10 +43,9 @@ class FolderListViewModel extends BaseViewModel {
     _folders.clear();
     _currentPage = 0;
     _hasMore = true;
-    // _errorMessage = ''; // Handled by state change
 
     try {
-      final folderPage = await _folderService.getFoldersByUser(
+      final folderPage = await FolderService.getFoldersByUser(
         _userId!,
         page: _currentPage,
         search: _searchQuery,
@@ -78,7 +75,7 @@ class FolderListViewModel extends BaseViewModel {
 
     try {
       _currentPage++;
-      final folderPage = await _folderService.getFoldersByUser(
+      final folderPage = await FolderService.getFoldersByUser(
         _userId!,
         page: _currentPage,
         search: _searchQuery,
@@ -87,8 +84,7 @@ class FolderListViewModel extends BaseViewModel {
       _folders.addAll(folderPage.content);
       _hasMore = !folderPage.isLast;
     } catch (e) {
-      // Silent error for pagination or show snackbar via view?
-      // keeping logic simple for now
+      // Silent error for pagination or show snackbar via view
     } finally {
       _isLoadingMore = false;
       notifyListeners();
@@ -98,7 +94,7 @@ class FolderListViewModel extends BaseViewModel {
   Future<bool> createFolder(String name) async {
     if (_userId == null) return false;
     try {
-      await _folderService.createFolder(name, _userId!);
+      await FolderService.createFolder(name, _userId!);
       await _resetAndFetchFolders();
       return true;
     } catch (e) {
@@ -109,7 +105,7 @@ class FolderListViewModel extends BaseViewModel {
 
   Future<bool> updateFolder(int folderId, String newName) async {
     try {
-      await _folderService.updateFolder(folderId, newName);
+      await FolderService.updateFolder(folderId, newName);
       await _resetAndFetchFolders();
       return true;
     } catch (e) {
@@ -120,7 +116,7 @@ class FolderListViewModel extends BaseViewModel {
 
   Future<bool> deleteFolder(int folderId) async {
     try {
-      await _folderService.deleteFolder(folderId);
+      await FolderService.deleteFolder(folderId);
       await _resetAndFetchFolders();
       return true;
     } catch (e) {

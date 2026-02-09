@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../core/base_view_model.dart';
 import '../../Study_Modes/model/quiz_session.dart';
 import '../service/study_mode_service.dart';
-import '../../../api/auth_service.dart';
 import '../../../api/sound_service.dart';
 
 class QuizViewModel extends BaseViewModel {
-  final StudyModeService _service = StudyModeService();
   final SoundService _soundService = SoundService();
 
   QuizSessionV2? _session;
@@ -41,7 +39,7 @@ class QuizViewModel extends BaseViewModel {
   }) async {
     setBusy(true);
     try {
-      _session = await _service.startQuizGame(
+      _session = await StudyModeService.startQuizGameV2(
         userId,
         folderId,
         subType: subType,
@@ -82,12 +80,12 @@ class QuizViewModel extends BaseViewModel {
 
     if (isCorrect) {
       _correctCount++;
-      await _soundService.playCorrectAndWait();
+      _soundService.playCorrect();
     } else {
       _wrongCount++;
       _wrongAnswerVocabIds.add(currentQuestion!.vocabularyId);
       _wrongQuestions.add(currentQuestion!); // Keep track for retry
-      await _soundService.playWrongAndWait();
+      _soundService.playWrong();
     }
 
     return isCorrect;
@@ -119,7 +117,7 @@ class QuizViewModel extends BaseViewModel {
   Future<void> submitResult() async {
     if (_session == null) return;
     try {
-      await AuthService.updateGameResult(
+      await StudyModeService.updateGameResult(
         _session!.gameResultId,
         _correctCount,
         _wrongCount,

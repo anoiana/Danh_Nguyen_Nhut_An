@@ -1,0 +1,232 @@
+@startuml GoTripViet_UseCase_Master_Detailed
+' ================================================
+' USE CASE DIAGRAM - DETAILED SYSTEM OVERVIEW
+' ================================================
+left to right direction
+skinparam handwritten false
+skinparam shadowing true
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+' --- COLORS DEFINITIONS ---
+!define COLOR_ACTOR_USER #E8F5E9
+!define COLOR_ACTOR_PARTNER #FFF9C4
+!define COLOR_ACTOR_ADMIN #FFCDD2
+
+!define COLOR_UC_AUTH #E0F2F1
+!define COLOR_UC_DISCOVERY #FFF3E0
+!define COLOR_UC_BOOKING #E1F5FE
+!define COLOR_UC_PARTNER #F3E5F5
+!define COLOR_UC_ADMIN #FFEBEE
+
+skinparam actor {
+    BorderColor #333333
+    FontSize 14
+    FontStyle Bold
+}
+
+skinparam usecase {
+    BorderColor #455A64
+    BackgroundColor #FFFFFF
+    FontSize 13
+    ArrowColor #546E7A
+}
+
+skinparam package {
+    BackgroundColor #FAFAFA
+    BorderColor #B0BEC5
+    FontSize 14
+    FontStyle Bold
+}
+
+title <size:24><b>GoTripViet - Hệ Thống Đặt Tour Du Lịch</b></size>\n<size:16>Sơ đồ Use Case Chi Tiết (Detailed)</size>
+
+' ================================================
+' ACTORS
+' ================================================
+actor "Guest\n(Khách vãng lai)" as Guest
+actor "Customer\n(Khách hàng)" as Customer COLOR_ACTOR_USER
+actor "Partner\n(Đối tác/NCC)" as Partner COLOR_ACTOR_PARTNER
+actor "Admin\n(Quản trị viên)" as Admin COLOR_ACTOR_ADMIN
+
+' Inheritance
+Guest <|-- Customer
+Customer <|-- Partner
+Customer <|-- Admin
+
+' ================================================
+' USE CASES
+' ================================================
+rectangle "GoTripViet System Features" {
+
+    ' --- 1. AUTHENTICATION (Xác thực) ---
+    package "1. Authentication & Security" COLOR_UC_AUTH {
+        usecase "Đăng Ký Tài Khoản" as UC_Register
+        usecase "Đăng Nhập" as UC_Login
+        usecase "Quên Mật Khẩu" as UC_ForgotPass
+        usecase "Đổi Mật Khẩu" as UC_ChangePass
+        usecase "Cập Nhật Profile" as UC_UpdateProfile
+        usecase "Đăng Ký Partner" as UC_RegPartner
+    }
+
+    ' --- 2. DISCOVERY (Khám phá) ---
+    package "2. Discovery & Search" COLOR_UC_DISCOVERY {
+        usecase "Tìm Kiếm Tour" as UC_Search
+        usecase "Lọc Tour (Giá/Địa điểm)" as UC_Filter
+        usecase "Xem Chi Tiết Tour" as UC_ViewDetail
+        usecase "Xem Đánh Giá/Review" as UC_ViewReview
+    }
+
+    ' --- 3. BOOKING (Đặt tour) ---
+    package "3. Booking Process" COLOR_UC_BOOKING {
+        usecase "Đặt Tour (Booking)" as UC_BookTour
+        usecase "Chọn Lịch Khởi Hành" as UC_SelectSchedule
+        usecase "Nhập Thông Tin Hành Khách" as UC_EnterPax
+        usecase "Áp Dụng Coupon/Voucher" as UC_ApplyVoucher
+        usecase "Thanh Toán Online" as UC_Payment
+        usecase "Quản Lý Đơn Đặt Chỗ" as UC_ManageBooking
+        usecase "Hủy Đặt Chỗ" as UC_CancelBooking
+    }
+
+    ' --- 4. PARTNER MANAGEMENT (Dành cho NCC) ---
+    package "4. Partner Operations" COLOR_UC_PARTNER {
+        usecase "Quản Lý Tour Của Tôi" as UC_MyTours
+        usecase "Tạo Tour Mới" as UC_CreateTour
+        usecase "Cập Nhật Thông Tin Tour" as UC_UpdateTour
+        usecase "Xóa Tour" as UC_DeleteTour
+        usecase "Quản Lý Lịch (Inventory)" as UC_ManageInventory
+        usecase "Thêm Lịch Khởi Hành" as UC_AddSchedule
+        usecase "Cập Nhật Lịch" as UC_UpdateSchedule
+        usecase "Xóa Lịch" as UC_DeleteSchedule
+        usecase "Xem Đơn Hàng (Orders)" as UC_ViewOrders
+        usecase "Xem Doanh Thu" as UC_PartnerRevenue
+    }
+
+    ' --- 5. ADMINISTRATION (Quản trị Hệ Thống) ---
+    package "5. Administration" COLOR_UC_ADMIN {
+        
+        ' 5.1 Nhóm Tài Khoản (Account Management)
+        usecase "Quản Lý Người Dùng" as UC_MgrUser
+        usecase "Xem Danh Sách User" as UC_ViewUserList
+        usecase "Khóa/Mở Khóa User" as UC_BlockUser
+        
+        usecase "Quản Lý Admin" as UC_MgrAdmin
+        usecase "Phân Quyền (Roles)" as UC_AssignRole
+
+        usecase "Quản Lý Đối Tác" as UC_MgrPartner
+        usecase "Xem Hồ Sơ Đối Tác" as UC_VerifyPartner
+        usecase "Duyệt Đối Tác (Approve)" as UC_ApprovePartner
+        
+        ' 5.2 Nhóm Quản Lý Dữ Liệu (Data Management)
+        usecase "Quản Lý Địa Điểm" as UC_MgrLocation
+        usecase "Thêm/Sửa/Xóa Location" as UC_CRUDLocation
+
+        usecase "Quản Lý Danh Mục" as UC_MgrCategory
+        usecase "Thêm/Sửa/Xóa Category" as UC_CRUDCategory
+
+        usecase "Quản Lý Tour (System)" as UC_MgrTourSystem
+        usecase "Duyệt Tour" as UC_ApproveTour
+        usecase "Từ Chối Tour" as UC_RejectTour
+
+        usecase "Quản Lý Khuyến Mãi" as UC_MgrPromo
+        usecase "Thêm/Sửa/Xóa Mã KM" as UC_CRUDPromo
+
+        usecase "Quản Lý Sự Kiện (Events)" as UC_MgrEvent
+        usecase "Thêm/Sửa/Xóa Event" as UC_CRUDEvent
+
+        ' 5.3 Nhóm Thống Kê & Doanh Thu (Revenue)
+        usecase "Quản Lý Doanh Thu" as UC_MgrRevenue
+        usecase "Xem Báo Cáo Tổng Quan" as UC_ViewReport
+        usecase "Xem Doanh Thu Theo Booking" as UC_ViewBookingRev
+    }
+
+    ' --- 6. AI SUPPORT (Hỗ trợ thông minh) ---
+    package "6. AI & Support" COLOR_UC_DISCOVERY {
+        usecase "Chat với AI (Tư vấn du lịch)" as UC_ChatAI
+        usecase "Nhận Gợi Ý Tour (Recommend)" as UC_AIRecommend
+    }
+}
+
+' ================================================
+' RELATIONSHIPS & FLOWS
+' ================================================
+
+' --- Guest ---
+Guest --> UC_Register
+Guest --> UC_Login
+Guest --> UC_ForgotPass
+Guest --> UC_Search
+UC_Search <.. UC_Filter : <<extend>>
+Guest --> UC_ViewDetail
+UC_ViewDetail <.. UC_ViewReview : <<extend>>
+
+' Guest & Customer đều dùng được AI
+Guest --> UC_ChatAI
+Guest --> UC_AIRecommend
+
+' --- Customer ---
+Customer --> UC_UpdateProfile
+Customer --> UC_ChangePass
+Customer --> UC_RegPartner
+
+' Booking Flow
+Customer --> UC_BookTour
+UC_BookTour ..> UC_SelectSchedule : <<include>> \n(Bước 1)
+UC_BookTour ..> UC_EnterPax : <<include>> \n(Bước 2)
+UC_BookTour <.. UC_ApplyVoucher : <<extend>> \n(Optional)
+UC_BookTour ..> UC_Payment : <<include>> \n(Bước 3)
+
+Customer --> UC_ManageBooking
+UC_ManageBooking <.. UC_CancelBooking : <<extend>>
+
+' --- Partner ---
+Partner --> UC_MyTours
+UC_MyTours <.. UC_CreateTour : <<extend>>
+UC_MyTours <.. UC_UpdateTour : <<extend>>
+UC_MyTours <.. UC_DeleteTour : <<extend>>
+
+Partner --> UC_ManageInventory
+UC_ManageInventory <.. UC_AddSchedule : <<extend>>
+UC_ManageInventory <.. UC_UpdateSchedule : <<extend>>
+UC_ManageInventory <.. UC_DeleteSchedule : <<extend>>
+
+Partner --> UC_ViewOrders
+Partner --> UC_PartnerRevenue
+
+' --- Admin (Detailed based on Sidebar) ---
+
+' 1. ACCOUNT MANAGEMENT
+Admin --> UC_MgrUser
+UC_MgrUser ..> UC_ViewUserList : <<include>>
+UC_MgrUser <.. UC_BlockUser : <<extend>>
+
+Admin --> UC_MgrAdmin
+UC_MgrAdmin <.. UC_AssignRole : <<extend>>
+
+Admin --> UC_MgrPartner
+UC_MgrPartner ..> UC_VerifyPartner : <<include>>
+UC_MgrPartner <.. UC_ApprovePartner : <<extend>>
+
+' 2. DATA MANAGEMENT
+Admin --> UC_MgrLocation
+UC_MgrLocation <.. UC_CRUDLocation : <<extend>>
+
+Admin --> UC_MgrCategory
+UC_MgrCategory <.. UC_CRUDCategory : <<extend>>
+
+Admin --> UC_MgrTourSystem
+UC_MgrTourSystem <.. UC_ApproveTour : <<extend>>
+UC_ApproveTour <.. UC_RejectTour : <<extend>>
+
+Admin --> UC_MgrPromo
+UC_MgrPromo <.. UC_CRUDPromo : <<extend>>
+
+Admin --> UC_MgrEvent
+UC_MgrEvent <.. UC_CRUDEvent : <<extend>>
+
+' 3. REVENUE MANAGEMENT
+Admin --> UC_MgrRevenue
+UC_MgrRevenue ..> UC_ViewReport : <<include>>
+UC_MgrRevenue <.. UC_ViewBookingRev : <<extend>>
+
+@enduml

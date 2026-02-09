@@ -5,11 +5,9 @@ import '../../Vocabulary/model/vocabulary.dart';
 import '../model/game_session.dart';
 import '../model/matching_tile.dart';
 import '../service/study_mode_service.dart';
-import '../../../api/auth_service.dart';
 import '../../../api/sound_service.dart';
 
 class MatchingViewModel extends BaseViewModel {
-  final StudyModeService _service = StudyModeService();
   final SoundService _soundService = SoundService();
 
   GameSession? _session;
@@ -43,23 +41,18 @@ class MatchingViewModel extends BaseViewModel {
   Future<void> init(int userId, int folderId) async {
     setBusy(true);
     try {
-      // Use 'flashcard' to just get the list of words for now as matching logic is frontend side
-      // Or 'matching' if backend supports. Let's use 'flashcard' to be safe since we just need vocab list.
-      // Actually let's use 'matching' to be semantically correct, if it fails I'll swap.
-      // But wait, the user showed me 'GameSelectionScreen' which implies 'writing', 'flashcard' exist.
-      // I'll stick to 'flashcard' gameType to ensure providing data, as matching game is just a UI layer over vocabs.
-      // Correction: Use 'matching' if you want backend to track it as matching game stats.
-      // I will assume 'matching' is valid or will default to flashcard data structure.
-      // Let's rely on standard GameSession return.
-      _session = await _service.startGenericGame(userId, folderId, 'matching');
+      _session = await StudyModeService.startGenericGame(
+        userId,
+        folderId,
+        'matching',
+      );
       _setupGame();
       setBusy(false);
     } catch (e) {
-      // Fallback to flashcard if matching not found? No, better show error.
-      // Actually, for safety let's just try 'matching'.
+      // Fallback to flashcard if matching not found
       try {
         if (e.toString().contains("Invalid game type")) {
-          _session = await _service.startGenericGame(
+          _session = await StudyModeService.startGenericGame(
             userId,
             folderId,
             'flashcard',
@@ -159,7 +152,7 @@ class MatchingViewModel extends BaseViewModel {
       _secondSelected!.isSelected = false; // Keep them visible as matched
 
       _matchedPairs++;
-      await _soundService.playCorrectAndWait();
+      _soundService.playCorrect();
 
       _firstSelected = null;
       _secondSelected = null;
@@ -177,7 +170,7 @@ class MatchingViewModel extends BaseViewModel {
 
       _firstSelected!.isError = true;
       _secondSelected!.isError = true;
-      await _soundService.playWrongAndWait();
+      _soundService.playWrong();
       notifyListeners();
 
       // Wait and reset
@@ -213,7 +206,7 @@ class MatchingViewModel extends BaseViewModel {
   Future<void> submitResult() async {
     if (_session == null) return;
     try {
-      await AuthService.updateGameResult(
+      await StudyModeService.updateGameResult(
         _session!.gameResultId,
         _matchedPairs,
         _failedVocabIds.length,

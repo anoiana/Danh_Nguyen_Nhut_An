@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../core/base_view_model.dart';
-import '../../../api/auth_service.dart';
 import '../../../api/tts_service.dart';
 import '../model/reading_content.dart';
 import '../../Vocabulary/model/vocabulary.dart';
+import '../../Vocabulary/service/vocabulary_service.dart';
+import '../service/study_mode_service.dart';
 
 class ReadingViewModel extends BaseViewModel {
   final TextToSpeechService _ttsService = TextToSpeechService();
@@ -37,14 +38,18 @@ class ReadingViewModel extends BaseViewModel {
   }) async {
     setBusy(true);
     try {
-      final vocabPage = await AuthService.getVocabulariesByFolder(
+      final vocabPage = await VocabularyService.getVocabulariesByFolder(
         folderId,
         page: 0,
         size: 100,
       );
       _vocabularyInFolder = vocabPage.content.map((v) => v.word).toList();
 
-      _content = await AuthService.generateReadingGame(folderId, level, topic);
+      _content = await StudyModeService.generateReadingGame(
+        folderId,
+        level,
+        topic,
+      );
       if (_content != null) {
         _paragraphs = _splitTextIntoParagraphs(_content!.story);
       }

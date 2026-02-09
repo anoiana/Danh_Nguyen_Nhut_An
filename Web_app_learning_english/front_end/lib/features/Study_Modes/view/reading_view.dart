@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../api/auth_service.dart';
+import '../../Dictionary/service/dictionary_service.dart';
 import '../../../core/widgets/speech_rate_slider.dart';
 import '../view_model/reading_view_model.dart';
 import 'dart:ui'; // For backdrop filter
@@ -663,7 +663,7 @@ class TranslationBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           FutureBuilder<String>(
-            future: AuthService.translateWord(text),
+            future: DictionaryService.translateWord(text),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Padding(
@@ -786,7 +786,7 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
                     if (_controller.text.isEmpty) return;
                     setState(() => _isLoading = true);
                     try {
-                      final res = await AuthService.translateWord(
+                      final res = await DictionaryService.translateWord(
                         _controller.text,
                       );
                       setState(() => _result = res);

@@ -295,7 +295,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                   child: TextButton.icon(
                     onPressed: () async {
                       final base64String =
-                          await ImageService.pickAndEncodeImage();
+                          await ImageUploadService.pickAndEncodeImage();
                       if (base64String != null) {
                         setState(() => _selectedImageBase64 = base64String);
                       }

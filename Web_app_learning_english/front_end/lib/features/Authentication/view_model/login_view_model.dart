@@ -1,15 +1,13 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled/features/Authentication/service/auth_service.dart';
 import '../../../core/base_view_model.dart';
-import '../service/auth_service.dart';
 import '../model/login_response.dart';
 
 class LoginViewModel extends BaseViewModel {
-  final AuthService _authService = AuthService();
-
   Future<bool> login(String username, String password) async {
     setBusy(true);
     try {
-      final LoginResponse response = await _authService.login(
+      final LoginResponse response = await AuthService.login(
         username,
         password,
       );
@@ -21,7 +19,9 @@ class LoginViewModel extends BaseViewModel {
 
       setBusy(false);
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Login Error Details: $e');
+      print('Stack Trace: $stackTrace');
       setError(e.toString());
       setBusy(false);
       return false;
@@ -31,9 +31,7 @@ class LoginViewModel extends BaseViewModel {
   Future<bool> register(String username, String password) async {
     setBusy(true);
     try {
-      await _authService.register(username, password);
-      // Registration successful, usually we don't login automatically here or we can
-      // For now just return true
+      await AuthService.register(username, password);
       setBusy(false);
       return true;
     } catch (e) {

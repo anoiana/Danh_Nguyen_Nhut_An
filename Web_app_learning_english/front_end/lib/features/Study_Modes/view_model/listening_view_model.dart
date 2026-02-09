@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../api/auth_service.dart';
 import '../../../api/tts_service.dart';
 import '../../../api/sound_service.dart';
 import '../service/study_mode_service.dart';
@@ -13,7 +12,6 @@ enum ListeningGameType { vocabulary, ai }
 enum FeedbackState { initial, correct, incorrect, loading }
 
 class ListeningViewModel extends ChangeNotifier {
-  final StudyModeService _service = StudyModeService();
   final TextToSpeechService _ttsService = TextToSpeechService();
   final SoundService _soundService = SoundService();
 
@@ -85,7 +83,7 @@ class ListeningViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final session = await _service.startGenericGame(
+      final session = await StudyModeService.startGenericGame(
         userId,
         folderId,
         'listening',
@@ -112,7 +110,7 @@ class ListeningViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _aiContent = await AuthService.generateListeningGame(
+      _aiContent = await StudyModeService.generateListeningGame(
         folderId,
         level,
         topic,
@@ -176,14 +174,16 @@ class ListeningViewModel extends ChangeNotifier {
       _correctCount++;
       _feedbackState = FeedbackState.correct;
       notifyListeners();
-      await _soundService.playCorrectAndWait();
+      _soundService.playCorrect();
+      _ttsService.setSpeechRate(1.0);
+      _ttsService.speak(currentVocab.word);
     } else {
       _wrongCount++;
       _wrongAnswerVocabIds.add(currentVocab.id);
       _wrongVocabularies.add(currentVocab);
       _feedbackState = FeedbackState.incorrect;
       notifyListeners();
-      await _soundService.playWrongAndWait();
+      _soundService.playWrong();
     }
   }
 
@@ -222,7 +222,7 @@ class ListeningViewModel extends ChangeNotifier {
     final session = _vocabSession;
     if (session == null) return;
     try {
-      await AuthService.updateGameResult(
+      await StudyModeService.updateGameResult(
         session.gameResultId,
         _correctCount,
         _wrongCount,

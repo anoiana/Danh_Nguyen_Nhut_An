@@ -1,0 +1,403 @@
+@startuml GoTripViet_ERD_Full
+' ================================================
+' COMPLETE ERD WITH ALL ATTRIBUTES
+' ================================================
+
+!define PK <b>PK</b>
+!define FK <b>FK</b>
+
+skinparam {
+    backgroundColor #FFFFFF
+    defaultFontName "Segoe UI"
+    defaultFontSize 10
+    linetype ortho
+}
+
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    BorderThickness 2
+    RoundCorner 0
+    AttributeFontSize 9
+}
+
+skinparam package {
+    BackgroundColor transparent
+    BorderColor #666666
+    BorderStyle dashed
+    FontSize 12
+    FontStyle bold
+}
+
+hide circle
+
+title <size:18><b>GoTripViet - Entity Relationship Diagram (Full)</b></size>
+
+' ================================================
+' USER SERVICE
+' ================================================
+package "User Service" #E8F5E9 {
+    entity "USER" as User #C8E6C9 {
+        * _id : ObjectId <<PK>>
+        --
+        * email : String <<unique>>
+        * password_hash : String
+        fullName : String
+        phone : String
+        * roles : String[] <<enum>>
+        * status : String <<enum>>
+        --
+        <i>// Preferences (Embedded)</i>
+        preferences.travel_style : String
+        preferences.interests : String[]
+        preferences.companions : String[]
+        preferences.budget_per_trip_usd : Number
+        preferences.pace : String
+        preferences.sustainability_priority : Boolean
+        --
+        <i>// Partner Details (Embedded)</i>
+        partner_details.company_name : String
+        partner_details.business_license : String
+        partner_details.contact_phone : String
+        partner_details.bank_account.bank_name : String
+        partner_details.bank_account.account_number : String
+        partner_details.bank_account.account_holder : String
+        partner_details.is_approved : Boolean
+        partner_details.approved_at : Date
+        --
+        * wallet_balance : Number
+        passwordResetToken : String
+        passwordResetExpires : Date
+        * createdAt : Date
+        * updatedAt : Date
+    }
+}
+
+' ================================================
+' CATALOG SERVICE
+' ================================================
+package "Catalog Service" #FFF8E1 {
+    entity "PRODUCT" as Product #FFE082 {
+        * _id : ObjectId <<PK>>
+        --
+        * partner_id : ObjectId <<FK User>>
+        product_code : String <<unique>>
+        * product_type : String <<enum>>
+        * title : String
+        * slug : String <<unique>>
+        description_short : String
+        description_long : String
+        images : Array [{url, public_id}]
+        tags : String[]
+        * base_price : Number
+        sustainability_score : Number
+        * status : String <<enum>>
+        rejection_reason : String
+        --
+        location_ids : ObjectId[] <<FK Location>>
+        category_ids : ObjectId[] <<FK Category>>
+        --
+        <i>// Tour Details (Embedded)</i>
+        tour_details.start_point : String
+        tour_details.departure_times : Date[]
+        tour_details.schedules : Array
+        tour_details.duration_days : Number
+        tour_details.transport_type : String <<enum>>
+        tour_details.hotel_rating : Number
+        tour_details.hotel_name : String
+        tour_details.itinerary : Array
+        tour_details.trip_highlights : Object
+        tour_details.policy_notes : Array
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+    
+    entity "CATEGORY" as Category #FFECB3 {
+        * _id : ObjectId <<PK>>
+        --
+        * name : String <<unique>>
+        * slug : String <<unique>>
+        description : String
+        image.url : String
+        image.public_id : String
+        * status : String <<enum>>
+        --
+        parent : ObjectId <<FK Category>>
+        created_by : ObjectId <<FK User>>
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+    
+    entity "LOCATION" as Location #FFECB3 {
+        * _id : ObjectId <<PK>>
+        --
+        * name : String
+        * slug : String <<unique>>
+        country : String
+        description : String
+        images : Array [{url, public_id}]
+        tags : String[]
+        coordinates.type : String
+        coordinates.coordinates : Number[]
+        * status : String <<enum>>
+        --
+        created_by : ObjectId <<FK User>>
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+}
+
+' ================================================
+' INVENTORY SERVICE
+' ================================================
+package "Inventory Service" #FFEBEE {
+    entity "INVENTORY_ITEM" as Inventory #FFCDD2 {
+        * _id : ObjectId <<PK>>
+        --
+        * product_id : ObjectId <<FK Product>>
+        * product_type : String <<enum>>
+        * price : Number
+        original_price : Number
+        * is_active : Boolean
+        --
+        <i>// Applied Event (Embedded)</i>
+        applied_event.event_id : ObjectId <<FK Event>>
+        applied_event.name : String
+        applied_event.discount_type : String
+        applied_event.discount_value : Number
+        applied_event.priority : Number
+        applied_event.applied_at : Date
+        --
+        <i>// Tour Details (Embedded)</i>
+        tour_details.date : Date
+        tour_details.total_slots : Number
+        tour_details.booked_slots : Number
+        tour_details.transport_schedule.departure_time : String
+        tour_details.transport_schedule.arrival_time : String
+        tour_details.transport_schedule.return_time : String
+        tour_details.transport_schedule.return_arrival_time : String
+        tour_details.transport_schedule.airline : String
+        tour_details.transport_schedule.depart_code : String
+        tour_details.transport_schedule.return_code : String
+        tour_details.transport_schedule.pickup_location : String
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+    
+    entity "EVENT" as Event #FFCDD2 {
+        * _id : ObjectId <<PK>>
+        --
+        * name : String
+        * slug : String <<unique>>
+        description : String
+        image.url : String
+        image.public_id : String
+        --
+        * discount_type : String <<enum>>
+        * discount_value : Number
+        --
+        * is_yearly : Boolean
+        * start_month : Number
+        * start_day : Number
+        * end_month : Number
+        * end_day : Number
+        --
+        * applies_to_product_type : String <<enum>>
+        * apply_to_all_tours : Boolean
+        tour_ids : String[]
+        * priority : Number
+        * is_active : Boolean
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+    
+    entity "PROMOTION" as Promotion #FFCDD2 {
+        * _id : ObjectId <<PK>>
+        --
+        * code : String <<unique>>
+        * type : String <<enum>>
+        * value : Number
+        description : String
+        --
+        * total_quantity : Number
+        * used_quantity : Number
+        * is_active : Boolean
+        --
+        <i>// Rules (Embedded)</i>
+        rules.valid_from : Date
+        rules.valid_to : Date
+        rules.applies_to_product_type : String
+        rules.min_spend : Number
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+}
+
+' ================================================
+' BOOKING SERVICE
+' ================================================
+package "Booking Service" #E3F2FD {
+    entity "BOOKING" as Booking #BBDEFB {
+        * _id : ObjectId <<PK>>
+        --
+        * user_id : ObjectId <<FK User>>
+        promotion_id : ObjectId <<FK Promotion>>
+        --
+        * status : String <<enum>>
+        * payment_status : String <<enum>>
+        --
+        <i>// Pricing (Embedded)</i>
+        * pricing.total_price_before_discount : Number
+        pricing.discount_amount : Number
+        * pricing.final_price : Number
+        --
+        <i>// Passengers (Embedded Array)</i>
+        passengers[].type : String <<enum>>
+        passengers[].fullName : String
+        passengers[].gender : String <<enum>>
+        passengers[].dateOfBirth : Date
+        --
+        <i>// Items (Embedded Array)</i>
+        items[].product_id : ObjectId <<FK Product>>
+        items[].inventory_id : ObjectId <<FK Inventory>>
+        items[].product_type : String
+        items[].quantity : Number
+        items[].unit_price : Number
+        items[].snapshot.title : String
+        items[].snapshot.description_short : String
+        items[].snapshot.image : String
+        items[].snapshot.details_text : String
+        --
+        <i>// Payments (Embedded Array)</i>
+        payments[].gateway : String
+        payments[].gateway_transaction_id : String
+        payments[].amount : Number
+        payments[].status : String <<enum>>
+        payments[].timestamp : Date
+        --
+        <i>// Customer Details (Embedded)</i>
+        customer_details.fullName : String
+        customer_details.email : String
+        customer_details.phone : String
+        customer_details.address : String
+        customer_details.note : String
+        --
+        * start_date : Date
+        * end_date : Date
+        * createdAt : Date
+        * updatedAt : Date
+    }
+}
+
+' ================================================
+' PAYMENT SERVICE
+' ================================================
+package "Payment Service" #F3E5F5 {
+    entity "PAYMENT" as Payment #E1BEE7 {
+        * _id : ObjectId <<PK>>
+        --
+        * booking_id : ObjectId <<FK Booking>>
+        user_id : ObjectId <<FK User>>
+        --
+        * amount : Number
+        * currency : String
+        * status : String <<enum>>
+        --
+        * gateway : String <<enum>>
+        gateway_transaction_id : String
+        --
+        amount_refunded : Number
+        refunded_at : Date
+        * transaction_date : Date
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+    
+    entity "TRANSACTION" as Transaction #E1BEE7 {
+        * _id : ObjectId <<PK>>
+        --
+        partner_id : ObjectId <<FK User>>
+        booking_id : ObjectId <<FK Booking>>
+        --
+        * type : String <<enum>>
+        * amount : Number
+        description : String
+        * status : String <<enum>>
+        balance_after : Number
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+}
+
+' ================================================
+' AI SERVICE
+' ================================================
+package "AI Service" #E0F7FA {
+    entity "CHAT_SESSION" as ChatSession #B2EBF2 {
+        * _id : ObjectId <<PK>>
+        --
+        * sessionId : String <<unique>>
+        --
+        <i>// Messages (Embedded Array)</i>
+        messages[].role : String <<enum>>
+        messages[].content : String
+        messages[].createdAt : Date
+        messages[].updatedAt : Date
+        --
+        * createdAt : Date
+        * updatedAt : Date
+    }
+}
+
+' ================================================
+' RELATIONSHIPS
+' ================================================
+
+' User relationships
+User ||--o{ Product : "partner_id"
+User ||--o{ Booking : "user_id"
+User |o--o{ Category : "created_by"
+User |o--o{ Location : "created_by"
+User ||--o{ Payment : "user_id"
+User ||--o{ Transaction : "partner_id"
+
+' Catalog relationships
+Category |o--o| Category : "parent"
+Product }o--o{ Category : "category_ids"
+Product }o--o{ Location : "location_ids"
+
+' Inventory relationships
+Product ||--o{ Inventory : "product_id"
+Inventory }o--o| Event : "applied_event"
+
+' Booking relationships
+Booking }o--o| Promotion : "promotion_id"
+Booking ||--o{ Payment : "booking_id"
+Booking ||--o{ Transaction : "booking_id"
+
+' ================================================
+' LEGEND
+' ================================================
+legend right
+  |= Ký hiệu |= Ý nghĩa |
+  | * | NOT NULL (Bắt buộc) |
+  | <<PK>> | Primary Key |
+  | <<FK>> | Foreign Key |
+  | <<unique>> | Unique Constraint |
+  | <<enum>> | Enumerated Values |
+  ----
+  |= Quan hệ |= Ý nghĩa |
+  | \|\|--o{ | 1 : N (Một - Nhiều) |
+  | }o--o{ | N : M (Nhiều - Nhiều) |
+  | \|o--o\| | 0..1 : 0..1 |
+endlegend
+
+@enduml

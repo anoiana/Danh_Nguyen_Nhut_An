@@ -1,0 +1,212 @@
+================================================================================
+                    GOTRIPVIET - GIẢI THÍCH SƠ ĐỒ ERD
+================================================================================
+
+I. TỔNG QUAN SƠ ĐỒ ERD
+================================================================================
+
+Sơ đồ gồm 11 entities (bảng) được phân chia vào 6 microservices:
+
++-------------------+----------------------------------+---------------------------+
+| Service           | Entities                         | Chức năng                 |
++-------------------+----------------------------------+---------------------------+
+| User Service      | USER                             | Quản lý tài khoản, xác thực|
+| Catalog Service   | PRODUCT, CATEGORY, LOCATION      | Quản lý tour & danh mục   |
+| Inventory Service | INVENTORY, EVENT, PROMOTION      | Quản lý lịch & khuyến mãi |
+| Booking Service   | BOOKING                          | Xử lý đặt tour            |
+| Payment Service   | PAYMENT, TRANSACTION             | Thanh toán & ví Partner   |
+| AI Service        | CHAT_SESSION                     | Chatbot AI tư vấn         |
++-------------------+----------------------------------+---------------------------+
+
+
+II. CHI TIẾT CÁC MỐI QUAN HỆ
+================================================================================
+
+1. USER → PRODUCT (1:N)
+--------------------------------------------------------------------------------
+   Ký hiệu:    User ||──o{ Product : "partner_id"
+   
+   Ý nghĩa:    1 User (vai trò Partner) có thể tạo NHIỀU Product (tour)
+   
+   Thực tế:    Partner A có thể đăng 10, 20 tour khác nhau
+   
+   Khóa ngoại: Product.partner_id → User._id
+
+
+2. USER → BOOKING (1:N)
+--------------------------------------------------------------------------------
+   Ký hiệu:    User ||──o{ Booking : "user_id"
+   
+   Ý nghĩa:    1 User có thể đặt NHIỀU Booking
+   
+   Thực tế:    Khách hàng có thể đặt nhiều tour khác nhau
+   
+   Khóa ngoại: Booking.user_id → User._id
+
+
+3. USER → CATEGORY/LOCATION (0..1:N)
+--------------------------------------------------------------------------------
+   Ký hiệu:    User |o──o{ Category : "created_by"
+               User |o──o{ Location : "created_by"
+   
+   Ý nghĩa:    1 User CÓ THỂ tạo nhiều Category/Location (không bắt buộc)
+   
+   Thực tế:    Partner đề xuất thêm địa điểm mới, Admin duyệt
+   
+   Khóa ngoại: Category.created_by → User._id (nullable)
+               Location.created_by → User._id (nullable)
+
+
+4. CATEGORY → CATEGORY (Self-reference 0..1:0..1)
+--------------------------------------------------------------------------------
+   Ký hiệu:    Category |o──o| Category : "parent"
+   
+   Ý nghĩa:    1 Category có thể có 1 Category cha (tạo cây phân cấp)
+   
+   Thực tế:    Du lịch biển
+                 ├── Đảo
+                 ├── Resort ven biển
+                 └── Lặn biển
+   
+   Khóa ngoại: Category.parent → Category._id (nullable)
+
+
+5. PRODUCT ↔ CATEGORY (N:M)
+--------------------------------------------------------------------------------
+   Ký hiệu:    Product }o──o{ Category
+   
+   Ý nghĩa:    1 Product thuộc NHIỀU Category
+               1 Category chứa NHIỀU Product
+   
+   Thực tế:    Tour "Phú Quốc 3N2Đ" thuộc cả "Du lịch biển" và "Nghỉ dưỡng"
+   
+   Lưu trữ:    Product.category_ids[] (mảng ObjectId)
+
+
+6. PRODUCT ↔ LOCATION (N:M)
+--------------------------------------------------------------------------------
+   Ký hiệu:    Product }o──o{ Location
+   
+   Ý nghĩa:    1 Product đi qua NHIỀU Location
+               1 Location có trong NHIỀU Product
+   
+   Thực tế:    Tour "Miền Tây 3N" đi qua: Cần Thơ, Vĩnh Long, Bến Tre
+   
+   Lưu trữ:    Product.location_ids[] (mảng ObjectId)
+
+
+7. PRODUCT → INVENTORY (1:N)
+--------------------------------------------------------------------------------
+   Ký hiệu:    Product ||──o{ Inventory : "product_id"
+   
+   Ý nghĩa:    1 Product có NHIỀU lịch khởi hành (Inventory)
+   
+   Thực tế:    Tour "Đà Nẵng 4N" có các ngày khởi hành: 01/02, 15/02, 01/03...
+   
+   Khóa ngoại: Inventory.product_id → Product._id
+   
+   Ghi chú:    Inventory chứa: ngày khởi hành, số chỗ, giá cụ thể cho ngày đó
+
+
+8. INVENTORY → EVENT (N:0..1)
+--------------------------------------------------------------------------------
+   Ký hiệu:    Inventory }o──o| Event : "applied_event"
+   
+   Ý nghĩa:    Nhiều Inventory có thể áp dụng 1 Event (sự kiện giảm giá)
+               Hoặc không có Event nào
+   
+   Thực tế:    Event "Tết Nguyên Đán" giảm 20% → áp vào các lịch khởi hành T1-T2
+   
+   Lưu trữ:    Inventory.applied_event.event_id → Event._id
+
+
+9. BOOKING → PROMOTION (N:0..1)
+--------------------------------------------------------------------------------
+   Ký hiệu:    Booking }o──o| Promotion : "promotion_id"
+   
+   Ý nghĩa:    1 Booking có thể dùng 1 mã khuyến mãi (hoặc không dùng)
+   
+   Thực tế:    Khách nhập mã "SUMMER2024" để giảm 500k
+   
+   Khóa ngoại: Booking.promotion_id → Promotion._id (nullable)
+
+
+10. BOOKING → PAYMENT (1:N)
+--------------------------------------------------------------------------------
+    Ký hiệu:    Booking ||──o{ Payment : "booking_id"
+    
+    Ý nghĩa:    1 Booking có thể có NHIỀU lần thanh toán
+    
+    Thực tế:    Đặt cọc 50% lần 1, thanh toán nốt 50% lần 2
+    
+    Khóa ngoại: Payment.booking_id → Booking._id
+
+
+11. BOOKING → TRANSACTION (1:N)
+--------------------------------------------------------------------------------
+    Ký hiệu:    Booking ||──o{ Transaction
+    
+    Ý nghĩa:    1 Booking sinh ra NHIỀU giao dịch ví
+    
+    Thực tế:    - Transaction 1: Partner nhận tiền (INCOME)
+                - Transaction 2: Hệ thống trừ hoa hồng (COMMISSION)
+    
+    Khóa ngoại: Transaction.booking_id → Booking._id
+
+
+12. PAYMENT/TRANSACTION → USER (N:1)
+--------------------------------------------------------------------------------
+    Ký hiệu:    Payment    }o──|| User : "user_id"
+                Transaction }o──|| User : "partner_id"
+    
+    Ý nghĩa:    - Nhiều Payment thuộc về 1 User (khách hàng)
+                - Nhiều Transaction thuộc về 1 User (Partner nhận tiền)
+    
+    Khóa ngoại: - Payment.user_id → User._id
+                - Transaction.partner_id → User._id
+
+
+III. KÝ HIỆU CROW'S FOOT (CHÂN CHIM)
+================================================================================
+
++----------+-------------------+---------------------------+
+| Ký hiệu  | Tên gọi           | Ý nghĩa                   |
++----------+-------------------+---------------------------+
+|   ||     | One (mandatory)   | Đúng 1, bắt buộc          |
+|   |o     | Zero or One       | 0 hoặc 1, không bắt buộc  |
+|   o{     | Zero or Many      | 0 đến nhiều               |
+|   |{     | One or Many       | 1 đến nhiều, bắt buộc     |
++----------+-------------------+---------------------------+
+
+Ví dụ đọc ký hiệu:
+   User ||──o{ Product
+   
+   Đọc từ trái sang phải:
+   - "||" (một bắt buộc) : 1 User
+   - "o{" (không hoặc nhiều) : tạo 0 hoặc nhiều Product
+   
+   → "1 User có thể tạo 0 hoặc nhiều Product"
+
+
+IV. TỔNG KẾT LUỒNG DỮ LIỆU
+================================================================================
+
+1. PARTNER TẠO TOUR:
+   User(Partner) → Product → Category/Location
+                         → Inventory (lịch khởi hành)
+
+2. KHÁCH HÀNG ĐẶT TOUR:
+   User(Customer) → Booking → Inventory (chọn ngày)
+                           → Promotion (mã giảm giá - optional)
+                           → Payment (thanh toán)
+
+3. SAU KHI THANH TOÁN:
+   Booking → Transaction (INCOME cho Partner)
+          → Transaction (COMMISSION cho hệ thống)
+   
+   User(Partner).wallet_balance += doanh thu
+
+
+================================================================================
+                              HẾT TÀI LIỆU
+================================================================================
