@@ -1,7 +1,5 @@
 package com.example.demo.services;
 
-// src/main/java/com/example/demo/services/TranslationService.java
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
@@ -14,22 +12,24 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class TranslationService {
 
-    // MyMemory Translation API - Miễn phí, không cần API key
+    // MyMemory Translation API - Free, no API key required
     private static final String MYMEMORY_API_URL = "https://api.mymemory.translated.net/get";
 
     private final OkHttpClient client = new OkHttpClient();
 
     /**
-     * Dịch từ tiếng Anh sang tiếng Việt sử dụng MyMemory Translation API
-     * 
-     * @param word từ hoặc câu cần dịch
-     * @return bản dịch tiếng Việt
+     * Translates a word or sentence from English to Vietnamese using MyMemory
+     * Translation API.
+     *
+     * @param word The word or sentence to translate.
+     * @return The Vietnamese translation.
+     * @throws IOException if the API request fails.
      */
     public String translateWord(String word) throws IOException {
-        // Encode từ cần dịch để đưa vào URL
+        // Encode the word to be URL safe
         String encodedWord = URLEncoder.encode(word, StandardCharsets.UTF_8);
 
-        // Tạo URL với tham số: q=text, langpair=source|target
+        // Create URL with parameters: q=text, langpair=source|target
         String url = MYMEMORY_API_URL + "?q=" + encodedWord + "&langpair=en|vi";
 
         Request request = new Request.Builder()
@@ -51,7 +51,7 @@ public class TranslationService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(responseBody);
 
-            // Kiểm tra response status
+            // Check response status
             int responseStatus = rootNode.path("responseStatus").asInt();
             if (responseStatus != 200) {
                 String errorMessage = rootNode.path("responseDetails").asText();
@@ -59,7 +59,7 @@ public class TranslationService {
                 return "Lỗi dịch: " + errorMessage;
             }
 
-            // Lấy bản dịch từ responseData.translatedText
+            // Get translation from responseData.translatedText
             JsonNode translatedTextNode = rootNode.path("responseData").path("translatedText");
 
             if (translatedTextNode.isMissingNode() || translatedTextNode.isNull()) {
@@ -71,12 +71,13 @@ public class TranslationService {
     }
 
     /**
-     * Dịch với ngôn ngữ nguồn và đích tùy chỉnh
-     * 
-     * @param text       văn bản cần dịch
-     * @param sourceLang mã ngôn ngữ nguồn (ví dụ: "en", "vi", "fr")
-     * @param targetLang mã ngôn ngữ đích
-     * @return bản dịch
+     * Translates text with specified source and target languages.
+     *
+     * @param text       The text to translate.
+     * @param sourceLang The source language code (e.g., "en", "vi").
+     * @param targetLang The target language code.
+     * @return The translation result.
+     * @throws IOException if the API request fails.
      */
     public String translate(String text, String sourceLang, String targetLang) throws IOException {
         String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8);

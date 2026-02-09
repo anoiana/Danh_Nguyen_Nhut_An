@@ -9,8 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface MeaningRepository extends JpaRepository<Meaning, Long> {
-
-    // Phương thức để lấy danh sách ID của các Meaning dựa trên danh sách Vocabulary ID
     @Query("SELECT m.id FROM Meaning m WHERE m.vocabulary.id IN :vocabularyIds")
     List<Long> findMeaningIdsByVocabularyIds(@Param("vocabularyIds") List<Long> vocabularyIds);
 }

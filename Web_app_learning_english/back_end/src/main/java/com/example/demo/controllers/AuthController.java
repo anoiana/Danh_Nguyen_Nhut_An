@@ -1,8 +1,7 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.AuthDTO;
 import com.example.demo.entities.User;
-import com.example.demo.repositories.UserRepository;
+import com.example.demo.entities.dto.AuthDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,25 +12,23 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private UserRepository userRepository;
+    private com.example.demo.services.AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body("Username already exists");
+        String result = authService.register(user);
+        if ("Username already exists".equals(result)) {
+            return ResponseEntity.badRequest().body(result);
         }
-        userRepository.save(user);
-        return ResponseEntity.ok("Registration successful");
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthDTO.LoginRequest loginRequest) {
-        User user = userRepository.findByUsername(loginRequest.username())
-                .orElse(null);
-        if (user == null || !loginRequest.password().equals(user.getPassword())) {
+        com.example.demo.entities.dto.AuthDTO.LoginResponse response = authService.login(loginRequest);
+        if (response == null) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
-        AuthDTO.LoginResponse response = new AuthDTO.LoginResponse("Login successful", user.getId(), user.getUsername());
         return ResponseEntity.ok(response);
     }
 }

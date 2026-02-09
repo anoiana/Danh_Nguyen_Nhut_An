@@ -1,16 +1,13 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.GameDTO;
 import com.example.demo.entities.GameResult;
-import com.example.demo.repositories.GameResultRepository;
+import com.example.demo.entities.dto.GameDTO;
+import com.example.demo.services.GameResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-
 
 @RestController
 @RequestMapping("/api/game-results")
@@ -18,23 +15,22 @@ import java.util.stream.Collectors;
 public class GameResultController {
 
     @Autowired
-    private GameResultRepository gameResultRepository;
+    private GameResultService gameResultService;
 
     @PutMapping("/{id}")
-    public ResponseEntity<GameResult> updateGameResult(@PathVariable Long id, @RequestBody GameDTO.GameResultUpdateDTO resultDTO) {
-        GameResult existing = gameResultRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Game result not found"));
-        existing.setCorrectCount(resultDTO.correctCount());
-        existing.setWrongCount(resultDTO.wrongCount());
-        existing.setWrongAnswers(resultDTO.wrongAnswers());
-        return ResponseEntity.ok(gameResultRepository.save(existing));
+    public ResponseEntity<?> updateGameResult(@PathVariable Long id,
+            @RequestBody GameDTO.GameResultUpdateDTO resultDTO) {
+        try {
+            GameResult updatedResult = gameResultService.updateGameResult(id, resultDTO);
+            return ResponseEntity.ok(updatedResult);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/wrong/{userId}")
-    public List<GameResult> getWrongAnswers(@PathVariable Long userId) {
-        return gameResultRepository.findAll().stream()
-                .filter(r -> r.getUserId().equals(userId) && r.getWrongCount() > 0)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<GameResult>> getWrongAnswers(@PathVariable Long userId) {
+        List<GameResult> results = gameResultService.getWrongAnswers(userId);
+        return ResponseEntity.ok(results);
     }
-
 }

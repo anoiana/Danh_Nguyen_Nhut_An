@@ -6,10 +6,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.util.List;
 
 @Entity
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class Vocabulary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,68 +38,4 @@ public class Vocabulary {
 
     @Column(columnDefinition = "LONGTEXT")
     private String userImageBase64;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getWord() {
-        return word;
-    }
-
-    public void setWord(String word) {
-        this.word = word;
-    }
-
-    public String getPhoneticText() {
-        return phoneticText;
-    }
-
-    public void setPhoneticText(String phoneticText) {
-        this.phoneticText = phoneticText;
-    }
-
-    public String getAudioUrl() {
-        return audioUrl;
-    }
-
-    public void setAudioUrl(String audioUrl) {
-        this.audioUrl = audioUrl;
-    }
-
-    public List<Meaning> getMeanings() {
-        return meanings;
-    }
-
-    public void setMeanings(List<Meaning> meanings) {
-        this.meanings = meanings;
-    }
-
-    public Folder getFolder() {
-        return folder;
-    }
-
-    public void setFolder(Folder folder) {
-        this.folder = folder;
-    }
-
-    public String getUserDefinedMeaning() {
-        return userDefinedMeaning;
-    }
-
-    public void setUserDefinedMeaning(String userDefinedMeaning) {
-        this.userDefinedMeaning = userDefinedMeaning;
-    }
-
-    public String getUserImageBase64() {
-        return userImageBase64;
-    }
-
-    public void setUserImageBase64(String userImageBase64) {
-        this.userImageBase64 = userImageBase64;
-    }
 }

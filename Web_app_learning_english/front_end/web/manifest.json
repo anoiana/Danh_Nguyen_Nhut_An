@@ -1,11 +1,11 @@
 {
-    "name": "untitled",
-    "short_name": "untitled",
+    "name": "Helen",
+    "short_name": "Helen",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F8D7DA",
+    "theme_color": "#E91E63",
+    "description": "Helen - Your English Learning Companion",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

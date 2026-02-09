@@ -1,12 +1,10 @@
 package com.example.demo.controllers;
 
-// src/main/java/com/example/demo/controllers/TranslationController.java
-
 import com.example.demo.services.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-//ádasfsdfsdádas
+
 @RestController
 @RequestMapping("/api/translate")
 @CrossOrigin(origins = "*", allowedHeaders = "*")

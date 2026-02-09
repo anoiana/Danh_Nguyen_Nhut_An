@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:untitled/screens/login_page.dart';
-import 'package:untitled/screens/homescreen.dart';
+import 'package:untitled/features/Authentication/view/login_view.dart';
+import 'package:untitled/features/Library/view/library_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Auth Demo',
+      title: 'Helen',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink),
@@ -46,7 +46,9 @@ class AuthWrapper extends StatelessWidget {
             body: Center(child: CircularProgressIndicator()),
           );
         } else {
-          return snapshot.data == true ? const HomeScreen() : const LoginScreen();
+          return snapshot.data == true
+              ? const LibraryView()
+              : const LoginView();
         }
       },
     );
