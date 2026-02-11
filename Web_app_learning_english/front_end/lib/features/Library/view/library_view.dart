@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../core/widgets/speech_rate_bottom_sheet.dart';
+import '../../../api/tts_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/theme/theme_provider.dart';
 
 import '../../Authentication/view/login_view.dart';
 import '../../Folders/model/folder.dart';
@@ -22,6 +25,7 @@ class LibraryView extends StatefulWidget {
 }
 
 class _LibraryViewState extends State<LibraryView> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final FolderListViewModel _viewModel = FolderListViewModel();
   final _folderSearchController = TextEditingController();
   final _dictionarySearchController = TextEditingController();
@@ -289,6 +293,8 @@ class _LibraryViewState extends State<LibraryView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: _buildDrawer(),
       extendBodyBehindAppBar: true,
       floatingActionButton:
           _isGlobalLoading
@@ -320,16 +326,23 @@ class _LibraryViewState extends State<LibraryView> {
                 ),
               ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFCE4EC), // Very Light Pink
-              Color(0xFFF8BBD0), // Light Pink
-              Color(0xFFF48FB1), // Medium Pink accent
-            ],
-            stops: [0.0, 0.6, 1.0],
+            colors:
+                Theme.of(context).brightness == Brightness.dark
+                    ? [
+                      const Color(0xFF121212),
+                      const Color(0xFF1E1E1E),
+                      const Color(0xFF2C2C2C),
+                    ]
+                    : [
+                      const Color(0xFFFCE4EC), // Very Light Pink
+                      const Color(0xFFF8BBD0), // Light Pink
+                      const Color(0xFFF48FB1), // Medium Pink accent
+                    ],
+            stops: const [0.0, 0.6, 1.0],
           ),
         ),
         child: Stack(
@@ -444,13 +457,15 @@ class _LibraryViewState extends State<LibraryView> {
                                 ),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Theme.of(
+                                      context,
+                                    ).cardColor.withOpacity(0.9),
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(
-                                          0xFFE91E63,
-                                        ).withOpacity(0.08),
+                                        color: Theme.of(
+                                          context,
+                                        ).shadowColor.withOpacity(0.1),
                                         blurRadius: 15,
                                         offset: const Offset(0, 5),
                                       ),
@@ -511,48 +526,278 @@ class _LibraryViewState extends State<LibraryView> {
   Widget _buildCustomAppBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Thư viện',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[800]?.withOpacity(0.7),
-                  letterSpacing: 1.1,
-                ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor.withOpacity(0.9),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).shadowColor.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
-              AnimatedBuilder(
-                animation: _viewModel,
-                builder:
-                    (context, child) => Text(
-                      'Xin chào, ${_viewModel.username ?? 'Bạn'}!',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF333333),
+              child: IconButton(
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+                icon: const Icon(Icons.menu_rounded, color: primaryPink),
+                tooltip: 'Menu',
+              ),
+            ),
+          ),
+          AnimatedBuilder(
+            animation: _viewModel,
+            builder:
+                (context, child) => Padding(
+                  padding: const EdgeInsets.only(left: 50),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color ??
+                                  const Color(0xFF555555),
+                            ),
+                            children: [const TextSpan(text: 'Helen chào bạn!')],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('👋', style: TextStyle(fontSize: 22)),
+                    ],
+                  ),
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawer() {
+    return Drawer(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors:
+                Theme.of(context).brightness == Brightness.dark
+                    ? [const Color(0xFF1E1E1E), const Color(0xFF2C2C2C)]
+                    : [const Color(0xFFFCE4EC), Colors.white],
+          ),
+        ),
+        child: Column(
+          children: [
+            // Drawer Header
+            Container(
+              padding: const EdgeInsets.only(top: 50, bottom: 20),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).shadowColor.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: primaryPink, width: 2),
+                    ),
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Theme.of(context).cardColor,
+                      child: Icon(
+                        Icons.person_rounded,
+                        size: 40,
+                        color: primaryPink,
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  AnimatedBuilder(
+                    animation: _viewModel,
+                    builder:
+                        (context, child) => Text(
+                          _viewModel.username ?? 'Nguời dùng',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Enjoy Learning!',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Menu Items
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  _buildDrawerItem(
+                    icon: Icons.settings_rounded,
+                    title: 'Cài đặt',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _handleSettingsTap(context);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDrawerItem(
+                    icon: Icons.info_outline_rounded,
+                    title: 'Về ứng dụng',
+                    onTap: () {
+                      Navigator.pop(context);
+                      showAboutDialog(
+                        context: context,
+                        applicationName: 'English Learning App',
+                        applicationVersion: '1.0.0',
+                        applicationIcon: const Icon(
+                          Icons.school_rounded,
+                          color: primaryPink,
+                        ),
+                        children: [
+                          const Text('Ứng dụng học tiếng Anh hiệu quả.'),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            // Logout Button Area
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  _logout();
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.red.withOpacity(0.2)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.logout_rounded, color: Colors.redAccent),
+                      SizedBox(width: 8),
+                      Text(
+                        'Đăng xuất',
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor.withOpacity(0.6),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: primaryPink.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: primaryPink, size: 22),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      Theme.of(context).textTheme.bodyLarge?.color ??
+                      const Color(0xFF444444),
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: Colors.grey[400],
               ),
             ],
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              onPressed: _logout,
-              icon: const Icon(Icons.logout_rounded, color: primaryPink),
-              tooltip: 'Đăng xuất',
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -630,11 +875,11 @@ class _LibraryViewState extends State<LibraryView> {
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.95),
+            color: Theme.of(context).cardColor.withOpacity(0.95),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFE91E63).withOpacity(0.06),
+                color: Theme.of(context).shadowColor.withOpacity(0.1),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
@@ -666,7 +911,10 @@ class _LibraryViewState extends State<LibraryView> {
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFF0F5), // ultra light pink
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey.withOpacity(0.1)
+                                : const Color(0xFFFFF0F5), // ultra light pink
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Icon(
@@ -865,6 +1113,78 @@ class _LibraryViewState extends State<LibraryView> {
                   ],
                 ),
       ),
+    );
+  }
+
+  Future<void> _handleSettingsTap(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, child) {
+            final isDark = themeProvider.themeMode == ThemeMode.dark;
+            return Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Cài đặt',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Dark Mode Toggle
+                  SwitchListTile(
+                    title: const Text('Chế độ tối (Dark Mode)'),
+                    secondary: Icon(
+                      isDark ? Icons.dark_mode : Icons.light_mode,
+                      color: isDark ? Colors.white : Colors.orange,
+                    ),
+                    value: isDark,
+                    onChanged: (bool value) {
+                      themeProvider.toggleTheme(value);
+                    },
+                  ),
+
+                  const Divider(),
+
+                  // TTS Settings
+                  ListTile(
+                    leading: const Icon(
+                      Icons.speed_rounded,
+                      color: primaryPink,
+                    ),
+                    title: const Text('Tốc độ đọc (TTS)'),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 16,
+                    ),
+                    onTap: () async {
+                      Navigator.pop(context); // Close main settings
+                      final ttsService = TextToSpeechService();
+                      await ttsService.init();
+                      if (context.mounted) {
+                        showSpeechRateBottomSheet(context, ttsService);
+                      }
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

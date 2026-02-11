@@ -10,6 +10,7 @@ import 'package:audioplayers/audioplayers.dart';
 import '../view/vocabulary_detail_view.dart';
 import '../view_model/vocabulary_detail_view_model.dart';
 import 'package:provider/provider.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 // Reuse colors
 const Color primaryPink = Color(0xFFE91E63);
@@ -417,11 +418,6 @@ class _VocabularyListViewState extends State<VocabularyListView> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.settings_voice, color: Colors.white),
-            tooltip: 'Cài đặt giọng nói',
-            onPressed: _showTtsSettingsDialog,
-          ),
-          IconButton(
             icon: const Icon(Icons.checklist, color: Colors.white),
             onPressed: _viewModel.toggleSelectionMode,
           ),
@@ -529,7 +525,7 @@ class _VocabularyListViewState extends State<VocabularyListView> {
                 ? const Center(
                   child: Padding(
                     padding: EdgeInsets.all(16),
-                    child: CircularProgressIndicator(),
+                    child: CustomLoadingWidget(color: primaryPink, size: 40),
                   ),
                 )
                 : const SizedBox.shrink();

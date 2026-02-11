@@ -8,6 +8,7 @@ import '../../../core/base_view_model.dart';
 
 import 'vocabulary_saving_dialog.dart';
 import 'paste_translate_dialog.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 class DictionaryResultView extends StatefulWidget {
   final String word;
@@ -156,6 +157,11 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
       );
     }
 
+    final primaryColor = Theme.of(context).primaryColor;
+    final accentColor = Theme.of(context).colorScheme.secondary;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+
     return Container(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
@@ -164,20 +170,20 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: accentPink.withOpacity(0.2),
+              color: accentColor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               meaning.partOfSpeech,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontStyle: FontStyle.italic,
-                color: primaryPink,
+                color: primaryColor,
                 fontSize: 18,
               ),
             ),
           ),
-          buildSectionHeader('Định nghĩa', Icons.book_outlined, primaryPink),
+          buildSectionHeader('Định nghĩa', Icons.book_outlined, primaryColor),
           ...meaning.definitions.map((def) {
             int index = meaning.definitions.indexOf(def) + 1;
             return Padding(
@@ -190,10 +196,10 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
                     children: [
                       Text(
                         '$index. ',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: darkTextColor,
+                          color: textColor,
                         ),
                       ),
                       Expanded(
@@ -329,20 +335,20 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
     return Consumer<DictionaryViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          backgroundColor: backgroundPink,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             title: Text(
               'Kết quả: "${widget.word}"',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            backgroundColor: primaryPink,
+            backgroundColor: Theme.of(context).primaryColor,
             foregroundColor: Colors.white,
             centerTitle: true,
             elevation: 0,
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: _showPasteAndTranslateDialog,
-            backgroundColor: primaryPink,
+            backgroundColor: Theme.of(context).primaryColor,
             tooltip: 'Dịch nhanh',
             child: const Icon(Icons.translate, color: Colors.white),
           ),
@@ -354,7 +360,7 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
 
   Widget _buildBody(DictionaryViewModel viewModel) {
     if (viewModel.isBusy) {
-      return const Center(child: CircularProgressIndicator(color: primaryPink));
+      return CustomLoadingWidget(color: Theme.of(context).primaryColor);
     }
 
     if (viewModel.state == ViewState.error || viewModel.entries.isEmpty) {
@@ -375,10 +381,10 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
               Text(
                 'Không tìm thấy từ "${widget.word}" trong từ điển.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: darkTextColor,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 8),
@@ -393,7 +399,7 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
                 icon: const Icon(Icons.add_circle_outline),
                 label: const Text('Tự định nghĩa và Lưu'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryPink,
+                  backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -441,7 +447,7 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
                           context,
                         ).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: primaryPink,
+                          color: Theme.of(context).primaryColor,
                         ),
                       ),
                     ),
@@ -455,24 +461,28 @@ class _DictionaryResultViewState extends State<DictionaryResultView> {
                       ),
                     if (entry.audioUrl != null && entry.audioUrl!.isNotEmpty)
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.volume_up,
-                          color: primaryPink,
+                          color: Theme.of(context).primaryColor,
                           size: 30,
                         ),
                         onPressed: () => viewModel.playAudio(entry.audioUrl),
                       ),
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.bookmark_add_outlined,
-                        color: primaryPink,
+                        color: Theme.of(context).primaryColor,
                         size: 30,
                       ),
                       onPressed: () => _showSaveVocabDialog(entry),
                     ),
                   ],
                 ),
-                const Divider(height: 24, thickness: 1.2, color: lightPink),
+                Divider(
+                  height: 24,
+                  thickness: 1.2,
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
                 ...entry.meanings.map((m) => _buildMeaningWidget(m)),
               ],
             ),

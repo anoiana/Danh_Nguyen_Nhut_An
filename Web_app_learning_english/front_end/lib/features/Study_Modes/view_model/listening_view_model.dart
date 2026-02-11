@@ -20,6 +20,9 @@ class ListeningViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  String _errorMessage = '';
+  String get errorMessage => _errorMessage;
+
   ListeningGameType? _gameType;
   ListeningGameType? get gameType => _gameType;
 
@@ -79,6 +82,7 @@ class ListeningViewModel extends ChangeNotifier {
 
   Future<void> startVocabListening(int userId, int folderId) async {
     _isLoading = true;
+    _errorMessage = '';
     _gameType = ListeningGameType.vocabulary;
     notifyListeners();
 
@@ -92,6 +96,7 @@ class ListeningViewModel extends ChangeNotifier {
       _resetVocabState();
     } catch (e) {
       debugPrint('Error starting Vocab Listening: $e');
+      _errorMessage = 'Không thể tải bài học: $e';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -105,6 +110,7 @@ class ListeningViewModel extends ChangeNotifier {
     String subType,
   ) async {
     _isLoading = true;
+    _errorMessage = '';
     _gameType = ListeningGameType.ai;
     _aiSubType = subType;
     notifyListeners();
@@ -121,6 +127,7 @@ class ListeningViewModel extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error starting AI Listening: $e');
+      _errorMessage = 'Không thể tạo bài học AI: $e';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -175,7 +182,7 @@ class ListeningViewModel extends ChangeNotifier {
       _feedbackState = FeedbackState.correct;
       notifyListeners();
       _soundService.playCorrect();
-      _ttsService.setSpeechRate(1.0);
+      _ttsService.setSpeechRate(0.5);
       _ttsService.speak(currentVocab.word);
     } else {
       _wrongCount++;
@@ -221,6 +228,8 @@ class ListeningViewModel extends ChangeNotifier {
   Future<void> _finishVocabGame() async {
     final session = _vocabSession;
     if (session == null) return;
+    _isLoading = true;
+    notifyListeners();
     try {
       await StudyModeService.updateGameResult(
         session.gameResultId,
@@ -230,8 +239,10 @@ class ListeningViewModel extends ChangeNotifier {
       );
     } catch (e) {
       debugPrint("Error updating game result: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   Future<void> retryVocabGame(int userId, int folderId) async {

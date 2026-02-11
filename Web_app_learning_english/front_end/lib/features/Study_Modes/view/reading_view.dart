@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../Dictionary/service/dictionary_service.dart';
-import '../../../core/widgets/speech_rate_slider.dart';
+import '../../../core/widgets/speech_rate_bottom_sheet.dart';
 import '../view_model/reading_view_model.dart';
 import 'dart:ui'; // For backdrop filter
+import '../../../core/widgets/custom_loading_widget.dart';
 
 class ReadingView extends StatefulWidget {
   final int folderId;
@@ -54,10 +55,8 @@ class _ReadingViewState extends State<ReadingView>
       child: Consumer<ReadingViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isBusy) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(color: primaryPink),
-              ),
+            return Scaffold(
+              body: CustomLoadingWidget(color: Theme.of(context).primaryColor),
             );
           }
 
@@ -97,11 +96,14 @@ class _ReadingViewState extends State<ReadingView>
           return Scaffold(
             extendBodyBehindAppBar: true,
             body: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+                  colors:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                          : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
                 ),
               ),
               child: SafeArea(
@@ -111,16 +113,18 @@ class _ReadingViewState extends State<ReadingView>
                     Expanded(
                       child: Container(
                         margin: const EdgeInsets.only(top: 8),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(32),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black12,
+                              color: Theme.of(
+                                context,
+                              ).shadowColor.withOpacity(0.12),
                               blurRadius: 20,
-                              offset: Offset(0, -5),
+                              offset: const Offset(0, -5),
                             ),
                           ],
                         ),
@@ -144,7 +148,7 @@ class _ReadingViewState extends State<ReadingView>
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () => _showPasteAndTranslateDialog(),
-              backgroundColor: primaryPink,
+              backgroundColor: Theme.of(context).primaryColor,
               elevation: 4,
               child: const Icon(Icons.translate_rounded, color: Colors.white),
             ),
@@ -213,11 +217,11 @@ class _ReadingViewState extends State<ReadingView>
           child: TabBar(
             controller: _tabController,
             indicator: BoxDecoration(
-              color: primaryPink,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
-                  color: primaryPink.withOpacity(0.3),
+                  color: Theme.of(context).primaryColor.withOpacity(0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -269,10 +273,12 @@ class _ReadingViewState extends State<ReadingView>
               viewModel.vocabularyInFolder,
             ),
             textAlign: TextAlign.justify,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               height: 1.8,
-              color: Color(0xFF444444),
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ??
+                  const Color(0xFF444444),
             ),
             contextMenuBuilder: (context, state) {
               final selectedText =
@@ -345,11 +351,13 @@ class _ReadingViewState extends State<ReadingView>
 
         Text(
           question.question,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             height: 1.4,
-            color: Color(0xFF333333),
+            color:
+                Theme.of(context).textTheme.bodyLarge?.color ??
+                const Color(0xFF333333),
           ),
         ),
         const SizedBox(height: 32),
@@ -376,10 +384,10 @@ class _ReadingViewState extends State<ReadingView>
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryPink,
+                backgroundColor: Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
                 elevation: 4,
-                shadowColor: primaryPink.withOpacity(0.4),
+                shadowColor: Theme.of(context).primaryColor.withOpacity(0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -429,7 +437,9 @@ class _ReadingViewState extends State<ReadingView>
     });
     return TextSpan(
       children: spans,
-      style: const TextStyle(color: Colors.black87),
+      style: TextStyle(
+        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black87,
+      ),
     );
   }
 
@@ -597,7 +607,7 @@ class _OptionCard extends StatelessWidget {
           boxShadow: [
             if (!isAnswered && !isSelected)
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Theme.of(context).shadowColor.withOpacity(0.03),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -636,9 +646,9 @@ class TranslationBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -668,7 +678,7 @@ class TranslationBottomSheet extends StatelessWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Padding(
                   padding: EdgeInsets.all(24.0),
-                  child: CircularProgressIndicator(color: Color(0xFFE91E63)),
+                  child: CustomLoadingWidget(color: Color(0xFFE91E63)),
                 );
               }
               return Text(
@@ -722,7 +732,7 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
               decoration: InputDecoration(
                 hintText: 'Nhập hoặc dán văn bản để dịch...',
                 filled: true,
-                fillColor: const Color(0xFFFCE4EC).withOpacity(0.5),
+                fillColor: Theme.of(context).cardColor.withOpacity(0.5),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -734,7 +744,7 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
               const Padding(
                 padding: EdgeInsets.all(24.0),
                 child: Center(
-                  child: CircularProgressIndicator(color: Color(0xFFE91E63)),
+                  child: CustomLoadingWidget(color: Color(0xFFE91E63)),
                 ),
               ),
             if (_result.isNotEmpty) ...[

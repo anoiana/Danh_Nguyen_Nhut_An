@@ -32,9 +32,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
   bool _isSaving = false;
   Alignment _imageAlignment = Alignment.center;
 
-  // Colors matching the original view
-  static const Color primaryPink = Color(0xFFE91E63);
-  static const Color darkTextColor = Color(0xFF333333);
+  // Colors are now derived from Theme.of(context)
 
   List<String> get _allPartsOfSpeech =>
       widget.entry.meanings.map((m) => m.partOfSpeech).toSet().toList();
@@ -123,7 +121,10 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       title: Text(
         'Lưu từ "${widget.entry.word}"',
-        style: const TextStyle(color: primaryPink, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: Theme.of(context).primaryColor,
+          fontWeight: FontWeight.bold,
+        ),
         overflow: TextOverflow.ellipsis,
       ),
       contentPadding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
@@ -143,9 +144,9 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                   isExpanded: true,
                   decoration: InputDecoration(
                     labelText: 'Chọn thư mục',
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.folder_open_outlined,
-                      color: primaryPink,
+                      color: Theme.of(context).primaryColor,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -173,9 +174,9 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                     value: _selectedPartOfSpeech,
                     decoration: InputDecoration(
                       labelText: 'Loại từ',
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.category_outlined,
-                        color: primaryPink,
+                        color: Theme.of(context).primaryColor,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -199,9 +200,9 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                     decoration: InputDecoration(
                       labelText: 'Loại từ (tùy chọn)',
                       hintText: 'ví dụ: noun, verb...',
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.category_outlined,
-                        color: primaryPink,
+                        color: Theme.of(context).primaryColor,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -217,9 +218,9 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                       controller: _meaningController,
                       decoration: InputDecoration(
                         labelText: 'Nghĩa của từ (có thể sửa)',
-                        prefixIcon: const Icon(
+                        prefixIcon: Icon(
                           Icons.translate,
-                          color: primaryPink,
+                          color: Theme.of(context).primaryColor,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -278,11 +279,11 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   "Ảnh minh họa (tùy chọn):",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: darkTextColor,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -300,13 +301,13 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                         setState(() => _selectedImageBase64 = base64String);
                       }
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.photo_library_outlined,
-                      color: primaryPink,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    label: const Text(
+                    label: Text(
                       'Chọn ảnh từ thiết bị',
-                      style: TextStyle(color: primaryPink),
+                      style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),
                 ),
@@ -322,7 +323,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
         ),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor: primaryPink,
+            backgroundColor: Theme.of(context).primaryColor,
             foregroundColor: Colors.white,
           ),
           icon:

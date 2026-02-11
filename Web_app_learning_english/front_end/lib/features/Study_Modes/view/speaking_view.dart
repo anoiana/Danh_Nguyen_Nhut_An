@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_model/speaking_view_model.dart';
 import '../../../api/stt_service.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 // Theme Colors
 const Color primaryPink = Color(0xFFE91E63);
@@ -97,39 +98,9 @@ class _SpeakingViewState extends State<SpeakingView>
   }
 
   Widget _buildLoadingView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: primaryPink.withOpacity(0.2),
-                  blurRadius: 20,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(primaryPink),
-              strokeWidth: 3,
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Đang chuẩn bị...',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Colors.black54,
-            ),
-          ),
-        ],
-      ),
+    return const CustomLoadingWidget(
+      message: 'Đang chuẩn bị...',
+      color: primaryPink,
     );
   }
 

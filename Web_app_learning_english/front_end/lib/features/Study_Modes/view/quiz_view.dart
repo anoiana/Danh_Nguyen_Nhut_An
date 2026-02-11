@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../api/tts_service.dart';
 import '../view_model/quiz_view_model.dart';
 import '../model/quiz_session.dart';
+import '../../../../core/widgets/custom_loading_widget.dart';
+import '../../../../core/widgets/custom_error_widget.dart';
 
 class QuizView extends StatefulWidget {
   final int folderId;
@@ -27,7 +29,7 @@ class _QuizViewState extends State<QuizView>
   final TextToSpeechService _ttsService = TextToSpeechService();
 
   // Colors
-  static const Color primaryPink = Color(0xFFE91E63);
+
   static const Color correctColor = Colors.green;
   static const Color wrongColor = Colors.red;
 
@@ -53,22 +55,27 @@ class _QuizViewState extends State<QuizView>
     super.dispose();
   }
 
+  Future<void> _speakQuestion(QuizQuestionV2 question) async {
+    await _ttsService.setSpeechRate(0.5);
+    String textToSpeak;
+    // Determine which text is English based on quiz type
+    if (widget.subType == 'en_vi') {
+      // English -> Vietnamese: Question (word) is English
+      textToSpeak = question.word;
+    } else {
+      // Vietnamese -> English: Answer is English
+      textToSpeak = question.correctAnswer;
+    }
+    _ttsService.speak(textToSpeak);
+  }
+
   void _handleAnswer(String option) async {
     // Logic updated to remove manual animation controller
     bool isCorrect = await _viewModel.answerQuestion(option);
 
     // Speak the word
     if (mounted && _viewModel.currentQuestion != null) {
-      await _ttsService.setSpeechRate(0.5);
-
-      String textToSpeak = _viewModel.currentQuestion!.word;
-      // If mode is Vietnamese -> English, the 'word' is the Vietnamese definition.
-      // We want to speak the English answer instead.
-      if (widget.subType == 'vi_en') {
-        textToSpeak = _viewModel.currentQuestion!.correctAnswer;
-      }
-
-      _ttsService.speak(textToSpeak);
+      _speakQuestion(_viewModel.currentQuestion!);
     }
 
     // Auto move to next question after delay
@@ -99,11 +106,11 @@ class _QuizViewState extends State<QuizView>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            title: const Row(
+            title: Row(
               children: [
-                Icon(Icons.celebration, color: primaryPink),
-                SizedBox(width: 8),
-                Text('Hoàn thành!'),
+                Icon(Icons.celebration, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                const Text('Hoàn thành!'),
               ],
             ),
             content: Column(
@@ -138,7 +145,7 @@ class _QuizViewState extends State<QuizView>
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryPink,
+                  backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -178,11 +185,14 @@ class _QuizViewState extends State<QuizView>
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+            colors:
+                Theme.of(context).brightness == Brightness.dark
+                    ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                    : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
           ),
         ),
         child: Stack(
@@ -206,32 +216,17 @@ class _QuizViewState extends State<QuizView>
                 animation: _viewModel,
                 builder: (context, child) {
                   if (_viewModel.isBusy) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: primaryPink),
+                    return CustomLoadingWidget(
+                      message: 'Đang tải câu hỏi...',
+                      color: Theme.of(context).primaryColor,
                     );
                   }
 
                   if (_viewModel.errorMessage.isNotEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.error_outline,
-                            color: Colors.orange,
-                            size: 60,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Lỗi: ${_viewModel.errorMessage}',
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Quay lại'),
-                          ),
-                        ],
-                      ),
+                    return CustomErrorWidget(
+                      errorMessage: _viewModel.errorMessage,
+                      onRetry: _loadData,
+                      onClose: () => Navigator.pop(context),
                     );
                   }
 
@@ -297,11 +292,14 @@ class _QuizViewState extends State<QuizView>
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
+              color: Theme.of(context).cardColor.withOpacity(0.5),
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(Icons.close_rounded, color: primaryPink),
+              icon: Icon(
+                Icons.close_rounded,
+                color: Theme.of(context).primaryColor,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -309,18 +307,22 @@ class _QuizViewState extends State<QuizView>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
+              color: Theme.of(context).cardColor.withOpacity(0.5),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               children: [
-                const Icon(Icons.quiz_rounded, color: primaryPink, size: 20),
+                Icon(
+                  Icons.quiz_rounded,
+                  color: Theme.of(context).primaryColor,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Câu hỏi ${_viewModel.currentIndex + 1}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: primaryPink,
+                    color: Theme.of(context).primaryColor,
                     fontSize: 16,
                   ),
                 ),
@@ -358,11 +360,11 @@ class _QuizViewState extends State<QuizView>
                 0.8 *
                 progress, // approx width
             decoration: BoxDecoration(
-              color: primaryPink,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(
-                  color: primaryPink.withOpacity(0.4),
+                  color: Theme.of(context).primaryColor.withOpacity(0.4),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -379,11 +381,11 @@ class _QuizViewState extends State<QuizView>
       width: double.infinity,
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE91E63).withOpacity(0.1),
+            color: Theme.of(context).primaryColor.withOpacity(0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -391,30 +393,33 @@ class _QuizViewState extends State<QuizView>
       ),
       child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF0F5),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.volume_up_rounded,
-              color: primaryPink,
-              size: 32,
+          GestureDetector(
+            onTap: () => _speakQuestion(question),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.volume_up_rounded,
+                color: Theme.of(context).primaryColor,
+                size: 32,
+              ),
             ),
           ),
           const SizedBox(height: 24),
           Text(
             question.word,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF333333),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 8),
-          if (question.phoneticText != null)
+          if (question.phoneticText != null && widget.subType == 'en_vi')
             Text(
               question.phoneticText!,
               style: TextStyle(
@@ -423,18 +428,30 @@ class _QuizViewState extends State<QuizView>
                 fontStyle: FontStyle.italic,
               ),
             ),
+          if (question.partOfSpeech != null &&
+              question.partOfSpeech!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  question.partOfSpeech!,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
           const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'Chọn nghĩa đúng',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
-            ),
-          ),
         ],
       ),
     );
@@ -445,9 +462,11 @@ class _QuizViewState extends State<QuizView>
     bool isCorrect = option == correctAnswer;
 
     // UI State Logic
-    Color bgColor = Colors.white;
-    Color borderColor = Colors.transparent;
-    Color textColor = const Color(0xFF555555);
+    Color bgColor = Theme.of(context).cardColor;
+    Color borderColor = Theme.of(context).dividerColor;
+    Color textColor =
+        Theme.of(context).textTheme.bodyMedium?.color ??
+        const Color(0xFF555555);
     IconData? icon;
     Color iconColor = Colors.transparent;
 

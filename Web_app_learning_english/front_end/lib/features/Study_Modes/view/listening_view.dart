@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../Dictionary/service/dictionary_service.dart';
-import '../../../core/widgets/speech_rate_slider.dart';
+import '../../../core/widgets/speech_rate_bottom_sheet.dart';
 import '../view_model/listening_view_model.dart';
 import '../model/listening_content.dart';
 import '../../Vocabulary/model/vocabulary.dart';
 import '../model/game_session.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
+
+import '../../../core/widgets/custom_error_widget.dart';
+import 'widgets/vocabulary_card.dart';
+import 'widgets/ai_task_content.dart';
 
 class ListeningView extends StatefulWidget {
   final int? folderId;
@@ -45,6 +50,10 @@ class _ListeningViewState extends State<ListeningView>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _viewModel.init();
+    _loadData();
+  }
+
+  void _loadData() {
     if (widget.initialType == ListeningGameType.vocabulary) {
       _viewModel.startVocabListening(widget.userId!, widget.folderId!).then((
         _,
@@ -78,8 +87,19 @@ class _ListeningViewState extends State<ListeningView>
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
             return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(color: primaryPink),
+              body: CustomLoadingWidget(
+                message: 'Đang tải bài nghe...',
+                color: primaryPink,
+              ),
+            );
+          }
+
+          if (viewModel.errorMessage.isNotEmpty) {
+            return Scaffold(
+              body: CustomErrorWidget(
+                errorMessage: viewModel.errorMessage,
+                onRetry: _loadData,
+                onClose: () => Navigator.pop(context),
               ),
             );
           }
@@ -97,11 +117,14 @@ class _ListeningViewState extends State<ListeningView>
             extendBodyBehindAppBar: true,
             resizeToAvoidBottomInset: true,
             body: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+                  colors:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                          : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
                 ),
               ),
               child: content,
@@ -133,7 +156,10 @@ class _ListeningViewState extends State<ListeningView>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 24),
-                  _buildListeningCard(viewModel, currentVocab),
+                  VocabularyCard(
+                    viewModel: viewModel,
+                    currentVocab: currentVocab,
+                  ),
                   const SizedBox(height: 32),
                   _buildVocabInputField(viewModel),
                   const SizedBox(height: 120), // Bottom Sheet space
@@ -321,7 +347,7 @@ class _ListeningViewState extends State<ListeningView>
   Widget _buildVocabInputField(ListeningViewModel viewModel) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
@@ -338,10 +364,12 @@ class _ListeningViewState extends State<ListeningView>
         textInputAction: TextInputAction.send,
         enabled: !viewModel.isSubmitted,
         textAlign: TextAlign.start,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF333333),
+          color:
+              Theme.of(context).textTheme.bodyLarge?.color ??
+              const Color(0xFF333333),
           height: 1.4,
         ),
         decoration: InputDecoration(
@@ -464,7 +492,7 @@ class _ListeningViewState extends State<ListeningView>
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
@@ -576,8 +604,9 @@ class _ListeningViewState extends State<ListeningView>
     );
   }
 
-  void _showFinishDialog(ListeningViewModel viewModel) {
-    viewModel.submitVocabResult();
+  void _showFinishDialog(ListeningViewModel viewModel) async {
+    await viewModel.submitVocabResult();
+    if (!mounted) return;
 
     showDialog(
       context: context,
@@ -906,14 +935,16 @@ class _ListeningViewState extends State<ListeningView>
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 8),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(32),
+                ),
               ),
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildAITaskContent(viewModel),
+                  AITaskContent(viewModel: viewModel),
                   _buildTranscriptView(viewModel),
                 ],
               ),
@@ -926,83 +957,37 @@ class _ListeningViewState extends State<ListeningView>
     );
   }
 
-  Widget _buildAITaskContent(ListeningViewModel viewModel) {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        if (viewModel.isSubmitted)
-          Container(
-            margin: const EdgeInsets.only(bottom: 24),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE3F2FD),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.blue.withOpacity(0.3)),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  'Kết quả của bạn',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "${viewModel.aiSubType == 'mcq' ? viewModel.mcqScore : viewModel.fitbScore}",
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.blue,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-        if (viewModel.aiSubType == 'mcq')
-          ...viewModel.aiContent!.mcq.asMap().entries.map(
-            (e) => _buildMcqCard(viewModel, e.key, e.value),
-          ),
-
-        if (viewModel.aiSubType == 'fitb' && viewModel.aiContent!.fitb != null)
-          _buildFitbCard(viewModel),
-
-        const SizedBox(height: 32),
-
-        SizedBox(
-          height: 50,
-          child: ElevatedButton(
-            onPressed:
-                viewModel.isSubmitted
-                    ? viewModel.resetAIGame
-                    : viewModel.checkAIAnswers,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryPink,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 4,
-              shadowColor: primaryPink.withOpacity(0.4),
-            ),
-            child: Text(
-              viewModel.isSubmitted ? "Làm lại bài" : "Nộp bài",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
+  Widget _buildTranscriptView(ListeningViewModel viewModel) {
+    final transcript = viewModel.aiContent?.transcript;
+    if (transcript == null || transcript.isEmpty) {
+      return const Center(
+        child: Text(
+          "Chưa có nội dung transcript",
+          style: TextStyle(color: Colors.grey),
         ),
-        const SizedBox(height: 24),
-      ],
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Text(
+        transcript,
+        style: TextStyle(
+          fontSize: 16,
+          height: 1.8,
+          color:
+              Theme.of(context).textTheme.bodyLarge?.color ??
+              const Color(0xFF333333),
+        ),
+      ),
     );
   }
 
   Widget _buildPlaybackControls(ListeningViewModel viewModel) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
@@ -1073,320 +1058,6 @@ class _ListeningViewState extends State<ListeningView>
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMcqCard(
-    ListeningViewModel viewModel,
-    int index,
-    ListeningMCQ question,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: primaryPink.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    '${index + 1}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: primaryPink,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    question.question,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ...question.options.map((option) {
-              bool isSelected = viewModel.selectedMcqOptions[index] == option;
-              bool isCorrect = option == question.answer;
-
-              Color borderColor = Colors.grey.shade300;
-              Color bgColor = Colors.transparent;
-              Color iconColor = Colors.grey;
-              IconData icon = Icons.circle_outlined;
-
-              if (viewModel.isSubmitted) {
-                if (isCorrect) {
-                  borderColor = Colors.green;
-                  bgColor = Colors.green.shade50;
-                  iconColor = Colors.green;
-                  icon = Icons.check_circle;
-                } else if (isSelected) {
-                  borderColor = Colors.red;
-                  bgColor = Colors.red.shade50;
-                  iconColor = Colors.red;
-                  icon = Icons.cancel;
-                }
-              } else {
-                if (isSelected) {
-                  borderColor = primaryPink;
-                  bgColor = Colors.pink.shade50;
-                  iconColor = primaryPink;
-                  icon = Icons.radio_button_checked;
-                }
-              }
-
-              return GestureDetector(
-                onTap:
-                    viewModel.isSubmitted
-                        ? null
-                        : () => viewModel.onMcqOptionSelected(index, option),
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: borderColor),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(icon, color: iconColor, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          option,
-                          style: TextStyle(color: Colors.grey[800]),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFitbCard(ListeningViewModel viewModel) {
-    if (viewModel.aiContent == null || viewModel.aiContent!.fitb == null)
-      return const SizedBox.shrink();
-
-    final textParts = viewModel.aiContent!.fitb!.textWithBlanks.split(
-      RegExp(r'____\(\d+\)____'),
-    );
-    final spans = <InlineSpan>[];
-    for (var i = 0; i < textParts.length; i++) {
-      // Regular text
-      spans.add(
-        TextSpan(text: textParts[i], style: const TextStyle(height: 2)),
-      );
-
-      // Blank field
-      if (i < viewModel.fitbControllers.length) {
-        final isCorrect = viewModel.fitbResults[i];
-        Color underlineColor = Colors.grey;
-        if (viewModel.isSubmitted) {
-          underlineColor = (isCorrect ?? false) ? Colors.green : Colors.red;
-        }
-
-        spans.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.baseline,
-            baseline: TextBaseline.alphabetic,
-            child: Container(
-              width: 100,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              child: TextField(
-                controller: viewModel.fitbControllers[i],
-                readOnly: viewModel.isSubmitted,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: underlineColor,
-                  fontWeight: FontWeight.bold,
-                ),
-                decoration: InputDecoration(
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: underlineColor),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: primaryPink, width: 2),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-    }
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: RichText(
-          text: TextSpan(
-            children: spans,
-            style: const TextStyle(
-              color: Color(0xFF333333),
-              fontSize: 16,
-              height: 1.8,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTranscriptView(ListeningViewModel viewModel) {
-    if (viewModel.aiContent == null) return const SizedBox.shrink();
-
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        const Text(
-          "Bài nghe",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        const SizedBox(height: 16),
-        SelectableText(
-          viewModel.aiContent!.transcript,
-          style: const TextStyle(
-            fontSize: 16,
-            height: 1.8,
-            color: Color(0xFF444444),
-          ),
-          contextMenuBuilder: (context, state) {
-            return AdaptiveTextSelectionToolbar.buttonItems(
-              anchors: state.contextMenuAnchors,
-              buttonItems: [
-                ContextMenuButtonItem(
-                  onPressed: () {
-                    final text =
-                        state.textEditingValue.selection
-                            .textInside(state.textEditingValue.text)
-                            .trim();
-                    if (text.isNotEmpty) viewModel.speak(text);
-                  },
-                  label: 'Phát âm',
-                ),
-                ContextMenuButtonItem(
-                  onPressed: () {
-                    final text =
-                        state.textEditingValue.selection
-                            .textInside(state.textEditingValue.text)
-                            .trim();
-                    if (text.isNotEmpty) _showTranslation(text);
-                  },
-                  label: 'Dịch',
-                ),
-              ],
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  void _showTranslation(String text) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => TranslationBottomSheet(text: text),
-    );
-  }
-}
-
-class TranslationBottomSheet extends StatelessWidget {
-  final String text;
-  const TranslationBottomSheet({super.key, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 24),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 18,
-              fontStyle: FontStyle.italic,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 16),
-          FutureBuilder<String>(
-            future: DictionaryService.translateWord(text),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator(
-                  color: Color(0xFFE91E63),
-                );
-              }
-              return Text(
-                snapshot.data ?? 'Không thể dịch',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFE91E63),
-                ),
-                textAlign: TextAlign.center,
-              );
-            },
-          ),
-          const SizedBox(height: 24),
         ],
       ),
     );

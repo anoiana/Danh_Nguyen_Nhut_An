@@ -1,9 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../api/tts_service.dart';
 import '../view_model/writing_view_model.dart';
 import '../../Vocabulary/model/vocabulary.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 class WritingView extends StatefulWidget {
   final int folderId;
@@ -110,11 +110,11 @@ class _WritingViewState extends State<WritingView> {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Theme.of(context).shadowColor.withOpacity(0.2),
                         blurRadius: 30,
                         offset: const Offset(0, 10),
                       ),
@@ -123,12 +123,14 @@ class _WritingViewState extends State<WritingView> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      Text(
                         'Hoàn thành!',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF333333),
+                          color:
+                              Theme.of(context).textTheme.bodyLarge?.color ??
+                              const Color(0xFF333333),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -236,7 +238,7 @@ class _WritingViewState extends State<WritingView> {
                           Expanded(
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryPink,
+                                backgroundColor: Theme.of(context).primaryColor,
                                 foregroundColor: Colors.white,
                                 elevation: 0,
                                 padding: const EdgeInsets.symmetric(
@@ -302,7 +304,7 @@ class _WritingViewState extends State<WritingView> {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -342,11 +344,14 @@ class _WritingViewState extends State<WritingView> {
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: true, // Allow resize for keyboard
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+            colors:
+                Theme.of(context).brightness == Brightness.dark
+                    ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                    : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
           ),
         ),
         child: Stack(
@@ -370,8 +375,9 @@ class _WritingViewState extends State<WritingView> {
                 animation: _viewModel,
                 builder: (context, child) {
                   if (_viewModel.isBusy) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: primaryPink),
+                    return CustomLoadingWidget(
+                      message: 'Đang tải câu hỏi...',
+                      color: Theme.of(context).primaryColor,
                     );
                   }
                   if (_viewModel.vocabularies.isEmpty) {
@@ -439,20 +445,23 @@ class _WritingViewState extends State<WritingView> {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Theme.of(context).cardColor.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close_rounded, color: primaryPink),
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
 
               Text(
                 'Câu ${_viewModel.currentIndex + 1}/${_viewModel.vocabularies.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: primaryPink,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
 
@@ -468,7 +477,9 @@ class _WritingViewState extends State<WritingView> {
                   _viewModel.vocabularies.length,
               minHeight: 6,
               backgroundColor: Colors.white.withOpacity(0.5),
-              valueColor: const AlwaysStoppedAnimation<Color>(primaryPink),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).primaryColor,
+              ),
             ),
           ),
         ],
@@ -481,11 +492,11 @@ class _WritingViewState extends State<WritingView> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE91E63).withOpacity(0.12),
+            color: Theme.of(context).primaryColor.withOpacity(0.12),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -497,23 +508,25 @@ class _WritingViewState extends State<WritingView> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             margin: const EdgeInsets.only(bottom: 24),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF0F5),
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: primaryPink.withOpacity(0.1)),
+              border: Border.all(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.translate_rounded,
                   size: 16,
-                  color: primaryPink,
+                  color: Theme.of(context).primaryColor,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'Dịch sang Tiếng Anh',
                   style: TextStyle(
-                    color: primaryPink.withOpacity(0.9),
+                    color: Theme.of(context).primaryColor.withOpacity(0.9),
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                     letterSpacing: 0.5,
@@ -525,10 +538,12 @@ class _WritingViewState extends State<WritingView> {
           Text(
             vocab.userDefinedMeaning ?? '(Chưa có nghĩa)',
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w900,
-              color: Color(0xFF333333),
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ??
+                  const Color(0xFF333333),
               height: 1.3,
               letterSpacing: -0.5,
             ),
@@ -576,20 +591,22 @@ class _WritingViewState extends State<WritingView> {
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(color: Theme.of(context).dividerColor),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Theme.of(
+                            context,
+                          ).shadowColor.withOpacity(0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.volume_up_rounded,
-                      color: primaryPink,
+                      color: Theme.of(context).primaryColor,
                       size: 24,
                     ),
                   ),
@@ -605,11 +622,11 @@ class _WritingViewState extends State<WritingView> {
   Widget _buildInputField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE91E63).withOpacity(0.1),
+            color: Theme.of(context).primaryColor.withOpacity(0.1),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -620,10 +637,12 @@ class _WritingViewState extends State<WritingView> {
         focusNode: _focusNode,
         enabled: !_viewModel.isSubmitted,
         textAlign: TextAlign.start,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF333333),
+          color:
+              Theme.of(context).textTheme.bodyLarge?.color ??
+              const Color(0xFF333333),
           height: 1.4,
         ),
         decoration: InputDecoration(
@@ -646,7 +665,9 @@ class _WritingViewState extends State<WritingView> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(28),
-            borderSide: BorderSide(color: primaryPink.withOpacity(0.3)),
+            borderSide: BorderSide(
+              color: Theme.of(context).primaryColor.withOpacity(0.3),
+            ),
           ),
           suffixIcon:
               _viewModel.isSubmitted
@@ -683,7 +704,9 @@ class _WritingViewState extends State<WritingView> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: primaryPink.withOpacity(0.4),
+                                color: Theme.of(
+                                  context,
+                                ).primaryColor.withOpacity(0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -733,11 +756,11 @@ class _WritingViewState extends State<WritingView> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Theme.of(context).shadowColor.withOpacity(0.08),
             blurRadius: 30,
             offset: const Offset(0, -10),
           ),

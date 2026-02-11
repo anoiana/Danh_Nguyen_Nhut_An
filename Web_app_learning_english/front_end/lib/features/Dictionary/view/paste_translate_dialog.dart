@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../service/dictionary_service.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 class PasteTranslateDialog extends StatefulWidget {
   const PasteTranslateDialog({super.key});
@@ -12,7 +13,6 @@ class PasteTranslateDialog extends StatefulWidget {
 class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
   final TextEditingController _textController = TextEditingController();
   Future<String>? _translationFuture;
-  static const Color primaryPink = Color(0xFFE91E63);
 
   @override
   void dispose() {
@@ -41,11 +41,11 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.translate, color: primaryPink),
-          SizedBox(width: 10),
-          Text('Dịch nhanh'),
+          Icon(Icons.translate, color: Theme.of(context).primaryColor),
+          const SizedBox(width: 10),
+          const Text('Dịch nhanh'),
         ],
       ),
       content: SingleChildScrollView(
@@ -76,8 +76,11 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
                 future: _translationFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: primaryPink),
+                    return Center(
+                      child: CustomLoadingWidget(
+                        color: Theme.of(context).primaryColor,
+                        size: 60,
+                      ),
                     );
                   }
                   if (snapshot.hasError) {
@@ -91,14 +94,14 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
                       padding: const EdgeInsets.all(12),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
+                        color: Theme.of(context).primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         snapshot.data!,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.blue.shade900,
+                          color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -118,7 +121,7 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
         ElevatedButton(
           onPressed: _translate,
           style: ElevatedButton.styleFrom(
-            backgroundColor: primaryPink,
+            backgroundColor: Theme.of(context).primaryColor,
             foregroundColor: Colors.white,
           ),
           child: const Text('Dịch'),

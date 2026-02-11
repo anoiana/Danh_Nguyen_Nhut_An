@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../view_model/matching_view_model.dart';
 import '../model/matching_tile.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 class MatchingView extends StatefulWidget {
   final int folderId;
@@ -163,9 +164,7 @@ class _MatchingViewState extends State<MatchingView> {
                 animation: _viewModel,
                 builder: (context, child) {
                   if (_viewModel.isBusy) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: primaryPink),
-                    );
+                    return const CustomLoadingWidget(color: primaryPink);
                   }
                   if (_viewModel.errorMessage.isNotEmpty) {
                     return Center(child: Text(_viewModel.errorMessage));
@@ -337,8 +336,8 @@ class _MatchingViewState extends State<MatchingView> {
       );
     }
 
-    Color cardColor = Colors.white;
-    Color textColor = const Color(0xFF424242);
+    Color cardColor;
+    Color textColor;
     double elevation = 4;
     Border? border;
 
@@ -351,10 +350,20 @@ class _MatchingViewState extends State<MatchingView> {
       textColor = primaryPink;
       border = Border.all(color: primaryPink, width: 2);
       elevation = 8;
+    } else {
+      // Different colors for Word and Meaning
+      if (tile.isWord) {
+        cardColor = const Color(0xFFFFF3E0); // Light Orange/Amber for Word
+        textColor = const Color(0xFFE65100); // Darker Orange text
+      } else {
+        cardColor = const Color(0xFFE3F2FD); // Light Blue for Meaning
+        textColor = const Color(0xFF1565C0); // Darker Blue text
+      }
     }
 
     return GestureDetector(
       onTap: () => _viewModel.selectTile(tile),
+      onDoubleTap: () => _viewModel.deselectTile(tile),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(

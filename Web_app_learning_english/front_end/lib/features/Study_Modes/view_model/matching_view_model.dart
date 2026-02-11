@@ -6,9 +6,11 @@ import '../model/game_session.dart';
 import '../model/matching_tile.dart';
 import '../service/study_mode_service.dart';
 import '../../../api/sound_service.dart';
+import '../../../api/tts_service.dart';
 
 class MatchingViewModel extends BaseViewModel {
   final SoundService _soundService = SoundService();
+  final TextToSpeechService _ttsService = TextToSpeechService();
 
   GameSession? _session;
   List<MatchingTile> _tiles = [];
@@ -127,12 +129,27 @@ class MatchingViewModel extends BaseViewModel {
     if (_firstSelected == null) {
       _firstSelected = tile;
     } else {
+      if (_firstSelected == tile) {
+        // Prevent selecting the same tile again as second selection
+        return;
+      }
       _secondSelected = tile;
       _moves++;
       _isProcessingMismatch = true;
 
       await _checkMatch();
     }
+  }
+
+  void deselectTile(MatchingTile tile) {
+    if (tile.isMatched || _isProcessingMismatch) return;
+
+    if (_firstSelected == tile) {
+      tile.isSelected = false;
+      _firstSelected = null;
+      notifyListeners();
+    }
+    // We generally don't need to handle _secondSelected because it triggers match check immediately
   }
 
   final Set<int> _failedVocabIds = {};
@@ -153,6 +170,17 @@ class MatchingViewModel extends BaseViewModel {
 
       _matchedPairs++;
       _soundService.playCorrect();
+
+      // Speak text
+      String textToSpeak = "";
+      if (_firstSelected!.isWord) {
+        textToSpeak = _firstSelected!.content;
+      } else {
+        // Find the word from the session vocabularies using ID, or if the second one is word (which it should be if first is not)
+        // Actually since it's a pair one MUST be word and one MUST be meaning
+        textToSpeak = _secondSelected!.content;
+      }
+      _ttsService.speak(textToSpeak);
 
       _firstSelected = null;
       _secondSelected = null;
@@ -205,6 +233,7 @@ class MatchingViewModel extends BaseViewModel {
 
   Future<void> submitResult() async {
     if (_session == null) return;
+    setBusy(true);
     try {
       await StudyModeService.updateGameResult(
         _session!.gameResultId,
@@ -214,6 +243,8 @@ class MatchingViewModel extends BaseViewModel {
       );
     } catch (e) {
       setError("Result submission notice: $e");
+    } finally {
+      setBusy(false);
     }
   }
 

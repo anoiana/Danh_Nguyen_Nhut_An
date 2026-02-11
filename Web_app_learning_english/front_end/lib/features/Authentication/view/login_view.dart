@@ -2,12 +2,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../view_model/login_view_model.dart';
 import '../../Library/view/library_view.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 // --- Theme Colors (Ported from LoginScreen) ---
-const Color primaryPink = Color(0xFFE91E63);
-const Color accentPink = Color(0xFFFF80AB);
-const Color backgroundPink = Color(0xFFFCE4EC);
-const Color darkTextColor = Color(0xFF333333);
+// --- Theme Colors (Ported from LoginScreen) ---
+// Colors are now derived from Theme.of(context)
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -80,7 +79,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundPink,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -91,7 +90,7 @@ class _LoginViewState extends State<LoginView> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: AnimatedBuilder(
@@ -106,7 +105,7 @@ class _LoginViewState extends State<LoginView> {
                               ? Icons.school_outlined
                               : Icons.person_add_alt_1_outlined,
                           size: 80,
-                          color: primaryPink,
+                          color: Theme.of(context).primaryColor,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -115,7 +114,7 @@ class _LoginViewState extends State<LoginView> {
                             context,
                           ).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: darkTextColor,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -123,8 +122,13 @@ class _LoginViewState extends State<LoginView> {
                           _isLoginMode
                               ? 'Đăng nhập để bắt đầu học tập'
                               : 'Đăng ký để tham gia cùng chúng tôi',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(color: Colors.grey[600]),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 40),
@@ -132,16 +136,16 @@ class _LoginViewState extends State<LoginView> {
                           controller: _usernameController,
                           decoration: InputDecoration(
                             labelText: 'Tên đăng nhập',
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.account_circle,
-                              color: primaryPink,
+                              color: Theme.of(context).primaryColor,
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: primaryPink,
+                              borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -153,16 +157,16 @@ class _LoginViewState extends State<LoginView> {
                           controller: _passwordController,
                           decoration: InputDecoration(
                             labelText: 'Mật khẩu',
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.lock,
-                              color: primaryPink,
+                              color: Theme.of(context).primaryColor,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureText
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: primaryPink,
+                                color: Theme.of(context).primaryColor,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -174,8 +178,8 @@ class _LoginViewState extends State<LoginView> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: primaryPink,
+                              borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -200,16 +204,17 @@ class _LoginViewState extends State<LoginView> {
                             ),
                           ),
                         _viewModel.isBusy
-                            ? const Center(
-                              child: CircularProgressIndicator(
-                                color: primaryPink,
+                            ? Center(
+                              child: CustomLoadingWidget(
+                                color: Theme.of(context).primaryColor,
+                                size: 40,
                               ),
                             )
                             : ElevatedButton(
                               onPressed: _handleSubmit,
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(
-                                  primaryPink,
+                                  Theme.of(context).primaryColor,
                                 ),
                                 foregroundColor: MaterialStateProperty.all(
                                   Colors.white,
@@ -246,9 +251,9 @@ class _LoginViewState extends State<LoginView> {
                                 _isLoginMode
                                     ? 'Đăng ký ngay'
                                     : 'Đăng nhập ngay',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: primaryPink,
+                                  color: Theme.of(context).primaryColor,
                                 ),
                               ),
                             ),

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../model/vocabulary.dart';
 import '../view_model/vocabulary_detail_view_model.dart';
 import '../../Dictionary/model/dictionary_entry.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 class VocabularyDetailView extends StatefulWidget {
   final Vocabulary vocabulary;
@@ -55,7 +56,7 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
                   translationContent = const SizedBox(
                     height: 50,
                     child: Center(
-                      child: CircularProgressIndicator(color: primaryPink),
+                      child: CustomLoadingWidget(color: primaryPink, size: 40),
                     ),
                   );
                 } else if (snapshot.hasError) {
@@ -687,7 +688,7 @@ class _PasteTranslateDialogState extends State<_PasteTranslateDialog> {
             const SizedBox(height: 16),
             if (_isLoading)
               const Center(
-                child: CircularProgressIndicator(color: primaryPink),
+                child: CustomLoadingWidget(color: primaryPink, size: 60),
               ),
             if (_errorMessage != null)
               Text(

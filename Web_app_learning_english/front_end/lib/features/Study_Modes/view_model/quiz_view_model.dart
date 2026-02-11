@@ -116,6 +116,7 @@ class QuizViewModel extends BaseViewModel {
 
   Future<void> submitResult() async {
     if (_session == null) return;
+    setBusy(true);
     try {
       await StudyModeService.updateGameResult(
         _session!.gameResultId,
@@ -125,6 +126,8 @@ class QuizViewModel extends BaseViewModel {
       );
     } catch (e) {
       setError("Failed to submit result: $e");
+    } finally {
+      setBusy(false);
     }
   }
 }

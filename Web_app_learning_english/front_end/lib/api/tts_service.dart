@@ -18,7 +18,7 @@ class TextToSpeechService {
   bool _isInitialized = false;
 
   // Constants
-  static const String _speechRateKey = 'tts_speech_rate';
+  static const String _speechRateKey = 'tts_speech_rate_v2';
   static const double _defaultSpeechRate = 0.5;
   static const double _defaultPitch = 1.0;
   static const String _defaultLanguage = "en-US";

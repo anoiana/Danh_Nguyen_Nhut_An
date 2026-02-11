@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../view_model/sentence_view_model.dart';
+import '../../../core/widgets/custom_loading_widget.dart';
 
 class SentenceView extends StatefulWidget {
   final int folderId;
@@ -89,31 +90,10 @@ class _SentenceViewState extends State<SentenceView> {
       child: Consumer<SentenceViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isBusy) {
-            return Scaffold(
-              body: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
-                  ),
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(color: primaryPink),
-                    SizedBox(height: 16),
-                    Text(
-                      'Đang tải dữ liệu...',
-                      style: TextStyle(
-                        color: primaryPink,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+            return const Scaffold(
+              body: CustomLoadingWidget(
+                message: 'Đang tải dữ liệu...',
+                color: primaryPink,
               ),
             );
           }
