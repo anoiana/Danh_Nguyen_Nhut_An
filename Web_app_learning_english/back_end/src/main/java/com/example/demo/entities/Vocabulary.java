@@ -36,6 +36,8 @@ public class Vocabulary {
     @Column(columnDefinition = "TEXT")
     private String userDefinedMeaning;
 
+    private String userDefinedPartOfSpeech;
+
     @Column(columnDefinition = "LONGTEXT")
     private String userImageBase64;
 }

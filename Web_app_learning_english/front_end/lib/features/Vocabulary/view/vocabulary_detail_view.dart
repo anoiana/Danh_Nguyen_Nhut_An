@@ -18,7 +18,6 @@ class VocabularyDetailView extends StatefulWidget {
 }
 
 class _VocabularyDetailViewState extends State<VocabularyDetailView> {
-  // Định nghĩa màu sắc chủ đạo
   static const Color primaryPink = Color(0xFFE91E63);
   static const Color accentPink = Color(0xFFFF80AB);
   static const Color backgroundPink = Color(0xFFFCE4EC);

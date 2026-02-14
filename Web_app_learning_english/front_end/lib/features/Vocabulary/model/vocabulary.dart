@@ -1,5 +1,5 @@
 import 'package:flutter/painting.dart';
-import 'package:untitled/features/Dictionary/model/dictionary_entry.dart';
+import 'package:hellen_app/features/Dictionary/model/dictionary_entry.dart';
 
 class Vocabulary {
   final int id;

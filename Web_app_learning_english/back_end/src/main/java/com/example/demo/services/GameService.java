@@ -352,8 +352,7 @@ public class GameService {
                 options.add(wrongMeanings.get(i));
             }
             Collections.shuffle(options);
-            String partOfSpeech = correctVocab.getMeanings().isEmpty() ? ""
-                    : correctVocab.getMeanings().get(0).getPartOfSpeech();
+            String partOfSpeech = resolvePartOfSpeech(correctVocab);
             return new GameDTO.QuizQuestionDTO(
                     correctVocab.getId(),
                     correctVocab.getWord(),
@@ -385,8 +384,7 @@ public class GameService {
                         options.add(wrongWords.get(i));
                     }
                     Collections.shuffle(options);
-                    String partOfSpeech = correctVocab.getMeanings().isEmpty() ? ""
-                            : correctVocab.getMeanings().get(0).getPartOfSpeech();
+                    String partOfSpeech = resolvePartOfSpeech(correctVocab);
                     return new GameDTO.ReverseQuizQuestionDTO(
                             correctVocab.getId(),
                             correctVocab.getUserDefinedMeaning(),
@@ -396,5 +394,26 @@ public class GameService {
                             correctVocab.getWord(),
                             correctVocab.getUserImageBase64());
                 }).collect(Collectors.toList());
+    }
+
+    /**
+     * Resolves the part of speech for a vocabulary.
+     * Prioritizes the user-defined value over the dictionary-provided one.
+     *
+     * @param vocab The vocabulary entity.
+     * @return The resolved part of speech string, or empty string if none
+     *         available.
+     */
+    private String resolvePartOfSpeech(Vocabulary vocab) {
+        // Priority 1: User-defined part of speech
+        if (vocab.getUserDefinedPartOfSpeech() != null && !vocab.getUserDefinedPartOfSpeech().isEmpty()) {
+            return vocab.getUserDefinedPartOfSpeech();
+        }
+        // Priority 2: First meaning's part of speech from dictionary
+        if (vocab.getMeanings() != null && !vocab.getMeanings().isEmpty()) {
+            String pos = vocab.getMeanings().get(0).getPartOfSpeech();
+            return pos != null ? pos : "";
+        }
+        return "";
     }
 }

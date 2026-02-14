@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:untitled/api/tts_service.dart';
+import 'package:hellen_app/api/tts_service.dart';
 
 /// A slider widget for adjusting Text-to-Speech (TTS) rate.
 /// Can be used within a BottomSheet or Dialog.

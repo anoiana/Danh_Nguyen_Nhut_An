@@ -60,6 +60,7 @@ public class VocabularyService {
         vocab.setAudioUrl(dto.audioUrl());
         vocab.setFolder(folder);
         vocab.setUserDefinedMeaning(dto.userDefinedMeaning());
+        vocab.setUserDefinedPartOfSpeech(dto.userDefinedPartOfSpeech());
         vocab.setUserImageBase64(dto.userImageBase64());
         vocab.setMeanings(new ArrayList<>());
 
@@ -133,6 +134,7 @@ public class VocabularyService {
         if (vocabOpt.isPresent()) {
             Vocabulary vocab = vocabOpt.get();
             vocab.setUserDefinedMeaning(updateDTO.userDefinedMeaning());
+            vocab.setUserDefinedPartOfSpeech(updateDTO.userDefinedPartOfSpeech());
             vocab.setUserImageBase64(updateDTO.userImageBase64());
             return vocabularyRepository.save(vocab);
         }
