@@ -65,9 +65,9 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
   Future<void> _handleSave() async {
     if (_meaningController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Nghĩa của từ không được để trống!'),
-          backgroundColor: Colors.redAccent,
+        SnackBar(
+          content: const Text('Nghĩa của từ không được để trống!'),
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -122,7 +122,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
       title: Text(
         'Lưu từ "${widget.entry.word}"',
         style: TextStyle(
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context).colorScheme.primary,
           fontWeight: FontWeight.bold,
         ),
         overflow: TextOverflow.ellipsis,
@@ -146,7 +146,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                     labelText: 'Chọn thư mục',
                     prefixIcon: Icon(
                       Icons.folder_open_outlined,
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -176,7 +176,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                       labelText: 'Loại từ',
                       prefixIcon: Icon(
                         Icons.category_outlined,
-                        color: Theme.of(context).primaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -220,7 +220,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                         labelText: 'Nghĩa của từ (có thể sửa)',
                         prefixIcon: Icon(
                           Icons.translate,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -303,11 +303,11 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                     },
                     icon: Icon(
                       Icons.photo_library_outlined,
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     label: Text(
                       'Chọn ảnh từ thiết bị',
-                      style: TextStyle(color: Theme.of(context).primaryColor),
+                      style: TextStyle(color: Theme.of(context).colorScheme.primary),
                     ),
                   ),
                 ),
@@ -323,7 +323,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
         ),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Colors.white,
           ),
           icon:

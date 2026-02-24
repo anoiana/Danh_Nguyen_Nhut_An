@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../view_model/sentence_view_model.dart';
 import '../../../core/widgets/custom_loading_widget.dart';
+import '../../../core/widgets/game_finish_dialog.dart';
 
 class SentenceView extends StatefulWidget {
   final int folderId;
@@ -90,10 +91,10 @@ class _SentenceViewState extends State<SentenceView> {
       child: Consumer<SentenceViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isBusy) {
-            return const Scaffold(
+            return Scaffold(
               body: CustomLoadingWidget(
                 message: 'Đang tải dữ liệu...',
-                color: primaryPink,
+                color: Theme.of(context).colorScheme.primary,
               ),
             );
           }
@@ -141,11 +142,14 @@ class _SentenceViewState extends State<SentenceView> {
             extendBodyBehindAppBar: true,
             resizeToAvoidBottomInset: true,
             body: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+                  colors:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? [const Color(0xFF1E1E1E), const Color(0xFF3D1525)]
+                          : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
                 ),
               ),
               child: Stack(
@@ -158,7 +162,12 @@ class _SentenceViewState extends State<SentenceView> {
                       width: 250,
                       height: 250,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(
+                                  context,
+                                ).primaryColor.withOpacity(0.3)
+                                : Colors.white.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -200,22 +209,6 @@ class _SentenceViewState extends State<SentenceView> {
                                               horizontal: 16,
                                               vertical: 8,
                                             ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(
-                                                0.6,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Text(
-                                              'Gợi ý: "${currentVocab.userDefinedMeaning}"',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontStyle: FontStyle.italic,
-                                                color: Colors.grey.shade700,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
                                           ),
                                         ),
                                       // Extra padding for scrolling above keyboard
@@ -252,7 +245,10 @@ class _SentenceViewState extends State<SentenceView> {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5),
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.1)
+                            : Theme.of(context).cardColor.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.close_rounded, color: primaryPink),
@@ -266,7 +262,10 @@ class _SentenceViewState extends State<SentenceView> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.1)
+                          : Theme.of(context).cardColor.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -274,6 +273,7 @@ class _SentenceViewState extends State<SentenceView> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
+                    fontStyle: FontStyle.italic,
                     color: primaryPink,
                   ),
                 ),
@@ -290,7 +290,10 @@ class _SentenceViewState extends State<SentenceView> {
                   (viewModel.currentIndex + 1) /
                   viewModel.session!.vocabularies.length,
               minHeight: 12,
-              backgroundColor: Colors.white.withOpacity(0.5),
+              backgroundColor:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[800]
+                      : Colors.white.withOpacity(0.5),
               valueColor: const AlwaysStoppedAnimation<Color>(primaryPink),
             ),
           ),
@@ -305,7 +308,7 @@ class _SentenceViewState extends State<SentenceView> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
@@ -321,19 +324,41 @@ class _SentenceViewState extends State<SentenceView> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             margin: const EdgeInsets.only(bottom: 24),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF0F5),
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).colorScheme.primary.withOpacity(0.15)
+                      : const Color(0xFFFFF0F5),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: primaryPink.withOpacity(0.1)),
+              border: Border.all(
+                color:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                        : primaryPink.withOpacity(0.1),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.create_rounded, size: 16, color: primaryPink),
+                Icon(
+                  Icons.create_rounded,
+                  size: 16,
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.9)
+                          : primaryPink,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Tạo câu với từ',
                   style: TextStyle(
-                    color: primaryPink.withOpacity(0.9),
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.9)
+                            : primaryPink.withOpacity(0.9),
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                     letterSpacing: 0.5,
@@ -345,10 +370,12 @@ class _SentenceViewState extends State<SentenceView> {
           Text(
             vocab.word,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.w900,
-              color: Color(0xFF333333),
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ??
+                  const Color(0xFF333333),
               height: 1.2,
               letterSpacing: -0.5,
             ),
@@ -359,7 +386,7 @@ class _SentenceViewState extends State<SentenceView> {
               vocab.phoneticText!,
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.grey[500],
+                color: Theme.of(context).textTheme.bodySmall?.color,
                 fontStyle: FontStyle.normal,
               ),
             ),
@@ -369,24 +396,25 @@ class _SentenceViewState extends State<SentenceView> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade50, Colors.blue.shade100],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.blue.withOpacity(0.15)
+                        : Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                border: Border.all(
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.blue.withOpacity(0.5)
+                          : Colors.transparent,
+                ),
               ),
               child: Text(
                 viewModel.partOfSpeech,
                 style: TextStyle(
-                  color: Colors.blue.shade700,
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.blue.shade200
+                          : Colors.blue.shade700,
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                 ),
@@ -415,16 +443,18 @@ class _SentenceViewState extends State<SentenceView> {
         focusNode: _focusNode,
         enabled: !viewModel.isSubmitted,
         // textAlign: TextAlign.center, // Removed center alignment for better input flow with suffix
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF333333),
+          color:
+              Theme.of(context).textTheme.bodyLarge?.color ??
+              const Color(0xFF333333),
         ),
         decoration: InputDecoration(
           hintText: 'Nhập câu của bạn...',
           hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Theme.of(context).cardColor,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 20,
             horizontal: 24,
@@ -435,7 +465,13 @@ class _SentenceViewState extends State<SentenceView> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(color: Colors.white, width: 2),
+            borderSide: BorderSide(
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).dividerColor
+                      : Colors.white,
+              width: 2,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
@@ -514,7 +550,7 @@ class _SentenceViewState extends State<SentenceView> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
@@ -604,7 +640,7 @@ class _SentenceViewState extends State<SentenceView> {
                         ? 'Câu của bạn rất tự nhiên và chính xác.'
                         : 'Hãy tham khảo cách diễn đạt dưới đây.',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                       fontSize: 14,
                       height: 1.4,
                     ),
@@ -619,9 +655,17 @@ class _SentenceViewState extends State<SentenceView> {
           width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color:
+                Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[850] ?? Colors.grey[900]
+                    : Colors.grey[50],
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.grey[200]!),
+            border: Border.all(
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[700]!
+                      : Colors.grey[200]!,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -638,7 +682,7 @@ class _SentenceViewState extends State<SentenceView> {
                     'AI Feedback',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                       fontSize: 13,
                       letterSpacing: 0.5,
                     ),
@@ -648,8 +692,10 @@ class _SentenceViewState extends State<SentenceView> {
               const SizedBox(height: 12),
               Text(
                 viewModel.feedbackMessage,
-                style: const TextStyle(
-                  color: Color(0xFF333333),
+                style: TextStyle(
+                  color:
+                      Theme.of(context).textTheme.bodyLarge?.color ??
+                      const Color(0xFF333333),
                   fontSize: 16,
                   height: 1.5,
                   fontWeight: FontWeight.w500,
@@ -674,7 +720,7 @@ class _SentenceViewState extends State<SentenceView> {
                   Text(
                     'Xem lại câu của bạn',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
@@ -684,7 +730,7 @@ class _SentenceViewState extends State<SentenceView> {
                     _showUserAnswerInFeedback
                         ? Icons.keyboard_arrow_up_rounded
                         : Icons.keyboard_arrow_down_rounded,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).textTheme.bodySmall?.color,
                     size: 20,
                   ),
                 ],
@@ -697,9 +743,9 @@ class _SentenceViewState extends State<SentenceView> {
               padding: const EdgeInsets.all(16),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: Theme.of(context).dividerColor),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -710,8 +756,8 @@ class _SentenceViewState extends State<SentenceView> {
               ),
               child: Text(
                 _textController.text,
-                style: const TextStyle(
-                  color: Color(0xFF555555),
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                   fontSize: 16,
                   height: 1.4,
                   fontStyle: FontStyle.italic,
@@ -735,250 +781,36 @@ class _SentenceViewState extends State<SentenceView> {
   void _showFinishDialog(SentenceViewModel viewModel) {
     viewModel.submitGameResult();
 
-    showDialog(
+    showGameFinishDialog(
       context: context,
-      barrierDismissible: false,
-      builder:
-          (ctx) => Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                // Main Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(32),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 30,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Hoàn thành!',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF333333),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Chúc mừng bạn đã hoàn thành bài tập.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Stats Row
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 20,
-                          horizontal: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF0F5),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: primaryPink.withOpacity(0.1),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              children: [
-                                const Text(
-                                  'Đúng',
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${viewModel.correctCount}',
-                                  style: const TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              width: 1,
-                              height: 40,
-                              color: primaryPink.withOpacity(0.2),
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  'Cần sửa',
-                                  style: TextStyle(
-                                    color: Colors.orange[700],
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${viewModel.wrongCount}',
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.orange[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Action Buttons
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                side: BorderSide(color: Colors.grey.shade300),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                foregroundColor: Colors.grey[700],
-                              ),
-                              onPressed: () {
-                                Navigator.of(ctx).pop();
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text(
-                                'Đóng',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryPink,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              onPressed: () async {
-                                Navigator.of(ctx).pop();
-                                await _initGame();
-                                setState(() {
-                                  _textController.clear();
-                                  _showUserAnswerInFeedback = false;
-                                });
-                              },
-                              child: const Text(
-                                'Chơi lại',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (viewModel.wrongCount > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.orange[700],
-                                backgroundColor: Colors.orange[50],
-                                side: BorderSide(
-                                  color: Colors.orange.withOpacity(0.5),
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                              ),
-                              onPressed: () async {
-                                Navigator.of(ctx).pop();
-                                await viewModel.retryGame();
-                                setState(() {
-                                  _textController.clear();
-                                  _showUserAnswerInFeedback = false;
-                                  _isFinishDialogShown = false;
-                                });
-                              },
-                              icon: const Icon(Icons.refresh_rounded, size: 20),
-                              label: const Text(
-                                'Ôn tập các câu cần sửa',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                // Floating Icon
-                Positioned(
-                  top: -50,
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFE91E63).withOpacity(0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFFE91E63), Color(0xFFFF4081)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.emoji_events_rounded,
-                        size: 48,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+      correctCount: viewModel.correctCount,
+      wrongCount: viewModel.wrongCount,
+      subtitle: 'Chúc mừng bạn đã hoàn thành bài tập.',
+      onClose: () {
+        Navigator.of(context).pop(); // close dialog
+        Navigator.of(context).pop(); // back to selection
+      },
+      onReplay: () async {
+        Navigator.of(context).pop(); // close dialog
+        await _initGame();
+        setState(() {
+          _textController.clear();
+          _showUserAnswerInFeedback = false;
+        });
+      },
+      wrongWordsCount: viewModel.wrongCount,
+      onRetryWrongWords:
+          viewModel.wrongCount > 0
+              ? () async {
+                Navigator.of(context).pop(); // close dialog
+                await viewModel.retryGame();
+                setState(() {
+                  _textController.clear();
+                  _showUserAnswerInFeedback = false;
+                  _isFinishDialogShown = false;
+                });
+              }
+              : null,
     );
   }
 }

@@ -1,16 +1,17 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../Dictionary/service/dictionary_service.dart';
 import '../../../core/widgets/speech_rate_bottom_sheet.dart';
 import '../view_model/listening_view_model.dart';
 import '../model/listening_content.dart';
-import '../../Vocabulary/model/vocabulary.dart';
 import '../model/game_session.dart';
 import '../../../core/widgets/custom_loading_widget.dart';
+import '../../../core/widgets/game_finish_dialog.dart';
 
 import '../../../core/widgets/custom_error_widget.dart';
 import 'widgets/vocabulary_card.dart';
 import 'widgets/ai_task_content.dart';
+import 'widgets/translation_bottom_sheet.dart';
 
 class ListeningView extends StatefulWidget {
   final int? folderId;
@@ -86,10 +87,10 @@ class _ListeningViewState extends State<ListeningView>
       child: Consumer<ListeningViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
-            return const Scaffold(
+            return Scaffold(
               body: CustomLoadingWidget(
                 message: 'Đang tải bài nghe...',
-                color: primaryPink,
+                color: Theme.of(context).colorScheme.primary,
               ),
             );
           }
@@ -123,7 +124,10 @@ class _ListeningViewState extends State<ListeningView>
                   end: Alignment.bottomCenter,
                   colors:
                       Theme.of(context).brightness == Brightness.dark
-                          ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                          ? [
+                            const Color(0xFF1E1E1E),
+                            Theme.of(context).primaryColor.withOpacity(0.5),
+                          ]
                           : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
                 ),
               ),
@@ -187,7 +191,10 @@ class _ListeningViewState extends State<ListeningView>
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5),
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.1)
+                            : Theme.of(context).cardColor,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.close_rounded, color: primaryPink),
@@ -200,6 +207,7 @@ class _ListeningViewState extends State<ListeningView>
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
                   color: primaryPink,
                 ),
               ),
@@ -215,7 +223,10 @@ class _ListeningViewState extends State<ListeningView>
                   (viewModel.currentVocabIndex + 1) /
                   session.vocabularies.length,
               minHeight: 6,
-              backgroundColor: Colors.white.withOpacity(0.5),
+              backgroundColor:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[800]
+                      : Theme.of(context).cardColor.withOpacity(0.5),
               valueColor: const AlwaysStoppedAnimation<Color>(primaryPink),
             ),
           ),
@@ -224,137 +235,25 @@ class _ListeningViewState extends State<ListeningView>
     );
   }
 
-  Widget _buildListeningCard(
-    ListeningViewModel viewModel,
-    Vocabulary currentVocab,
-  ) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE91E63).withOpacity(0.12),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            margin: const EdgeInsets.only(bottom: 24),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF0F5),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: primaryPink.withOpacity(0.1)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.headphones_rounded,
-                  size: 16,
-                  color: primaryPink,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Nghe và điền từ',
-                  style: TextStyle(
-                    color: primaryPink.withOpacity(0.9),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          GestureDetector(
-            onTap: viewModel.speakCurrentVocab,
-            child: Container(
-              padding: const EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.white, Color(0xFFFFF0F5)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryPink.withOpacity(0.15),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                  BoxShadow(
-                    color: Colors.white,
-                    blurRadius: 10,
-                    offset: const Offset(-5, -5),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.volume_up_rounded,
-                size: 64,
-                color: primaryPink,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Chạm để nghe lại',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-
-          if (viewModel.isSubmitted &&
-              viewModel.feedbackState == FeedbackState.incorrect) ...[
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.shade200),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'Nghĩa: ${currentVocab.userDefinedMeaning ?? "Chưa có"}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.orange.shade800,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
   Widget _buildVocabInputField(ListeningViewModel viewModel) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color:
+            Theme.of(context).brightness == Brightness.dark
+                ? Colors.transparent
+                : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(28),
+        border:
+            Theme.of(context).brightness == Brightness.dark
+                ? Border.all(color: Theme.of(context).primaryColor, width: 2)
+                : null,
         boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE91E63).withOpacity(0.1),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
+          if (Theme.of(context).brightness == Brightness.light)
+            BoxShadow(
+              color: const Color(0xFFE91E63).withOpacity(0.1),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            ),
         ],
       ),
       child: TextField(
@@ -375,7 +274,10 @@ class _ListeningViewState extends State<ListeningView>
         decoration: InputDecoration(
           hintText: 'Nhập từ bạn nghe được...',
           hintStyle: TextStyle(
-            color: Colors.grey[400],
+            color:
+                Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[500]
+                    : Colors.grey[400],
             fontSize: 18,
             fontWeight: FontWeight.w400,
           ),
@@ -461,18 +363,22 @@ class _ListeningViewState extends State<ListeningView>
     );
   }
 
-  void _handleNextVocab(ListeningViewModel viewModel) {
+  void _handleNextVocab(ListeningViewModel viewModel) { 
     final session = viewModel.vocabSession;
     if (session == null) return;
 
     _vocabController.clear();
-    // Ensure we request focus back after a short delay for the animation
-    Future.delayed(Duration.zero, () => _vocabFocusNode.requestFocus());
 
     if (viewModel.currentVocabIndex >= session.vocabularies.length - 1) {
       _showFinishDialog(viewModel);
     } else {
       viewModel.nextVocabWord();
+      // Auto-focus sau khi widget rebuild xong (TextField được enable lại)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _vocabFocusNode.requestFocus();
+        }
+      });
     }
   }
 
@@ -551,16 +457,25 @@ class _ListeningViewState extends State<ListeningView>
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: wrongColor.withOpacity(0.05),
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? wrongColor.withOpacity(0.15)
+                            : wrongColor.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: wrongColor.withOpacity(0.1)),
+                    border: Border.all(
+                      color: wrongColor.withOpacity(0.3),
+                      width: 1,
+                    ),
                   ),
                   child: Text(
                     currentVocab.word,
-                    style: const TextStyle(
-                      fontSize: 20,
+                    style: TextStyle(
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: wrongColor,
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.red.shade300
+                              : wrongColor,
                     ),
                   ),
                 ),
@@ -608,251 +523,26 @@ class _ListeningViewState extends State<ListeningView>
     await viewModel.submitVocabResult();
     if (!mounted) return;
 
-    showDialog(
+    showGameFinishDialog(
       context: context,
-      barrierDismissible: false,
-      builder:
-          (ctx) => Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-            child: SingleChildScrollView(
-              clipBehavior: Clip.none,
-              child: Stack(
-                alignment: Alignment.topCenter,
-                clipBehavior: Clip.none,
-                children: [
-                  // Main Card
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 40),
-                    padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(32),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 30,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Hoàn thành!',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF333333),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Bạn đã hoàn thành bài luyện tập.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-
-                        // Stats Row
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 20,
-                            horizontal: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF0F5),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: primaryPink.withOpacity(0.1),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Column(
-                                children: [
-                                  const Text(
-                                    'Đúng',
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${viewModel.correctCount}',
-                                    style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                width: 1,
-                                height: 40,
-                                color: primaryPink.withOpacity(0.2),
-                              ),
-                              Column(
-                                children: [
-                                  Text(
-                                    'Sai',
-                                    style: TextStyle(
-                                      color: Colors.red[700],
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${viewModel.wrongCount}',
-                                    style: TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.red[700],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-
-                        // Action Buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                  side: BorderSide(color: Colors.grey.shade300),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  foregroundColor: Colors.grey[700],
-                                ),
-                                onPressed: () {
-                                  Navigator.of(ctx).pop();
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text(
-                                  'Đóng',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryPink,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(ctx).pop();
-                                  viewModel.retryVocabGame(
-                                    widget.userId!,
-                                    widget.folderId!,
-                                  );
-                                },
-                                child: const Text(
-                                  'Chơi lại',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (viewModel.wrongVocabularies.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.orange[700],
-                                  backgroundColor: Colors.orange[50],
-                                  side: BorderSide(
-                                    color: Colors.orange.withOpacity(0.5),
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(ctx).pop();
-                                  viewModel.startWrongWordsRetry();
-                                },
-                                icon: const Icon(
-                                  Icons.refresh_rounded,
-                                  size: 20,
-                                ),
-                                label: const Text(
-                                  'Ôn tập từ sai',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  // Floating Icon
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFE91E63).withOpacity(0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFFE91E63), Color(0xFFFF4081)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.emoji_events_rounded,
-                        size: 48,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      correctCount: viewModel.correctCount,
+      wrongCount: viewModel.wrongCount,
+      onClose: () {
+        Navigator.of(context).pop(); // close dialog
+        Navigator.of(context).pop(); // back to selection
+      },
+      onReplay: () async {
+        Navigator.of(context).pop(); // close dialog
+        await viewModel.retryVocabGame(widget.userId!, widget.folderId!);
+      },
+      wrongWordsCount: viewModel.wrongCount,
+      onRetryWrongWords:
+          viewModel.wrongCount > 0
+              ? () {
+                Navigator.of(context).pop(); // close dialog
+                viewModel.startWrongWordsRetry();
+              }
+              : null,
     );
   }
 
@@ -873,7 +563,7 @@ class _ListeningViewState extends State<ListeningView>
                   icon: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Theme.of(context).cardColor,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.arrow_back, color: primaryPink),
@@ -884,10 +574,12 @@ class _ListeningViewState extends State<ListeningView>
                   child: Text(
                     viewModel.aiSubType == 'mcq' ? 'Trắc nghiệm' : 'Điền từ',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: Color(0xFF333333),
+                      color:
+                          Theme.of(context).textTheme.bodyLarge?.color ??
+                          const Color(0xFF333333),
                     ),
                   ),
                 ),
@@ -908,8 +600,11 @@ class _ListeningViewState extends State<ListeningView>
             margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                color: Theme.of(context).dividerColor.withOpacity(0.5),
+              ),
             ),
             child: TabBar(
               controller: _tabController,
@@ -970,7 +665,7 @@ class _ListeningViewState extends State<ListeningView>
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
-      child: Text(
+      child: SelectableText(
         transcript,
         style: TextStyle(
           fontSize: 16,
@@ -979,7 +674,41 @@ class _ListeningViewState extends State<ListeningView>
               Theme.of(context).textTheme.bodyLarge?.color ??
               const Color(0xFF333333),
         ),
+        contextMenuBuilder: (context, state) {
+          final selectedText =
+              state.textEditingValue.selection
+                  .textInside(state.textEditingValue.text)
+                  .trim();
+          if (selectedText.isEmpty) return const SizedBox.shrink();
+
+          return AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: state.contextMenuAnchors,
+            buttonItems: [
+              ContextMenuButtonItem(
+                onPressed: () {
+                  _showTranslationBottomSheet(selectedText);
+                  state.hideToolbar();
+                },
+                label: 'Dịch',
+              ),
+              ...state.contextMenuButtonItems,
+            ],
+          );
+        },
       ),
+    );
+  }
+
+  void _showTranslationBottomSheet(String text) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder:
+          (context) => TranslationBottomSheet(
+            text: text,
+            translateWord: (val) => DictionaryService.translateWord(val),
+          ),
     );
   }
 
@@ -1020,9 +749,7 @@ class _ListeningViewState extends State<ListeningView>
             children: [
               IconButton(
                 icon: const Icon(Icons.replay_10_rounded),
-                onPressed:
-                    viewModel
-                        .replay, // Actually replay from start in VM currently, ideal would be -10s
+                onPressed: viewModel.replay,
                 color: Colors.grey[700],
               ),
               const SizedBox(width: 24),

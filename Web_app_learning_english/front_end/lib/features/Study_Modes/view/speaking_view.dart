@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../view_model/speaking_view_model.dart';
 import '../../../api/stt_service.dart';
 import '../../../core/widgets/custom_loading_widget.dart';
+import '../../../core/widgets/game_finish_dialog.dart';
 
 // Theme Colors
 const Color primaryPink = Color(0xFFE91E63);
@@ -32,6 +33,7 @@ class _SpeakingViewState extends State<SpeakingView>
   late AnimationController _pulseController;
   late AnimationController _waveController;
   late Animation<double> _pulseAnimation;
+  bool _hasShownFinishDialog = false;
 
   @override
   void initState() {
@@ -55,10 +57,54 @@ class _SpeakingViewState extends State<SpeakingView>
     // Initialize ViewModel
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final viewModel = context.read<SpeakingViewModel>();
+      viewModel.addListener(() => _onViewModelChanged(viewModel));
       viewModel.init().then((_) {
         viewModel.startGame(widget.userId, widget.folderId);
       });
     });
+  }
+
+  void _onViewModelChanged(SpeakingViewModel viewModel) {
+    // Auto-show GameFinishDialog when result submission is complete
+    if (viewModel.isFinished &&
+        !viewModel.isSubmittingResult &&
+        !_hasShownFinishDialog &&
+        mounted) {
+      _hasShownFinishDialog = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showFinishDialog(viewModel);
+      });
+    }
+  }
+
+  void _showFinishDialog(SpeakingViewModel viewModel) {
+    showGameFinishDialog(
+      context: context,
+      correctCount: viewModel.correctCount,
+      wrongCount: viewModel.wrongCount + viewModel.skippedCount,
+      extraStats:
+          viewModel.skippedCount > 0
+              ? {'Bỏ qua': '${viewModel.skippedCount}'}
+              : null,
+      onClose: () {
+        Navigator.of(context).pop(); // close dialog
+        Navigator.of(context).pop(); // back to selection
+      },
+      onReplay: () {
+        Navigator.of(context).pop(); // close dialog
+        _hasShownFinishDialog = false;
+        viewModel.retryGame(widget.userId, widget.folderId);
+      },
+      wrongWordsCount: viewModel.wrongVocabularies.length,
+      onRetryWrongWords:
+          viewModel.wrongVocabularies.isNotEmpty
+              ? () {
+                Navigator.of(context).pop(); // close dialog
+                _hasShownFinishDialog = false;
+                viewModel.startWrongWordsRetry();
+              }
+              : null,
+    );
   }
 
   @override
@@ -72,6 +118,8 @@ class _SpeakingViewState extends State<SpeakingView>
   Widget build(BuildContext context) {
     return Consumer<SpeakingViewModel>(
       builder: (context, viewModel, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
         // Control pulse animation based on state
         if (viewModel.sttStatus == SttStatus.listening) {
           if (!_pulseController.isAnimating) {
@@ -83,14 +131,31 @@ class _SpeakingViewState extends State<SpeakingView>
         }
 
         return Scaffold(
-          backgroundColor: backgroundPink,
-          body: SafeArea(
-            child:
-                viewModel.isLoading
-                    ? _buildLoadingView()
-                    : viewModel.isFinished
-                    ? _buildResultView(viewModel)
-                    : _buildGameView(viewModel),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors:
+                    isDark
+                        ? [
+                          const Color(0xFF1E1E1E),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.5),
+                        ]
+                        : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
+              ),
+            ),
+            child: SafeArea(
+              child:
+                  viewModel.isLoading
+                      ? _buildLoadingView()
+                      : (viewModel.isSubmittingResult || viewModel.isFinished)
+                      ? _buildSubmittingView()
+                      : _buildGameView(viewModel),
+            ),
           ),
         );
       },
@@ -98,9 +163,16 @@ class _SpeakingViewState extends State<SpeakingView>
   }
 
   Widget _buildLoadingView() {
-    return const CustomLoadingWidget(
-      message: 'Đang chuẩn bị...',
-      color: primaryPink,
+    return CustomLoadingWidget(
+      message: 'Đang tải dữ liệu...',
+      color: Theme.of(context).colorScheme.primary,
+    );
+  }
+
+  Widget _buildSubmittingView() {
+    return CustomLoadingWidget(
+      message: 'Đang lưu kết quả...',
+      color: Theme.of(context).colorScheme.primary,
     );
   }
 
@@ -131,6 +203,11 @@ class _SpeakingViewState extends State<SpeakingView>
 
                   const SizedBox(height: 32),
 
+                  // Status hint text
+                  _buildStatusHint(viewModel),
+
+                  const SizedBox(height: 24),
+
                   // Microphone button
                   _buildMicrophoneButton(viewModel),
 
@@ -154,6 +231,8 @@ class _SpeakingViewState extends State<SpeakingView>
   }
 
   Widget _buildHeader(SpeakingViewModel viewModel) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
@@ -165,32 +244,29 @@ class _SpeakingViewState extends State<SpeakingView>
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.6),
+                color:
+                    isDark
+                        ? Colors.white.withOpacity(0.1)
+                        : Theme.of(context).cardColor.withOpacity(0.6),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back_rounded, color: primaryPink),
+              child: Icon(
+                Icons.arrow_back_rounded,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ),
 
           // Title
-          // Title
-          const Expanded(
-            child: Text(
-              'Luyện Nói',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF333333),
-              ),
-            ),
-          ),
 
           // Score Display
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.6),
+              color:
+                  isDark
+                      ? Colors.white.withOpacity(0.1)
+                      : Theme.of(context).cardColor.withOpacity(0.6),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -223,6 +299,7 @@ class _SpeakingViewState extends State<SpeakingView>
   }
 
   Widget _buildProgressBar(SpeakingViewModel viewModel) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final progress =
         viewModel.totalWords > 0
             ? (viewModel.currentIndex + 1) / viewModel.totalWords
@@ -237,15 +314,19 @@ class _SpeakingViewState extends State<SpeakingView>
             children: [
               Text(
                 'Từ ${viewModel.currentIndex + 1}/${viewModel.totalWords}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: primaryPink,
+                  fontStyle: FontStyle.italic,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               Text(
                 '${(progress * 100).toInt()}%',
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.grey[400] : Colors.black54,
+                ),
               ),
             ],
           ),
@@ -254,7 +335,7 @@ class _SpeakingViewState extends State<SpeakingView>
           height: 6,
           margin: const EdgeInsets.symmetric(horizontal: 24),
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            color: isDark ? Colors.grey[800] : Colors.grey[200],
             borderRadius: BorderRadius.circular(3),
           ),
           child: FractionallySizedBox(
@@ -262,10 +343,17 @@ class _SpeakingViewState extends State<SpeakingView>
             widthFactor: progress.clamp(0.0, 1.0),
             child: Container(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFF80AB), primaryPink],
-                ),
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(3),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
             ),
           ),
@@ -275,6 +363,7 @@ class _SpeakingViewState extends State<SpeakingView>
   }
 
   Widget _buildWordCard(SpeakingViewModel viewModel, dynamic vocab) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     Color borderColor = Colors.transparent;
     IconData? statusIcon;
     Color? iconColor;
@@ -282,17 +371,17 @@ class _SpeakingViewState extends State<SpeakingView>
     switch (viewModel.feedbackState) {
       case SpeakingFeedbackState.correct:
         borderColor = successGreen;
-        statusIcon = Icons.check_circle;
+        statusIcon = Icons.check_circle_rounded;
         iconColor = successGreen;
         break;
       case SpeakingFeedbackState.incorrect:
         borderColor = errorRed;
-        statusIcon = Icons.cancel;
+        statusIcon = Icons.cancel_rounded;
         iconColor = errorRed;
         break;
       case SpeakingFeedbackState.skipped:
         borderColor = warningOrange;
-        statusIcon = Icons.skip_next;
+        statusIcon = Icons.skip_next_rounded;
         iconColor = warningOrange;
         break;
       default:
@@ -301,38 +390,46 @@ class _SpeakingViewState extends State<SpeakingView>
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: borderColor != Colors.transparent ? borderColor : Colors.white,
-          width: 3,
+          color:
+              borderColor != Colors.transparent
+                  ? borderColor
+                  : isDark
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                  : Colors.transparent,
+          width: borderColor != Colors.transparent ? 3 : 1,
         ),
         boxShadow: [
           BoxShadow(
             color:
                 borderColor != Colors.transparent
-                    ? borderColor.withOpacity(0.3)
-                    : Colors.black.withOpacity(0.05),
-            blurRadius: 20,
+                    ? borderColor.withOpacity(0.25)
+                    : isDark
+                    ? Colors.black.withOpacity(0.3)
+                    : Theme.of(context).colorScheme.primary.withOpacity(0.08),
+            blurRadius: 24,
             spreadRadius: 0,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Status icon (Correct/Incorrect)
+          // Status icon (Correct/Incorrect/Skipped)
           if (statusIcon != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: iconColor!.withOpacity(0.1),
+                  color: iconColor!.withOpacity(isDark ? 0.2 : 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(statusIcon, color: iconColor, size: 40),
@@ -349,10 +446,14 @@ class _SpeakingViewState extends State<SpeakingView>
               children: [
                 Text(
                   vocab.word,
-                  style: const TextStyle(
-                    fontSize: 32,
+                  style: TextStyle(
+                    fontSize: 34,
                     fontWeight: FontWeight.w800,
-                    color: Colors.black87,
+                    color:
+                        isDark
+                            ? Colors.white
+                            : Theme.of(context).textTheme.bodyLarge?.color ??
+                                Colors.black87,
                     letterSpacing: -0.5,
                   ),
                   textAlign: TextAlign.center,
@@ -360,22 +461,32 @@ class _SpeakingViewState extends State<SpeakingView>
                 if (vocab.phoneticText != null &&
                     vocab.phoneticText!.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: const EdgeInsets.only(top: 10),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
+                        horizontal: 16,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(16),
+                        color:
+                            isDark
+                                ? Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.1)
+                                : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         vocab.phoneticText!,
                         style: TextStyle(
                           fontSize: 16,
-                          fontStyle: FontStyle.normal,
-                          color: Colors.grey[700],
+                          fontStyle: FontStyle.italic,
+                          color:
+                              isDark
+                                  ? Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.8)
+                                  : Colors.grey[600],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -397,26 +508,37 @@ class _SpeakingViewState extends State<SpeakingView>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          primaryPink.withOpacity(0.1),
-                          Colors.purple.withOpacity(0.05),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(isDark ? 0.2 : 0.1),
+                          Colors.purple.withOpacity(isDark ? 0.1 : 0.05),
                         ],
                       ),
                       shape: BoxShape.circle,
+                      border:
+                          isDark
+                              ? Border.all(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.3),
+                                width: 1.5,
+                              )
+                              : null,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.volume_up_rounded,
-                      color: primaryPink,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 48,
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Nghe và Nhắc lại',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.grey,
+                    color: isDark ? Colors.grey[400] : Colors.grey,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -424,7 +546,9 @@ class _SpeakingViewState extends State<SpeakingView>
                   height: 4,
                   width: 32,
                   decoration: BoxDecoration(
-                    color: primaryPink.withOpacity(0.2),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -437,14 +561,29 @@ class _SpeakingViewState extends State<SpeakingView>
                   viewModel.feedbackState != SpeakingFeedbackState.initial))
             Padding(
               padding: const EdgeInsets.only(top: 16),
-              child: Text(
-                vocab.userDefinedMeaning!,
-                style: TextStyle(
-                  fontSize: 16,
-                  height: 1.4,
-                  color: Colors.grey[700],
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
                 ),
-                textAlign: TextAlign.center,
+                decoration: BoxDecoration(
+                  color:
+                      isDark
+                          ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.08)
+                          : Colors.grey[50],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  vocab.userDefinedMeaning!,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.4,
+                    color: isDark ? Colors.grey[300] : Colors.grey[700],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
 
@@ -458,8 +597,10 @@ class _SpeakingViewState extends State<SpeakingView>
                 icon: const Icon(Icons.volume_up_rounded, size: 18),
                 label: const Text('Nghe lại'),
                 style: TextButton.styleFrom(
-                  foregroundColor: primaryPink,
-                  backgroundColor: primaryPink.withOpacity(0.05),
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(isDark ? 0.15 : 0.05),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 10,
@@ -475,7 +616,60 @@ class _SpeakingViewState extends State<SpeakingView>
     );
   }
 
+  Widget _buildStatusHint(SpeakingViewModel viewModel) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isListening = viewModel.sttStatus == SttStatus.listening;
+
+    if (viewModel.feedbackState != SpeakingFeedbackState.initial &&
+        viewModel.feedbackState != SpeakingFeedbackState.listening) {
+      return const SizedBox.shrink();
+    }
+
+    String hintText;
+    IconData hintIcon;
+    Color hintColor;
+
+    if (isListening) {
+      hintText = 'Đang lắng nghe bạn...';
+      hintIcon = Icons.hearing_rounded;
+      hintColor = errorRed;
+    } else {
+      hintText = 'Nhấn micro để bắt đầu nói';
+      hintIcon = Icons.mic_none_rounded;
+      hintColor = isDark ? Theme.of(context).colorScheme.primary : primaryPink;
+    }
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: Container(
+        key: ValueKey(isListening),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: hintColor.withOpacity(isDark ? 0.15 : 0.08),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: hintColor.withOpacity(isDark ? 0.3 : 0.15)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(hintIcon, size: 18, color: hintColor),
+            const SizedBox(width: 8),
+            Text(
+              hintText,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: hintColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildMicrophoneButton(SpeakingViewModel viewModel) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isListening = viewModel.sttStatus == SttStatus.listening;
     final canListen =
         viewModel.feedbackState == SpeakingFeedbackState.initial ||
@@ -491,9 +685,9 @@ class _SpeakingViewState extends State<SpeakingView>
             children: [
               // Wave circles when listening
               if (isListening) ...[
-                _buildWaveCircle(1.0, 0.0),
-                _buildWaveCircle(0.8, 0.3),
-                _buildWaveCircle(0.6, 0.6),
+                _buildWaveCircle(1.0, 0.0, isDark),
+                _buildWaveCircle(0.8, 0.3, isDark),
+                _buildWaveCircle(0.6, 0.6, isDark),
               ],
 
               // Main button
@@ -509,18 +703,25 @@ class _SpeakingViewState extends State<SpeakingView>
                       colors:
                           canListen
                               ? [
-                                isListening ? errorRed : primaryPink,
+                                isListening
+                                    ? errorRed
+                                    : Theme.of(context).colorScheme.primary,
                                 isListening
                                     ? errorRed.withOpacity(0.8)
                                     : const Color(0xFFC2185B),
                               ]
-                              : [Colors.grey[400]!, Colors.grey[500]!],
+                              : [
+                                isDark ? Colors.grey[700]! : Colors.grey[400]!,
+                                isDark ? Colors.grey[800]! : Colors.grey[500]!,
+                              ],
                     ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: (isListening ? errorRed : primaryPink)
-                            .withOpacity(0.4),
+                        color: (isListening
+                                ? errorRed
+                                : Theme.of(context).colorScheme.primary)
+                            .withOpacity(canListen ? 0.4 : 0.1),
                         blurRadius: 20,
                         spreadRadius: 2,
                       ),
@@ -540,7 +741,7 @@ class _SpeakingViewState extends State<SpeakingView>
     );
   }
 
-  Widget _buildWaveCircle(double scale, double delay) {
+  Widget _buildWaveCircle(double scale, double delay, bool isDark) {
     return AnimatedBuilder(
       animation: _waveController,
       builder: (context, child) {
@@ -551,7 +752,9 @@ class _SpeakingViewState extends State<SpeakingView>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: primaryPink.withOpacity((1 - animValue) * 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity((1 - animValue) * 0.5),
               width: 2,
             ),
           ),
@@ -561,19 +764,11 @@ class _SpeakingViewState extends State<SpeakingView>
   }
 
   Widget _buildRecognizedText(SpeakingViewModel viewModel) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (viewModel.recognizedText.isEmpty &&
         viewModel.sttStatus != SttStatus.listening) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: const Text(
-          'Nhấn micro để bắt đầu nói',
-          style: TextStyle(fontSize: 14, color: Colors.grey),
-        ),
-      );
+      return const SizedBox.shrink();
     }
 
     return AnimatedOpacity(
@@ -584,24 +779,31 @@ class _SpeakingViewState extends State<SpeakingView>
               ? 0.0
               : 1.0,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 32),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
             bottomLeft: Radius.circular(24),
-            bottomRight: Radius.circular(4),
+            bottomRight: Radius.circular(6),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color:
+                  isDark
+                      ? Colors.black.withOpacity(0.3)
+                      : Colors.black.withOpacity(0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
-          border: Border.all(color: primaryPink.withOpacity(0.1)),
+          border: Border.all(
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withOpacity(isDark ? 0.3 : 0.1),
+          ),
         ),
         child: Column(
           children: [
@@ -610,21 +812,23 @@ class _SpeakingViewState extends State<SpeakingView>
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(primaryPink),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Text(
-                    'Đang nghe...',
+                    'Đang nhận dạng giọng nói...',
                     style: TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
-                      color: Colors.grey[600],
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
                 ],
@@ -632,22 +836,38 @@ class _SpeakingViewState extends State<SpeakingView>
             else
               Column(
                 children: [
-                  Text(
-                    'Bạn nói:',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[400],
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.record_voice_over_rounded,
+                        size: 14,
+                        color: isDark ? Colors.grey[500] : Colors.grey[400],
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Bạn nói:',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.grey[500] : Colors.grey[400],
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   Text(
                     '"${viewModel.recognizedText}"',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          isDark
+                              ? Colors.white
+                              : Theme.of(context).textTheme.bodyLarge?.color ??
+                                  Colors.black87,
                     ),
                   ),
                 ],
@@ -659,22 +879,45 @@ class _SpeakingViewState extends State<SpeakingView>
   }
 
   Widget _buildActionButtons(SpeakingViewModel viewModel) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final showNextButton =
         viewModel.feedbackState == SpeakingFeedbackState.correct ||
         viewModel.feedbackState == SpeakingFeedbackState.incorrect ||
         viewModel.feedbackState == SpeakingFeedbackState.skipped;
 
     if (showNextButton) {
-      return ElevatedButton.icon(
-        onPressed: viewModel.nextWord,
-        icon: const Icon(Icons.arrow_forward_rounded),
-        label: const Text('Tiếp theo'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryPink,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+      final isCorrect =
+          viewModel.feedbackState == SpeakingFeedbackState.correct;
+      final buttonColor = isCorrect ? successGreen : primaryPink;
+
+      return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: viewModel.nextWord,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: buttonColor,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            elevation: 4,
+            shadowColor: buttonColor.withOpacity(0.4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+            ),
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Tiếp theo',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              SizedBox(width: 8),
+              Icon(Icons.arrow_forward_rounded, size: 22),
+            ],
           ),
         ),
       );
@@ -684,275 +927,49 @@ class _SpeakingViewState extends State<SpeakingView>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Hint button
-        OutlinedButton.icon(
-          onPressed: viewModel.isWordRevealed ? null : viewModel.showHint,
-          icon: const Icon(Icons.lightbulb_outline_rounded, size: 20),
-          label: const Text('Gợi ý'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: warningOrange,
-            side: BorderSide(
-              color: viewModel.isWordRevealed ? Colors.grey : warningOrange,
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: viewModel.isWordRevealed ? null : viewModel.showHint,
+            icon: const Icon(Icons.lightbulb_outline_rounded, size: 20),
+            label: const Text('Gợi ý'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: warningOrange,
+              side: BorderSide(
+                color:
+                    viewModel.isWordRevealed
+                        ? (isDark ? Colors.grey[700]! : Colors.grey[300]!)
+                        : warningOrange,
+                width: 1.5,
+              ),
+              disabledForegroundColor:
+                  isDark ? Colors.grey[600] : Colors.grey[400],
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
             ),
           ),
         ),
         const SizedBox(width: 16),
         // Skip button
-        OutlinedButton.icon(
-          onPressed: viewModel.skipWord,
-          icon: const Icon(Icons.skip_next_rounded, size: 20),
-          label: const Text('Bỏ qua'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.grey[600],
-            side: BorderSide(color: Colors.grey[400]!),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: viewModel.skipWord,
+            icon: const Icon(Icons.skip_next_rounded, size: 20),
+            label: const Text('Bỏ qua'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: isDark ? Colors.grey[400] : Colors.grey[600],
+              side: BorderSide(
+                color: isDark ? Colors.grey[600]! : Colors.grey[400]!,
+                width: 1.5,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
             ),
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildResultView(SpeakingViewModel viewModel) {
-    final total = viewModel.totalWords;
-    final correct = viewModel.correctCount;
-    final percentage = total > 0 ? (correct / total * 100).toInt() : 0;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          const SizedBox(height: 40),
-
-          // Trophy or result icon
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors:
-                    percentage >= 70
-                        ? [successGreen, successGreen.withOpacity(0.8)]
-                        : percentage >= 50
-                        ? [warningOrange, warningOrange.withOpacity(0.8)]
-                        : [errorRed, errorRed.withOpacity(0.8)],
-              ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: (percentage >= 70 ? successGreen : primaryPink)
-                      .withOpacity(0.3),
-                  blurRadius: 20,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: Icon(
-              percentage >= 70
-                  ? Icons.emoji_events_rounded
-                  : percentage >= 50
-                  ? Icons.thumb_up_rounded
-                  : Icons.refresh_rounded,
-              color: Colors.white,
-              size: 64,
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Title
-          Text(
-            percentage >= 70
-                ? 'Xuất sắc!'
-                : percentage >= 50
-                ? 'Khá tốt!'
-                : 'Cần luyện thêm!',
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            'Bạn đã hoàn thành bài luyện nói',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Stats card
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Percentage circle
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 120,
-                      height: 120,
-                      child: CircularProgressIndicator(
-                        value: percentage / 100,
-                        strokeWidth: 10,
-                        backgroundColor: Colors.grey[200],
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          percentage >= 70
-                              ? successGreen
-                              : percentage >= 50
-                              ? warningOrange
-                              : errorRed,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '$percentage%',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                // Stats row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildStatItem(
-                      Icons.check_circle,
-                      successGreen,
-                      '${viewModel.correctCount}',
-                      'Đúng',
-                    ),
-                    _buildStatItem(
-                      Icons.cancel,
-                      errorRed,
-                      '${viewModel.wrongCount}',
-                      'Sai',
-                    ),
-                    _buildStatItem(
-                      Icons.skip_next,
-                      warningOrange,
-                      '${viewModel.skippedCount}',
-                      'Bỏ qua',
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Action buttons
-          if (viewModel.wrongVocabularies.isNotEmpty)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: viewModel.startWrongWordsRetry,
-                icon: const Icon(Icons.refresh_rounded),
-                label: Text(
-                  'Ôn lại ${viewModel.wrongVocabularies.length} từ sai',
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: warningOrange,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-              ),
-            ),
-
-          const SizedBox(height: 12),
-
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed:
-                  () => viewModel.retryGame(widget.userId, widget.folderId),
-              icon: const Icon(Icons.replay_rounded),
-              label: const Text('Chơi lại'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryPink,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.home_rounded),
-              label: const Text('Về trang chính'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: primaryPink,
-                side: const BorderSide(color: primaryPink),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(
-    IconData icon,
-    Color color,
-    String value,
-    String label,
-  ) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
       ],
     );
   }

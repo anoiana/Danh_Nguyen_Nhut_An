@@ -1,0 +1,32 @@
+# Root .gitignore for monorepo structure
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Build and dependencies
+**/node_modules/
+**/target/
+**/dist/
+**/build/
+**/out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+backend/*.txt
+!backend/README.md
+!backend/HELP.md

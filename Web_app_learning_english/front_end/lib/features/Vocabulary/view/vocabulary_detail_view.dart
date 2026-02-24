@@ -6,12 +6,17 @@ import '../model/vocabulary.dart';
 import '../view_model/vocabulary_detail_view_model.dart';
 import '../../Dictionary/model/dictionary_entry.dart';
 import '../../../core/widgets/custom_loading_widget.dart';
+import '../../Folders/view/folder_selection_dialog.dart';
 
 class VocabularyDetailView extends StatefulWidget {
   final Vocabulary vocabulary;
+  final int folderId;
 
-  const VocabularyDetailView({Key? key, required this.vocabulary})
-    : super(key: key);
+  const VocabularyDetailView({
+    Key? key,
+    required this.vocabulary,
+    required this.folderId,
+  }) : super(key: key);
 
   @override
   _VocabularyDetailViewState createState() => _VocabularyDetailViewState();
@@ -41,8 +46,8 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Padding(
@@ -71,10 +76,13 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
                 } else {
                   translationContent = Text(
                     snapshot.data ?? 'Không có bản dịch.',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D47A1),
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.blue.shade200
+                              : const Color(0xFF0D47A1),
                     ),
                     textAlign: TextAlign.center,
                   );
@@ -87,7 +95,7 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
                       width: 40,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: Theme.of(context).dividerColor,
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
@@ -101,7 +109,11 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
                             '"$text"',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey.shade700,
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.color
+                                  ?.withValues(alpha: 0.7),
                               fontStyle: FontStyle.italic,
                             ),
                             textAlign: TextAlign.center,
@@ -172,6 +184,24 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
     );
   }
 
+  Future<void> _moveVocabulary(VocabularyDetailViewModel viewModel) async {
+    final targetFolderId = await showDialog<int>(
+      context: context,
+      builder:
+          (context) => FolderSelectionDialog(currentFolderId: widget.folderId),
+    );
+
+    if (targetFolderId != null && mounted) {
+      final success = await viewModel.moveVocabulary(targetFolderId);
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã chuyển thư mục thành công!')),
+        );
+        Navigator.pop(context, true); // Return true to indicate change
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<VocabularyDetailViewModel>(
@@ -180,7 +210,7 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
         final isLargeScreen = MediaQuery.of(context).size.width > 600;
 
         return Scaffold(
-          backgroundColor: backgroundPink,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             title: Text(
               vocab.word,
@@ -189,6 +219,13 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
             backgroundColor: primaryPink,
             foregroundColor: Colors.white,
             elevation: 2,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.drive_file_move),
+                onPressed: () => _moveVocabulary(viewModel),
+                tooltip: 'Chuyển thư mục',
+              ),
+            ],
           ),
           floatingActionButton:
               kIsWeb
@@ -210,7 +247,7 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
                   padding: EdgeInsets.all(padding),
                   child: Card(
                     elevation: 0,
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -385,7 +422,8 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
             title,
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: darkTextColor,
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? darkTextColor,
               fontSize: isLargeScreen ? 24 : 20,
             ),
           ),
@@ -430,7 +468,7 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(top: 16),
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: EdgeInsets.all(isLargeScreen ? 20.0 : 16.0),
@@ -458,7 +496,9 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
                       TextSpan(
                         style: TextStyle(
                           fontSize: isLargeScreen ? 18 : 16,
-                          color: darkTextColor,
+                          color:
+                              Theme.of(context).textTheme.bodyLarge?.color ??
+                              darkTextColor,
                           height: 1.4,
                         ),
                         children: [
@@ -483,7 +523,7 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
                           'Vd: "${def.example!}"',
                           style: TextStyle(
                             fontStyle: FontStyle.italic,
-                            color: Colors.grey.shade700,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
                             fontSize: isLargeScreen ? 16 : 14,
                           ),
                           contextMenuBuilder:
@@ -574,7 +614,10 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
       width: maxImageWidth,
       height: 200,
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color:
+            Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]
+                : Colors.grey[200],
         borderRadius: BorderRadius.circular(16),
       ),
       child: const Center(
@@ -699,9 +742,17 @@ class _PasteTranslateDialogState extends State<_PasteTranslateDialog> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.blue.shade900.withValues(alpha: 0.3)
+                          : Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue.shade100),
+                  border: Border.all(
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.blue.shade700
+                            : Colors.blue.shade100,
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -710,7 +761,10 @@ class _PasteTranslateDialogState extends State<_PasteTranslateDialog> {
                       'Bản dịch:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade800,
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.blue.shade200
+                                : Colors.blue.shade800,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -718,7 +772,10 @@ class _PasteTranslateDialogState extends State<_PasteTranslateDialog> {
                       _translationResult,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.blue.shade900,
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.blue.shade100
+                                : Colors.blue.shade900,
                       ),
                     ),
                   ],

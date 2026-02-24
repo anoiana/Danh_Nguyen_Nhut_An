@@ -55,7 +55,7 @@ class AppTheme {
       onSurface: const Color(0xFFEEEEEE),
     ),
     scaffoldBackgroundColor: const Color(0xFF121212), // Dark background
-    cardColor: const Color(0xFF1E1E1E),
+    cardColor: const Color(0xFF2C2C2C),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,

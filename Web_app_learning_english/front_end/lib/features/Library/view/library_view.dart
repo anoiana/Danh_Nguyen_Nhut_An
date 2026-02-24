@@ -355,7 +355,10 @@ class _LibraryViewState extends State<LibraryView> {
                 width: 250,
                 height: 250,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -367,7 +370,10 @@ class _LibraryViewState extends State<LibraryView> {
                 width: 150,
                 height: 150,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withValues(alpha: 0.03)
+                          : Colors.white.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -401,11 +407,13 @@ class _LibraryViewState extends State<LibraryView> {
                               margin: const EdgeInsets.all(24),
                               padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Theme.of(
+                                  context,
+                                ).cardColor.withValues(alpha: 0.95),
                                 borderRadius: BorderRadius.circular(24),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
+                                    color: Colors.black.withValues(alpha: 0.05),
                                     blurRadius: 20,
                                     offset: const Offset(0, 10),
                                   ),
@@ -422,7 +430,13 @@ class _LibraryViewState extends State<LibraryView> {
                                   const SizedBox(height: 16),
                                   Text(
                                     _viewModel.errorMessage,
-                                    style: const TextStyle(color: Colors.grey),
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color
+                                          ?.withValues(alpha: 0.7),
+                                    ),
                                     textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 16),
@@ -444,7 +458,7 @@ class _LibraryViewState extends State<LibraryView> {
                         return RefreshIndicator(
                           onRefresh: _viewModel.loadUserDataAndFetchFolders,
                           color: primaryPink,
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).cardColor,
                           child: Column(
                             children: [
                               // Dictionary Search Bar
@@ -814,7 +828,7 @@ class _LibraryViewState extends State<LibraryView> {
               Container(
                 padding: const EdgeInsets.all(30),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.6),
+                  color: Theme.of(context).cardColor.withOpacity(0.6),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -829,13 +843,16 @@ class _LibraryViewState extends State<LibraryView> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Tạo thư mục đầu tiên để bắt đầu học nhé!',
-                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
               ),
             ],
           ),
@@ -847,7 +864,10 @@ class _LibraryViewState extends State<LibraryView> {
       return Center(
         child: Text(
           'Không tìm thấy thư mục nào.',
-          style: TextStyle(color: Colors.grey[600], fontSize: 16),
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyMedium?.color,
+            fontSize: 16,
+          ),
         ),
       );
     }
@@ -932,10 +952,11 @@ class _LibraryViewState extends State<LibraryView> {
                         children: [
                           Text(
                             folder.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF333333),
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -1039,7 +1060,7 @@ class _LibraryViewState extends State<LibraryView> {
             _isSearchingFolders
                 ? Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Theme.of(context).cardColor.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: TextField(
@@ -1078,7 +1099,11 @@ class _LibraryViewState extends State<LibraryView> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF333333).withOpacity(0.9),
+                            color: (Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge?.color ??
+                                    const Color(0xFF333333))
+                                .withValues(alpha: 0.9),
                           ),
                         ),
                         const SizedBox(width: 8),

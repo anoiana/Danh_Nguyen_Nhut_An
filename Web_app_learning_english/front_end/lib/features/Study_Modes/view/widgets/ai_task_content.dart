@@ -110,8 +110,10 @@ class AITaskContent extends StatelessWidget {
 
       // Blank field
       if (i < viewModel.fitbControllers.length) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         final isCorrect = viewModel.fitbResults[i];
-        Color underlineColor = Colors.grey;
+        Color underlineColor =
+            isDark ? Colors.grey.shade600 : Colors.grey.shade400;
         if (viewModel.isSubmitted) {
           underlineColor = (isCorrect ?? false) ? Colors.green : Colors.red;
         }
@@ -128,17 +130,25 @@ class AITaskContent extends StatelessWidget {
                 readOnly: viewModel.isSubmitted,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: underlineColor,
+                  color:
+                      viewModel.isSubmitted
+                          ? (isDark
+                              ? (isCorrect ?? false
+                                  ? Colors.greenAccent
+                                  : Colors.redAccent)
+                              : underlineColor)
+                          : (isDark ? Colors.white : Colors.black),
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
                 decoration: InputDecoration(
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(vertical: 4),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: underlineColor),
+                    borderSide: BorderSide(color: underlineColor, width: 1.5),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: primaryPink, width: 2),
+                    borderSide: BorderSide(color: primaryPink, width: 2.5),
                   ),
                 ),
               ),

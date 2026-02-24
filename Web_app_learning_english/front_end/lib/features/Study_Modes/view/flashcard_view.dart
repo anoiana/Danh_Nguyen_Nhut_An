@@ -74,11 +74,6 @@ class _FlashcardViewState extends State<FlashcardView> {
   void dispose() {
     _ttsService.stop();
     _audioPlayer.dispose();
-    // Try to remove listener if possible, though mostly handled by Garbage Collection if ViewModel dies with View
-    // But good practice if ViewModel outlives View (which it might if provided above)
-    // We cannot safely use context.read here if the widget is already unmounted from the tree part where provider is.
-    // However, usually we can capture the viewModel in a variable if really needed.
-    // For now, trusting Flutter's dispose lifecycle.
     super.dispose();
   }
 
@@ -111,14 +106,14 @@ class _FlashcardViewState extends State<FlashcardView> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 20),
                   SwitchListTile(
                     title: const Text('Lặp lại danh sách'),
                     value: settings.loopMode,
-                    activeColor: Theme.of(context).primaryColor,
+                    activeColor: Theme.of(context).colorScheme.primary,
                     onChanged: (val) {
                       viewModel.updateSettings(loopMode: val);
                       setStateModal(() {});
@@ -127,7 +122,7 @@ class _FlashcardViewState extends State<FlashcardView> {
                   SwitchListTile(
                     title: const Text('Tự động phát âm thanh'),
                     value: settings.autoSpeak,
-                    activeColor: Theme.of(context).primaryColor,
+                    activeColor: Theme.of(context).colorScheme.primary,
                     onChanged: (val) {
                       viewModel.updateSettings(autoSpeak: val);
                       setStateModal(() {});
@@ -136,7 +131,7 @@ class _FlashcardViewState extends State<FlashcardView> {
                   SwitchListTile(
                     title: const Text('Bắt đầu bằng mặt nghĩa'),
                     value: settings.startWithMeaningSide,
-                    activeColor: Theme.of(context).primaryColor,
+                    activeColor: Theme.of(context).colorScheme.primary,
                     onChanged: (val) {
                       viewModel.updateSettings(startWithMeaningSide: val);
                       setStateModal(() {});
@@ -150,7 +145,7 @@ class _FlashcardViewState extends State<FlashcardView> {
                       max: 10,
                       divisions: 9,
                       label: '${settings.displayDuration}s',
-                      activeColor: Theme.of(context).primaryColor,
+                      activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (val) {
                         viewModel.updateSettings(displayDuration: val.toInt());
                         setStateModal(() {});
@@ -160,7 +155,7 @@ class _FlashcardViewState extends State<FlashcardView> {
                       '${settings.displayDuration}s',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -180,7 +175,10 @@ class _FlashcardViewState extends State<FlashcardView> {
         if (viewModel.isBusy && viewModel.vocabularies.isEmpty) {
           return Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            body: CustomLoadingWidget(color: Theme.of(context).primaryColor),
+            body: CustomLoadingWidget(
+              message: 'Đang tải dữ liệu...',
+              color: Theme.of(context).colorScheme.primary,
+            ),
           );
         }
 
@@ -190,7 +188,7 @@ class _FlashcardViewState extends State<FlashcardView> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+              iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
             ),
             body: Center(
               child: Padding(
@@ -268,7 +266,10 @@ class _FlashcardViewState extends State<FlashcardView> {
                 end: Alignment.bottomCenter,
                 colors:
                     Theme.of(context).brightness == Brightness.dark
-                        ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                        ? [
+                          const Color(0xFF1E1E1E),
+                          Theme.of(context).primaryColor.withOpacity(0.5),
+                        ]
                         : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
               ),
             ),
@@ -283,7 +284,12 @@ class _FlashcardViewState extends State<FlashcardView> {
                       width: 200,
                       height: 200,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(
+                                  context,
+                                ).primaryColor.withOpacity(0.3)
+                                : Colors.white.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -295,7 +301,12 @@ class _FlashcardViewState extends State<FlashcardView> {
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(
+                                  context,
+                                ).primaryColor.withOpacity(0.3)
+                                : Colors.white.withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -410,13 +421,16 @@ class _FlashcardViewState extends State<FlashcardView> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor.withOpacity(0.5),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.1)
+                          : Theme.of(context).cardColor.withOpacity(0.5),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
                   icon: Icon(
                     Icons.arrow_back_rounded,
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -427,7 +441,10 @@ class _FlashcardViewState extends State<FlashcardView> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor.withOpacity(0.5),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.1)
+                          : Theme.of(context).cardColor.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -435,19 +452,23 @@ class _FlashcardViewState extends State<FlashcardView> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor.withOpacity(0.5),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.1)
+                          : Theme.of(context).cardColor.withOpacity(0.5),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
                   icon: Icon(
                     Icons.tune_rounded,
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   onPressed: () => _showSettingsModal(viewModel),
                 ),
@@ -465,7 +486,10 @@ class _FlashcardViewState extends State<FlashcardView> {
                     height: 6,
                     width: width,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[800]
+                              : Colors.white.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
@@ -474,7 +498,7 @@ class _FlashcardViewState extends State<FlashcardView> {
                     height: 6,
                     width: width * (current / total),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(3),
                       boxShadow: [
                         BoxShadow(
@@ -536,14 +560,14 @@ class _FlashcardViewState extends State<FlashcardView> {
               decoration: BoxDecoration(
                 color:
                     viewModel.isPlaying
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).primaryColor,
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
                     color: (viewModel.isPlaying
-                            ? Theme.of(context).colorScheme.error
-                            : Theme.of(context).primaryColor)
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.primary)
                         .withOpacity(0.4),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
@@ -577,7 +601,6 @@ class _FlashcardViewState extends State<FlashcardView> {
     FlashcardViewModel viewModel, {
     Key? key,
   }) {
-    // GestureDetector for flipping
     return GestureDetector(
       key: key,
       onTap: viewModel.flipCard,
@@ -682,18 +705,20 @@ class _FlashcardViewState extends State<FlashcardView> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).primaryColor.withOpacity(0.1),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             vocab.phoneticText!,
                             style: TextStyle(
                               fontSize: 18,
-                              color: Theme.of(
-                                context,
-                              ).primaryColor.withOpacity(0.8),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.8),
                               fontStyle: FontStyle.italic,
                               fontWeight: FontWeight.w500,
                             ),
@@ -708,14 +733,15 @@ class _FlashcardViewState extends State<FlashcardView> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).primaryColor.withOpacity(0.1),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.1),
                             shape: BoxShape.circle,
-                          ),
+                          ), 
                           child: Icon(
                             Icons.volume_up_rounded,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).colorScheme.primary,
                             size: 28,
                           ),
                         ),
@@ -783,7 +809,7 @@ class _FlashcardViewState extends State<FlashcardView> {
               IconButton(
                 icon: Icon(
                   Icons.volume_up_rounded,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onPressed:
                     () => _speakCurrentWord(context.read<FlashcardViewModel>()),
@@ -845,7 +871,7 @@ class _FlashcardViewState extends State<FlashcardView> {
                                       child: Icon(
                                         Icons.circle,
                                         size: 6,
-                                        color: Theme.of(context).primaryColor,
+                                        color: Theme.of(context).colorScheme.primary,
                                       ),
                                     ),
                                     const SizedBox(width: 10),

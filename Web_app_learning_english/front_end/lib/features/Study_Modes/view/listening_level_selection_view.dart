@@ -48,13 +48,16 @@ class _ListeningLevelSelectionViewState
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+            colors:
+                Theme.of(context).brightness == Brightness.dark
+                    ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                    : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
           ),
         ),
         child: SafeArea(
@@ -117,7 +120,7 @@ class _ListeningLevelSelectionViewState
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.6),
+                color: Theme.of(context).cardColor.withOpacity(0.6),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.arrow_back_rounded, color: primaryPink),
@@ -127,11 +130,7 @@ class _ListeningLevelSelectionViewState
             child: Text(
               'Tùy Chỉnh Bài Nghe',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Color(0xFF333333),
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           ),
           const SizedBox(width: 48), // Spacer to balance back button
@@ -147,10 +146,12 @@ class _ListeningLevelSelectionViewState
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF333333),
+            color:
+                Theme.of(context).textTheme.bodyLarge?.color ??
+                const Color(0xFF333333),
           ),
         ),
       ],
@@ -161,7 +162,7 @@ class _ListeningLevelSelectionViewState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -202,7 +203,7 @@ class _ListeningLevelSelectionViewState
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          color: isSelected ? primaryPink : Colors.white,
+          color: isSelected ? primaryPink : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -224,6 +225,8 @@ class _ListeningLevelSelectionViewState
                 color:
                     isSelected
                         ? Colors.white.withOpacity(0.2)
+                        : Theme.of(context).brightness == Brightness.dark
+                        ? primaryPink.withOpacity(0.1)
                         : Colors.pink.shade50,
                 shape: BoxShape.circle,
               ),
@@ -240,7 +243,10 @@ class _ListeningLevelSelectionViewState
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : Colors.grey[800],
+                color:
+                    isSelected
+                        ? Colors.white
+                        : Theme.of(context).textTheme.bodyMedium?.color,
               ),
             ),
           ],
@@ -253,8 +259,8 @@ class _ListeningLevelSelectionViewState
     final bool isReady = _selectedLevel != null && _selectedTopic != null;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
@@ -279,8 +285,14 @@ class _ListeningLevelSelectionViewState
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              disabledBackgroundColor: Colors.grey[300],
-              disabledForegroundColor: Colors.grey[500],
+              disabledBackgroundColor:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[700]
+                      : Colors.grey[300],
+              disabledForegroundColor:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[500]
+                      : Colors.grey[500],
             ),
             child: const Text(
               'Bắt Đầu Nghe',

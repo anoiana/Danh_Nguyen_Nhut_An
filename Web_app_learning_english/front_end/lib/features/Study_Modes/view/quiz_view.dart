@@ -6,6 +6,7 @@ import '../view_model/quiz_view_model.dart';
 import '../model/quiz_session.dart';
 import '../../../../core/widgets/custom_loading_widget.dart';
 import '../../../../core/widgets/custom_error_widget.dart';
+import '../../../core/widgets/game_finish_dialog.dart';
 
 class QuizView extends StatefulWidget {
   final int folderId;
@@ -98,85 +99,26 @@ class _QuizViewState extends State<QuizView>
   }
 
   void _showCompletionDialog() {
-    showDialog(
+    showGameFinishDialog(
       context: context,
-      barrierDismissible: false,
-      builder:
-          (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: Row(
-              children: [
-                Icon(Icons.celebration, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
-                const Text('Hoàn thành!'),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Kết quả: ${_viewModel.correctCount}/${_viewModel.questions.length}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(Icons.check, color: correctColor),
-                    Text('Đúng: ${_viewModel.correctCount}'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.close, color: wrongColor),
-                    Text('Sai: ${_viewModel.wrongCount}'),
-                  ],
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                child: const Text('Đóng'),
-                onPressed: () {
-                  Navigator.pop(ctx); // Close dialog
-                  Navigator.pop(context); // Back to selection
-                },
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('Luyện tập lại'),
-                onPressed: () {
-                  Navigator.pop(ctx); // Close dialog
-                  _loadData(); // Reload data/reset state
-                },
-              ),
-              if (_viewModel.wrongQuestions.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text('Ôn tập từ sai'),
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      _viewModel.startWrongQuestionsRetry();
-                    },
-                  ),
-                ),
-            ],
-          ),
+      correctCount: _viewModel.correctCount,
+      wrongCount: _viewModel.wrongCount,
+      onClose: () {
+        Navigator.of(context).pop(); // close dialog
+        Navigator.of(context).pop(); // back to selection
+      },
+      onReplay: () {
+        Navigator.of(context).pop(); // close dialog
+        _loadData();
+      },
+      wrongWordsCount: _viewModel.wrongQuestions.length,
+      onRetryWrongWords:
+          _viewModel.wrongQuestions.isNotEmpty
+              ? () {
+                Navigator.of(context).pop(); // close dialog
+                _viewModel.startWrongQuestionsRetry();
+              }
+              : null,
     );
   }
 
@@ -191,7 +133,10 @@ class _QuizViewState extends State<QuizView>
             end: Alignment.bottomCenter,
             colors:
                 Theme.of(context).brightness == Brightness.dark
-                    ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                    ? [
+                      const Color(0xFF1E1E1E),
+                     Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    ]
                     : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
           ),
         ),
@@ -205,7 +150,10 @@ class _QuizViewState extends State<QuizView>
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Theme.of(context).primaryColor.withOpacity(0.3)
+                          : Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -217,8 +165,8 @@ class _QuizViewState extends State<QuizView>
                 builder: (context, child) {
                   if (_viewModel.isBusy) {
                     return CustomLoadingWidget(
-                      message: 'Đang tải câu hỏi...',
-                      color: Theme.of(context).primaryColor,
+                      message: 'Đang tải dữ liệu...',
+                      color: Theme.of(context).colorScheme.primary,
                     );
                   }
 
@@ -292,13 +240,16 @@ class _QuizViewState extends State<QuizView>
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor.withOpacity(0.5),
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.1)
+                      : Theme.of(context).cardColor.withOpacity(0.5),
               shape: BoxShape.circle,
             ),
             child: IconButton(
               icon: Icon(
                 Icons.close_rounded,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -307,14 +258,17 @@ class _QuizViewState extends State<QuizView>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor.withOpacity(0.5),
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.1)
+                      : Theme.of(context).cardColor.withOpacity(0.5),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.quiz_rounded,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -322,7 +276,8 @@ class _QuizViewState extends State<QuizView>
                   'Câu hỏi ${_viewModel.currentIndex + 1}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 16,
                   ),
                 ),
@@ -348,7 +303,10 @@ class _QuizViewState extends State<QuizView>
             height: 8,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[800]
+                      : Colors.white.withOpacity(0.5),
               borderRadius: BorderRadius.circular(4),
             ),
           ),
@@ -360,11 +318,11 @@ class _QuizViewState extends State<QuizView>
                 0.8 *
                 progress, // approx width
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).primaryColor.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -385,7 +343,7 @@ class _QuizViewState extends State<QuizView>
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -398,12 +356,12 @@ class _QuizViewState extends State<QuizView>
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.volume_up_rounded,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 size: 32,
               ),
             ),
@@ -438,15 +396,28 @@ class _QuizViewState extends State<QuizView>
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                          : Colors.purple.withOpacity(0.1), // Purple/Pink tint
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                            : Colors.transparent,
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   question.partOfSpeech!,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w500,
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.purple,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -462,8 +433,16 @@ class _QuizViewState extends State<QuizView>
     bool isCorrect = option == correctAnswer;
 
     // UI State Logic
-    Color bgColor = Theme.of(context).cardColor;
-    Color borderColor = Theme.of(context).dividerColor;
+    Color bgColor =
+        Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).cardColor
+                .withRed(40)
+                .withBlue(40) // Slight tint
+            : Theme.of(context).cardColor;
+    Color borderColor =
+        Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
+            : Theme.of(context).dividerColor;
     Color textColor =
         Theme.of(context).textTheme.bodyMedium?.color ??
         const Color(0xFF555555);

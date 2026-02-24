@@ -68,30 +68,33 @@ class ListeningMcqCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             ...question.options.map((option) {
+              final bool isDark =
+                  Theme.of(context).brightness == Brightness.dark;
               bool isSelected = viewModel.selectedMcqOptions[index] == option;
               bool isCorrect = option == question.answer;
 
-              Color borderColor = Colors.grey.shade300;
+              Color borderColor =
+                  isDark ? Colors.grey.shade800 : Colors.grey.shade300;
               Color bgColor = Colors.transparent;
-              Color iconColor = Colors.grey;
+              Color iconColor = isDark ? Colors.grey.shade400 : Colors.grey;
               IconData icon = Icons.circle_outlined;
 
               if (viewModel.isSubmitted) {
                 if (isCorrect) {
                   borderColor = Colors.green;
-                  bgColor = Colors.green.shade50;
+                  bgColor = Colors.green.withOpacity(0.1);
                   iconColor = Colors.green;
                   icon = Icons.check_circle;
                 } else if (isSelected) {
                   borderColor = Colors.red;
-                  bgColor = Colors.red.shade50;
+                  bgColor = Colors.red.withOpacity(0.1);
                   iconColor = Colors.red;
                   icon = Icons.cancel;
                 }
               } else {
                 if (isSelected) {
                   borderColor = primaryPink;
-                  bgColor = Colors.pink.shade50;
+                  bgColor = primaryPink.withOpacity(isDark ? 0.2 : 0.1);
                   iconColor = primaryPink;
                   icon = Icons.radio_button_checked;
                 }
@@ -103,24 +106,45 @@ class ListeningMcqCard extends StatelessWidget {
                         ? null
                         : () => viewModel.onMcqOptionSelected(index, option),
                 child: Container(
-                  margin: const EdgeInsets.only(bottom: 8),
+                  margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 12,
+                    vertical: 14,
                   ),
                   decoration: BoxDecoration(
                     color: bgColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: borderColor),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: borderColor,
+                      width:
+                          isSelected ||
+                                  (viewModel.isSubmitted &&
+                                      (isCorrect || isSelected))
+                              ? 2
+                              : 1,
+                    ),
+                    boxShadow: [
+                      if (isSelected && !viewModel.isSubmitted)
+                        BoxShadow(
+                          color: primaryPink.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                    ],
                   ),
                   child: Row(
                     children: [
-                      Icon(icon, color: iconColor, size: 20),
+                      Icon(icon, color: iconColor, size: 22),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           option,
                           style: TextStyle(
+                            fontSize: 15,
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
                             color:
                                 Theme.of(context).textTheme.bodyMedium?.color,
                           ),

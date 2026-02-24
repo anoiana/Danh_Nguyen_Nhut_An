@@ -79,7 +79,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -105,7 +105,7 @@ class _LoginViewState extends State<LoginView> {
                               ? Icons.school_outlined
                               : Icons.person_add_alt_1_outlined,
                           size: 80,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -138,14 +138,14 @@ class _LoginViewState extends State<LoginView> {
                             labelText: 'Tên đăng nhập',
                             prefixIcon: Icon(
                               Icons.account_circle,
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).colorScheme.primary,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -159,14 +159,14 @@ class _LoginViewState extends State<LoginView> {
                             labelText: 'Mật khẩu',
                             prefixIcon: Icon(
                               Icons.lock,
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureText
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -179,7 +179,7 @@ class _LoginViewState extends State<LoginView> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).colorScheme.primary,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -206,7 +206,7 @@ class _LoginViewState extends State<LoginView> {
                         _viewModel.isBusy
                             ? Center(
                               child: CustomLoadingWidget(
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).colorScheme.primary,
                                 size: 40,
                               ),
                             )
@@ -214,7 +214,7 @@ class _LoginViewState extends State<LoginView> {
                               onPressed: _handleSubmit,
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(
-                                  Theme.of(context).primaryColor,
+                                  Theme.of(context).colorScheme.primary,
                                 ),
                                 foregroundColor: MaterialStateProperty.all(
                                   Colors.white,
@@ -253,7 +253,7 @@ class _LoginViewState extends State<LoginView> {
                                     : 'Đăng nhập ngay',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).primaryColor,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                             ),

@@ -174,7 +174,7 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundPink,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -334,8 +334,8 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
                       backgroundColor: Colors.transparent,
                       builder:
                           (context) => Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
                               borderRadius: BorderRadius.vertical(
                                 top: Radius.circular(24),
                               ),
@@ -349,7 +349,7 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
                                   height: 4,
                                   margin: const EdgeInsets.only(bottom: 24),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[300],
+                                    color: Theme.of(context).dividerColor,
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
@@ -527,7 +527,7 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
+          border: Border.all(color: Theme.of(context).dividerColor),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -562,7 +562,12 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: enabled ? Colors.white : Colors.grey[100],
+        color:
+            enabled
+                ? Theme.of(context).cardColor
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.grey[100]),
         borderRadius: BorderRadius.circular(20),
         boxShadow:
             enabled
@@ -620,6 +625,8 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
                       color:
                           enabled
                               ? primaryPink.withOpacity(0.08)
+                              : Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[800]
                               : Colors.grey[200],
                       shape: BoxShape.circle,
                     ),
@@ -636,7 +643,11 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: enabled ? Colors.black87 : Colors.grey[500],
+                    color:
+                        enabled
+                            ? (Theme.of(context).textTheme.bodyLarge?.color ??
+                                Colors.black87)
+                            : Colors.grey[500],
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -644,7 +655,12 @@ class _StudyModeSelectionViewState extends State<StudyModeSelectionView> {
                   subtitle,
                   style: TextStyle(
                     fontSize: 12,
-                    color: enabled ? Colors.black54 : Colors.grey[400],
+                    color:
+                        enabled
+                            ? (Theme.of(context).textTheme.bodyMedium?.color
+                                    ?.withOpacity(0.7) ??
+                                Colors.black54)
+                            : Colors.grey[400],
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

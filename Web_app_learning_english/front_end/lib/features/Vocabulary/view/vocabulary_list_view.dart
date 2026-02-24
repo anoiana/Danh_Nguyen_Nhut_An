@@ -11,6 +11,7 @@ import '../view/vocabulary_detail_view.dart';
 import '../view_model/vocabulary_detail_view_model.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/custom_loading_widget.dart';
+import '../../Folders/view/folder_selection_dialog.dart';
 
 // Reuse colors
 const Color primaryPink = Color(0xFFE91E63);
@@ -319,6 +320,32 @@ class _VocabularyListViewState extends State<VocabularyListView> {
     );
   }
 
+  Future<void> _moveVocabularies({int? singleId}) async {
+    final ids =
+        singleId != null ? [singleId] : _viewModel.selectedVocabIds.toList();
+    if (ids.isEmpty) return;
+
+    final targetFolderId = await showDialog<int>(
+      context: context,
+      builder:
+          (context) => FolderSelectionDialog(currentFolderId: widget.folderId),
+    );
+
+    if (targetFolderId != null && mounted) {
+      if (singleId != null) {
+        // For individual move, we need to temporarily select it
+        _viewModel.toggleSelection(singleId);
+      }
+
+      final success = await _viewModel.moveVocabularies(targetFolderId);
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã chuyển từ vựng thành công!')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -330,7 +357,7 @@ class _VocabularyListViewState extends State<VocabularyListView> {
             return false;
           },
           child: Scaffold(
-            backgroundColor: const Color(0xFFFCE4EC), // backgroundPink
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -343,12 +370,36 @@ class _VocabularyListViewState extends State<VocabularyListView> {
                       onChanged: _onSearchChanged,
                       decoration: InputDecoration(
                         hintText: 'Tìm kiếm từ vựng...',
+                        hintStyle: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.color?.withOpacity(0.5),
+                          fontSize: 15,
+                        ),
                         prefixIcon: const Icon(
-                          Icons.search,
+                          Icons.search_rounded,
                           color: primaryPink,
                         ),
+                        suffixIcon:
+                            _searchController.text.isNotEmpty
+                                ? IconButton(
+                                  icon: Icon(
+                                    Icons.close_rounded,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall?.color,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    _onSearchChanged('');
+                                    setState(() {});
+                                  },
+                                )
+                                : null,
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: Theme.of(context).cardColor,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide(
@@ -363,13 +414,16 @@ class _VocabularyListViewState extends State<VocabularyListView> {
                           ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                          vertical: 0,
+                          vertical: 14,
                           horizontal: 20,
                         ),
                       ),
                     ),
                   ),
                 ),
+                if (!_viewModel.isSelectionMode &&
+                    _searchController.text.isEmpty)
+                  _buildStudyBanner(),
                 _buildSliverList(),
               ],
             ),
@@ -401,23 +455,6 @@ class _VocabularyListViewState extends State<VocabularyListView> {
       actions: [
         if (!_viewModel.isSelectionMode) ...[
           IconButton(
-            icon: const Icon(Icons.school, color: Colors.white),
-            tooltip: 'Chế độ học',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (_) => StudyModeSelectionView(
-                        folderId: widget.folderId,
-                        folderName: widget.folderName,
-                        vocabularyCount: _viewModel.totalVocabulariesCount,
-                      ),
-                ),
-              );
-            },
-          ),
-          IconButton(
             icon: const Icon(Icons.checklist, color: Colors.white),
             onPressed: _viewModel.toggleSelectionMode,
           ),
@@ -436,20 +473,42 @@ class _VocabularyListViewState extends State<VocabularyListView> {
                       _viewModel.deleteSelectedVocabularies();
                     },
           ),
+          IconButton(
+            icon: const Icon(Icons.drive_file_move, color: Colors.white),
+            onPressed:
+                _viewModel.selectedVocabIds.isEmpty
+                    ? null
+                    : () => _moveVocabularies(),
+          ),
         ],
       ],
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
-        title: Text(
-          _viewModel.isSelectionMode
-              ? '${_viewModel.selectedVocabIds.length} đã chọn'
-              : widget.folderName,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 18,
-            shadows: [Shadow(color: Colors.black26, blurRadius: 2)],
-          ),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _viewModel.isSelectionMode
+                  ? '${_viewModel.selectedVocabIds.length} đã chọn'
+                  : widget.folderName,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 18,
+                shadows: [Shadow(color: Colors.black26, blurRadius: 2)],
+              ),
+            ),
+            if (!_viewModel.isSelectionMode &&
+                _viewModel.totalVocabulariesCount > 0)
+              Text(
+                '${_viewModel.totalVocabulariesCount} từ vựng',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+          ],
         ),
         background: Container(
           decoration: const BoxDecoration(
@@ -492,23 +551,202 @@ class _VocabularyListViewState extends State<VocabularyListView> {
     );
   }
 
+  Widget _buildStudyBanner() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isReady = _viewModel.totalVocabulariesCount > 0;
+    final vocabCount = _viewModel.totalVocabulariesCount;
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap:
+                isReady
+                    ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => StudyModeSelectionView(
+                                folderId: widget.folderId,
+                                folderName: widget.folderName,
+                                vocabularyCount: vocabCount,
+                              ),
+                        ),
+                      );
+                    }
+                    : null,
+            borderRadius: BorderRadius.circular(20),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: isReady ? 1.0 : 0.5,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors:
+                        isDark
+                            ? [const Color(0xFF4A1942), const Color(0xFF2D1B3D)]
+                            : [
+                              const Color(0xFFFF80AB),
+                              const Color(0xFFE91E63),
+                            ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryPink.withOpacity(isDark ? 0.3 : 0.25),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    // Decorative circles
+                    Positioned(
+                      right: -20,
+                      top: -20,
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 30,
+                      bottom: -15,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                    // Content
+                    Row(
+                      children: [
+                        // Left side - icon + info
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.school_rounded,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isReady
+                                    ? '📚 $vocabCount từ vựng sẵn sàng'
+                                    : '⏳ Đang tải từ vựng...',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.85),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Luyện tập ngay!',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Right side - arrow
+                        // Container(
+                        //   padding: const EdgeInsets.all(10),
+                        //   decoration: BoxDecoration(
+                        //     color: Colors.white.withOpacity(0.2),
+                        //     shape: BoxShape.circle,
+                        //   ),
+                        //   child: const Icon(
+                        //     Icons.arrow_forward_rounded,
+                        //     color: Colors.white,
+                        //     size: 22,
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSliverList() {
     if (_viewModel.isBusy && _viewModel.vocabularies.isEmpty) {
       return const SliverFillRemaining(
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: CustomLoadingWidget(color: primaryPink, size: 60)),
       );
     }
     if (_viewModel.vocabularies.isEmpty) {
-      return const SliverFillRemaining(
+      return SliverFillRemaining(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.assignment_outlined, size: 80, color: Colors.grey),
-              SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: primaryPink.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _searchController.text.isNotEmpty
+                      ? Icons.search_off_rounded
+                      : Icons.auto_stories_rounded,
+                  size: 64,
+                  color: primaryPink.withOpacity(0.5),
+                ),
+              ),
+              const SizedBox(height: 20),
               Text(
-                'Chưa có từ vựng nào.',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
+                _searchController.text.isNotEmpty
+                    ? 'Không tìm thấy từ vựng'
+                    : 'Chưa có từ vựng nào',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _searchController.text.isNotEmpty
+                    ? 'Thử tìm với từ khóa khác'
+                    : 'Hãy thêm từ vựng vào thư mục này',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -540,27 +778,42 @@ class _VocabularyListViewState extends State<VocabularyListView> {
   }
 
   Widget _buildPremiumCard(Vocabulary vocab, bool isSelected) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final firstLetter =
+        vocab.word.isNotEmpty ? vocab.word[0].toUpperCase() : '?';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isSelected ? primaryPink.withOpacity(0.05) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color:
+            isSelected
+                ? primaryPink.withOpacity(isDark ? 0.15 : 0.05)
+                : Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20),
         border:
             isSelected
                 ? Border.all(color: primaryPink, width: 2)
-                : Border.all(color: Colors.transparent),
+                : Border.all(
+                  color:
+                      isDark
+                          ? Colors.white.withOpacity(0.06)
+                          : Colors.grey.withOpacity(0.08),
+                ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color:
+                isDark
+                    ? Colors.black.withOpacity(0.2)
+                    : Colors.grey.withOpacity(0.08),
             offset: const Offset(0, 4),
-            blurRadius: 10,
+            blurRadius: 12,
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           onTap: () {
             if (_viewModel.isSelectionMode) {
               _viewModel.toggleSelection(vocab.id);
@@ -571,7 +824,10 @@ class _VocabularyListViewState extends State<VocabularyListView> {
                   builder:
                       (context) => ChangeNotifierProvider(
                         create: (_) => VocabularyDetailViewModel(),
-                        child: VocabularyDetailView(vocabulary: vocab),
+                        child: VocabularyDetailView(
+                          vocabulary: vocab,
+                          folderId: widget.folderId,
+                        ),
                       ),
                 ),
               );
@@ -581,72 +837,225 @@ class _VocabularyListViewState extends State<VocabularyListView> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
+                // Selection checkbox or letter avatar
                 if (_viewModel.isSelectionMode)
                   Padding(
                     padding: const EdgeInsets.only(right: 12),
-                    child: Icon(
-                      isSelected
-                          ? Icons.check_circle
-                          : Icons.radio_button_unchecked,
-                      color: isSelected ? primaryPink : Colors.grey,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: isSelected ? primaryPink : Colors.transparent,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color:
+                              isSelected
+                                  ? primaryPink
+                                  : Colors.grey.withOpacity(0.4),
+                          width: 2,
+                        ),
+                      ),
+                      child:
+                          isSelected
+                              ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 18,
+                              )
+                              : null,
+                    ),
+                  )
+                else
+                  // Letter avatar
+                  Container(
+                    width: 48,
+                    height: 48,
+                    margin: const EdgeInsets.only(right: 14),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          primaryPink.withOpacity(isDark ? 0.3 : 0.15),
+                          primaryPink.withOpacity(isDark ? 0.15 : 0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        firstLetter,
+                        style: TextStyle(
+                          color:
+                              isDark
+                                  ? primaryPink.withOpacity(0.9)
+                                  : primaryPink,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
                   ),
+
+                // Word info
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        vocab.word,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.black87,
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              vocab.word,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 17,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge?.color,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                          ),
+                          if (vocab.userDefinedPartOfSpeech != null &&
+                              vocab.userDefinedPartOfSpeech!.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: primaryPink.withOpacity(
+                                  isDark ? 0.2 : 0.08,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                vocab.userDefinedPartOfSpeech!,
+                                style: TextStyle(
+                                  color:
+                                      isDark
+                                          ? primaryPink.withOpacity(0.9)
+                                          : primaryPink,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                      const SizedBox(height: 4),
                       if (vocab.phoneticText != null &&
-                          vocab.phoneticText!.isNotEmpty)
+                          vocab.phoneticText!.isNotEmpty) ...[
+                        const SizedBox(height: 2),
                         Text(
                           vocab.phoneticText!,
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: Theme.of(
+                              context,
+                            ).textTheme.bodySmall?.color?.withOpacity(0.7),
                             fontStyle: FontStyle.italic,
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                         ),
-                      const SizedBox(height: 4),
+                      ],
+                      const SizedBox(height: 6),
                       Text(
                         vocab.userDefinedMeaning ?? 'Chưa có định nghĩa',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey[800], fontSize: 15),
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withOpacity(0.8),
+                          fontSize: 14,
+                          height: 1.3,
+                        ),
                       ),
                     ],
                   ),
                 ),
+
+                // Actions
                 Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.volume_up_rounded),
-                      color: primaryPink,
-                      onPressed: () => _speakVocabulary(vocab),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: primaryPink.withOpacity(isDark ? 0.15 : 0.06),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.volume_up_rounded, size: 22),
+                        color: primaryPink,
+                        onPressed: () => _speakVocabulary(vocab),
+                        constraints: const BoxConstraints(
+                          minWidth: 40,
+                          minHeight: 40,
+                        ),
+                        padding: EdgeInsets.zero,
+                      ),
                     ),
-                    if (!_viewModel.isSelectionMode)
+                    if (!_viewModel.isSelectionMode) ...[
+                      const SizedBox(height: 4),
                       PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert, color: Colors.grey[400]),
+                        icon: Icon(
+                          Icons.more_horiz_rounded,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.color?.withOpacity(0.5),
+                          size: 20,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 40,
+                          minHeight: 36,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         onSelected: (v) {
                           if (v == 'edit') _showEditDialog(vocab);
                           if (v == 'delete') _showDeleteDialog(vocab.id);
+                          if (v == 'move')
+                            _moveVocabularies(singleId: vocab.id);
                         },
                         itemBuilder:
                             (context) => [
-                              const PopupMenuItem(
+                              PopupMenuItem(
                                 value: 'edit',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.edit, size: 20),
-                                    SizedBox(width: 8),
-                                    Text('Sửa'),
+                                    Icon(
+                                      Icons.edit_rounded,
+                                      size: 20,
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyLarge?.color,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Text('Sửa'),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: 'move',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.drive_file_move_rounded,
+                                      size: 20,
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyLarge?.color,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Text('Di chuyển'),
                                   ],
                                 ),
                               ),
@@ -655,11 +1064,11 @@ class _VocabularyListViewState extends State<VocabularyListView> {
                                 child: Row(
                                   children: [
                                     Icon(
-                                      Icons.delete,
+                                      Icons.delete_rounded,
                                       size: 20,
                                       color: Colors.red,
                                     ),
-                                    SizedBox(width: 8),
+                                    SizedBox(width: 12),
                                     Text(
                                       'Xóa',
                                       style: TextStyle(color: Colors.red),
@@ -669,6 +1078,7 @@ class _VocabularyListViewState extends State<VocabularyListView> {
                               ),
                             ],
                       ),
+                    ],
                   ],
                 ),
               ],

@@ -11,7 +11,7 @@ void showSpeechRateBottomSheet(
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     builder: (context) => _SpeechRateBottomSheet(ttsService: ttsService),
   );
 }
@@ -24,8 +24,8 @@ class _SpeechRateBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),

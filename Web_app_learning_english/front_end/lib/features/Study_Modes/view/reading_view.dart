@@ -5,6 +5,7 @@ import '../../../core/widgets/speech_rate_bottom_sheet.dart';
 import '../view_model/reading_view_model.dart';
 import 'dart:ui'; // For backdrop filter
 import '../../../core/widgets/custom_loading_widget.dart';
+import '../../../core/widgets/game_finish_dialog.dart';
 
 class ReadingView extends StatefulWidget {
   final int folderId;
@@ -56,13 +57,20 @@ class _ReadingViewState extends State<ReadingView>
         builder: (context, viewModel, child) {
           if (viewModel.isBusy) {
             return Scaffold(
-              body: CustomLoadingWidget(color: Theme.of(context).primaryColor),
+              body: CustomLoadingWidget(
+                message: 'Đang tải dữ liệu...',
+                color: Theme.of(context).colorScheme.primary
+              ),
             );
           }
 
           if (viewModel.isError) {
             return Scaffold(
-              appBar: AppBar(leading: const BackButton(color: Colors.black)),
+              appBar: AppBar(
+                leading: BackButton(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
               body: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
@@ -102,7 +110,10 @@ class _ReadingViewState extends State<ReadingView>
                   end: Alignment.bottomCenter,
                   colors:
                       Theme.of(context).brightness == Brightness.dark
-                          ? [const Color(0xFF121212), const Color(0xFF2C2C2C)]
+                          ? [
+                            const Color(0xFF1E1E1E),
+                            Theme.of(context).primaryColor.withOpacity(0.5),
+                          ]
                           : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
                 ),
               ),
@@ -171,7 +182,7 @@ class _ReadingViewState extends State<ReadingView>
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Theme.of(context).cardColor.withOpacity(0.6),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -182,11 +193,7 @@ class _ReadingViewState extends State<ReadingView>
               ),
               const Text(
                 'Đọc & Hiểu',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Color(0xFF333333),
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               GestureDetector(
                 onTap:
@@ -197,7 +204,7 @@ class _ReadingViewState extends State<ReadingView>
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Theme.of(context).cardColor.withOpacity(0.6),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.speed_rounded, color: primaryPink),
@@ -211,7 +218,7 @@ class _ReadingViewState extends State<ReadingView>
           margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.5),
+            color: Theme.of(context).cardColor.withOpacity(0.5),
             borderRadius: BorderRadius.circular(25),
           ),
           child: TabBar(
@@ -228,7 +235,7 @@ class _ReadingViewState extends State<ReadingView>
               ],
             ),
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.grey[700],
+            unselectedLabelColor: Theme.of(context).textTheme.bodyMedium?.color,
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
             overlayColor: MaterialStateProperty.all(Colors.transparent),
@@ -333,6 +340,7 @@ class _ReadingViewState extends State<ReadingView>
               style: const TextStyle(
                 color: primaryPink,
                 fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
               ),
             ),
             const SizedBox(height: 8),
@@ -341,7 +349,10 @@ class _ReadingViewState extends State<ReadingView>
               child: LinearProgressIndicator(
                 value: progress,
                 color: primaryPink,
-                backgroundColor: Colors.pink.shade50,
+                backgroundColor:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]
+                        : Colors.pink.shade50,
                 minHeight: 8,
               ),
             ),
@@ -459,92 +470,28 @@ class _ReadingViewState extends State<ReadingView>
   }
 
   void _showResultDialog(ReadingViewModel viewModel) {
-    showDialog(
+    final totalQuestions = viewModel.content?.questions.length ?? 0;
+    final score = viewModel.score;
+    final wrongCount = totalQuestions - score;
+
+    showGameFinishDialog(
       context: context,
-      barrierDismissible: false,
-      builder:
-          (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
-            ),
-            title: const Column(
-              children: [
-                Icon(Icons.emoji_events_rounded, color: primaryPink, size: 48),
-                SizedBox(height: 16),
-                Text(
-                  'Hoàn thành!',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            content: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF0F5),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Điểm số của bạn',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${viewModel.score}/${viewModel.content!.questions.length}',
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      color: primaryPink,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actionsAlignment: MainAxisAlignment.center,
-            actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-            actions: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        'Đóng',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryPink,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        _viewModel.init(
-                          folderId: widget.folderId,
-                          level: widget.level,
-                          topic: widget.topic,
-                        );
-                      },
-                      child: const Text('Luyện tập lại'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+      correctCount: score,
+      wrongCount: wrongCount,
+      wrongWordsCount: 0,
+      extraStats: {'Điểm số': '$score/$totalQuestions'},
+      onClose: () {
+        Navigator.of(context).pop(); // close dialog
+        Navigator.of(context).pop(); // back to selection
+      },
+      onReplay: () {
+        Navigator.of(context).pop(); // close dialog
+        viewModel.init(
+          folderId: widget.folderId,
+          level: widget.level,
+          topic: widget.topic,
+        );
+      },
     );
   }
 }
@@ -566,26 +513,35 @@ class _OptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color borderColor = Colors.grey.shade200;
-    Color bgColor = Colors.white;
+    Color borderColor = Theme.of(context).dividerColor;
+    Color bgColor = Theme.of(context).cardColor;
     Color iconColor = Colors.grey.shade400;
     IconData icon = Icons.circle_outlined;
 
     if (isAnswered) {
       if (isCorrect) {
         borderColor = Colors.green;
-        bgColor = Colors.green.shade50;
+        bgColor =
+            Theme.of(context).brightness == Brightness.dark
+                ? Colors.green.shade900.withOpacity(0.3)
+                : Colors.green.shade50;
         iconColor = Colors.green;
         icon = Icons.check_circle_rounded;
       } else if (isSelected) {
         borderColor = Colors.red;
-        bgColor = Colors.red.shade50;
+        bgColor =
+            Theme.of(context).brightness == Brightness.dark
+                ? Colors.red.shade900.withOpacity(0.3)
+                : Colors.red.shade50;
         iconColor = Colors.red;
         icon = Icons.cancel_rounded;
       }
     } else if (isSelected) {
       borderColor = const Color(0xFFE91E63);
-      bgColor = const Color(0xFFFCE4EC);
+      bgColor =
+          Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFFE91E63).withOpacity(0.15)
+              : const Color(0xFFFCE4EC);
       iconColor = const Color(0xFFE91E63);
       icon = Icons.radio_button_checked_rounded;
     }
@@ -625,7 +581,8 @@ class _OptionCard extends StatelessWidget {
                   color:
                       (isAnswered && !isCorrect && isSelected)
                           ? Colors.red
-                          : Colors.black87,
+                          : Theme.of(context).textTheme.bodyLarge?.color ??
+                              Colors.black87,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -659,16 +616,16 @@ class TranslationBottomSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 24),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: Theme.of(context).dividerColor,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontStyle: FontStyle.italic,
-              color: Colors.grey,
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
           const SizedBox(height: 16),
@@ -676,9 +633,12 @@ class TranslationBottomSheet extends StatelessWidget {
             future: DictionaryService.translateWord(text),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: CustomLoadingWidget(color: Color(0xFFE91E63)),
+                return Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: CustomLoadingWidget(
+                    message: 'Đang tải dữ liệu...',
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 );
               }
               return Text(
@@ -741,10 +701,13 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
               ),
             ),
             if (_isLoading)
-              const Padding(
-                padding: EdgeInsets.all(24.0),
+              Padding(
+                padding: const EdgeInsets.all(24.0),
                 child: Center(
-                  child: CustomLoadingWidget(color: Color(0xFFE91E63)),
+                  child: CustomLoadingWidget(
+                    message: 'Đang tải dữ liệu...',
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
             if (_result.isNotEmpty) ...[
@@ -752,9 +715,17 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.blue.shade900.withOpacity(0.3)
+                          : Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.blue.shade100),
+                  border: Border.all(
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.blue.shade700
+                            : Colors.blue.shade100,
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -770,9 +741,11 @@ class _PasteTranslateDialogState extends State<PasteTranslateDialog> {
                     const SizedBox(height: 4),
                     Text(
                       _result,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF333333),
+                        color:
+                            Theme.of(context).textTheme.bodyLarge?.color ??
+                            const Color(0xFF333333),
                       ),
                     ),
                   ],

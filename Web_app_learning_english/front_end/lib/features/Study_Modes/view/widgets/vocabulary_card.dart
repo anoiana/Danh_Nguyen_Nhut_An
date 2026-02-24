@@ -115,9 +115,15 @@ class VocabularyCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.shade200),
+                color:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.orange.withOpacity(0.15)
+                        : Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.orange.withOpacity(0.4),
+                  width: 1,
+                ),
               ),
               child: Column(
                 children: [
@@ -125,8 +131,11 @@ class VocabularyCard extends StatelessWidget {
                     'Nghĩa: ${currentVocab.userDefinedMeaning ?? "Chưa có"}',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.orange.shade800,
-                      fontWeight: FontWeight.w600,
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.orange.shade300
+                              : Colors.orange.shade800,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],

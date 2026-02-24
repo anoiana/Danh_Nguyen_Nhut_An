@@ -3,6 +3,7 @@ import '../../../core/base_view_model.dart';
 import '../../../api/tts_service.dart';
 import '../../Dictionary/service/dictionary_service.dart';
 import '../model/vocabulary.dart';
+import '../service/vocabulary_service.dart';
 
 class VocabularyDetailViewModel extends BaseViewModel {
   final TextToSpeechService _ttsService = TextToSpeechService();
@@ -34,6 +35,22 @@ class VocabularyDetailViewModel extends BaseViewModel {
 
   Future<String> translate(String text) async {
     return await DictionaryService.translateWord(text);
+  }
+
+  Future<bool> moveVocabulary(int targetFolderId) async {
+    if (_vocabulary == null) return false;
+    try {
+      setBusy(true);
+      await VocabularyService.moveVocabularies([
+        _vocabulary!.id,
+      ], targetFolderId);
+      setBusy(false);
+      return true;
+    } catch (e) {
+      setError(e.toString());
+      setBusy(false);
+      return false;
+    }
   }
 
   @override

@@ -24,6 +24,10 @@ class SpeakingViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  // Submitting result state
+  bool _isSubmittingResult = false;
+  bool get isSubmittingResult => _isSubmittingResult;
+
   // Game session
   GameSession? _session;
   GameSession? get session => _session;
@@ -266,7 +270,11 @@ class SpeakingViewModel extends ChangeNotifier {
     } else {
       // Game finished
       _currentIndex++;
+      _isSubmittingResult = true;
+      notifyListeners();
       await _finishGame();
+      _isSubmittingResult = false;
+      notifyListeners();
     }
   }
 

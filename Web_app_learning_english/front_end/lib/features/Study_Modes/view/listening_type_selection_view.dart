@@ -12,19 +12,27 @@ class ListeningTypeSelectionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: const BackButton(color: primaryPink),
+        leading: BackButton(color: isDark ? Colors.white : primaryPink),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+            colors:
+                isDark
+                    ? [
+                      const Color(0xFF1E1E1E),
+                      Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    ]
+                    : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
           ),
         ),
         child: Stack(
@@ -37,7 +45,10 @@ class ListeningTypeSelectionView extends StatelessWidget {
                 width: 250,
                 height: 250,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color:
+                      isDark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -49,7 +60,10 @@ class ListeningTypeSelectionView extends StatelessWidget {
                 width: 250,
                 height: 250,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color:
+                      isDark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -62,13 +76,16 @@ class ListeningTypeSelectionView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'Luyện Nghe 🎧',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
-                        color: primaryPink,
+                        color:
+                            isDark
+                                ? Theme.of(context).colorScheme.primary
+                                : primaryPink,
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -78,7 +95,7 @@ class ListeningTypeSelectionView extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey[700],
+                        color: isDark ? Colors.grey[400] : Colors.grey[700],
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -156,16 +173,23 @@ class ListeningTypeSelectionView extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       constraints: const BoxConstraints(maxWidth: 400),
       margin: const EdgeInsets.only(bottom: 24), // For column spacing
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(24),
+        border:
+            isDark ? Border.all(color: color.withOpacity(0.3), width: 1) : null,
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.15),
+            color:
+                isDark
+                    ? Colors.black.withOpacity(0.3)
+                    : color.withOpacity(0.15),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -186,7 +210,10 @@ class ListeningTypeSelectionView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color:
+                        isDark
+                            ? color.withOpacity(0.2)
+                            : color.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, color: color, size: 36),
@@ -201,7 +228,7 @@ class ListeningTypeSelectionView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
+                          color: isDark ? Colors.white : Colors.grey[800],
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -209,7 +236,7 @@ class ListeningTypeSelectionView extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey[600],
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
                           height: 1.4,
                         ),
                       ),
@@ -218,7 +245,7 @@ class ListeningTypeSelectionView extends StatelessWidget {
                 ),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: Colors.grey[300],
+                  color: isDark ? Colors.grey[600] : Colors.grey[300],
                   size: 20,
                 ),
               ],

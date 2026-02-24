@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../view_model/matching_view_model.dart';
 import '../model/matching_tile.dart';
 import '../../../core/widgets/custom_loading_widget.dart';
+import '../../../core/widgets/game_finish_dialog.dart';
 
 class MatchingView extends StatefulWidget {
   final int folderId;
@@ -45,77 +46,30 @@ class _MatchingViewState extends State<MatchingView> {
   }
 
   void _showCompletionDialog() {
-    showDialog(
+    showGameFinishDialog(
       context: context,
-      barrierDismissible: false,
-      builder:
-          (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: const Row(
-              children: [
-                Icon(Icons.celebration, color: primaryPink),
-                SizedBox(width: 8),
-                Text('Hoàn thành!'),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Thời gian: ${_viewModel.timeString}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Số bước: ${_viewModel.moves}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                child: const Text('Đóng'),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  Navigator.pop(context);
-                },
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryPink,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('Luyện tập lại'),
-                onPressed: () {
-                  Navigator.pop(ctx); // Close dialog
-                  _loadData(); // Reload data/reset state
-                },
-              ),
-              if (_viewModel.wrongVocabularies.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text('Ôn tập từ sai'),
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      _viewModel.startWrongWordsRetry();
-                    },
-                  ),
-                ),
-            ],
-          ),
+      correctCount: _viewModel.matchedPairs,
+      wrongCount: _viewModel.wrongVocabularies.length,
+      extraStats: {
+        'Thời gian': _viewModel.timeString,
+        'Số bước': '${_viewModel.moves}',
+      },
+      onClose: () {
+        Navigator.of(context).pop(); // close dialog
+        Navigator.of(context).pop(); // back to selection
+      },
+      onReplay: () {
+        Navigator.of(context).pop(); // close dialog
+        _loadData();
+      },
+      wrongWordsCount: _viewModel.wrongVocabularies.length,
+      onRetryWrongWords:
+          _viewModel.wrongVocabularies.isNotEmpty
+              ? () {
+                Navigator.of(context).pop(); // close dialog
+                _viewModel.startWrongWordsRetry();
+              }
+              : null,
     );
   }
 
@@ -124,11 +78,17 @@ class _MatchingViewState extends State<MatchingView> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+            colors:
+                Theme.of(context).brightness == Brightness.dark
+                    ? [
+                      const Color(0xFF1E1E1E),
+                      Theme.of(context).primaryColor.withOpacity(0.5),
+                    ]
+                    : [const Color(0xFFFCE4EC), const Color(0xFFF8BBD0)],
           ),
         ),
         child: Stack(
@@ -141,7 +101,10 @@ class _MatchingViewState extends State<MatchingView> {
                 width: 250,
                 height: 250,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Theme.of(context).primaryColor.withOpacity(0.3)
+                          : Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -153,7 +116,10 @@ class _MatchingViewState extends State<MatchingView> {
                 width: 150,
                 height: 150,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Theme.of(context).primaryColor.withOpacity(0.3)
+                          : Colors.white.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -164,7 +130,10 @@ class _MatchingViewState extends State<MatchingView> {
                 animation: _viewModel,
                 builder: (context, child) {
                   if (_viewModel.isBusy) {
-                    return const CustomLoadingWidget(color: primaryPink);
+                   return CustomLoadingWidget(
+                      message: 'Đang tải dữ liệu...',
+                      color: Theme.of(context).colorScheme.primary,
+                    );
                   }
                   if (_viewModel.errorMessage.isNotEmpty) {
                     return Center(child: Text(_viewModel.errorMessage));
@@ -242,10 +211,16 @@ class _MatchingViewState extends State<MatchingView> {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5),
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.1)
+                            : Colors.white.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close_rounded, color: primaryPink),
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -256,7 +231,10 @@ class _MatchingViewState extends State<MatchingView> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.6),
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.white.withOpacity(0.6),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -278,6 +256,7 @@ class _MatchingViewState extends State<MatchingView> {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
+                        fontStyle: FontStyle.italic,
                         color: primaryPink,
                         fontFeatures: [FontFeature.tabularFigures()],
                       ),
@@ -298,9 +277,13 @@ class _MatchingViewState extends State<MatchingView> {
                 ),
                 child: Text(
                   'Bước: ${_viewModel.moves}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF880E4F),
+                    fontStyle: FontStyle.italic,
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? primaryPink
+                            : const Color(0xFF880E4F),
                   ),
                 ),
               ),
@@ -316,9 +299,12 @@ class _MatchingViewState extends State<MatchingView> {
                       ? _viewModel.matchedPairs / _viewModel.totalPairs
                       : 0,
               minHeight: 8,
-              backgroundColor: Colors.white.withOpacity(0.5),
+              backgroundColor:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[800]
+                      : Colors.white.withOpacity(0.5),
               valueColor: const AlwaysStoppedAnimation<Color>(
-                Colors.greenAccent,
+                primaryPink,
               ),
             ),
           ),
