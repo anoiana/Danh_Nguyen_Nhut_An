@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import LoginForm from '../features/auth/components/LoginForm';
 import MatchFeed from '../features/matching/components/MatchFeed';
@@ -21,6 +21,7 @@ const HomePage = () => {
         loading: authLoading,
         error: authError
     } = useAuth();
+    const navigate = useNavigate();
     const { showNotification } = useNotification();
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -49,7 +50,10 @@ const HomePage = () => {
             <OnboardingFlow
                 currentUser={currentUser}
                 onUpdate={handleUpdateProfile}
-                onComplete={() => window.location.reload()}
+                onComplete={() => {
+                    navigate('/?tab=feed', { replace: true });
+                    window.location.reload();
+                }}
             />
         );
     }

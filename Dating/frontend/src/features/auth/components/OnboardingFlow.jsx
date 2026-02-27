@@ -48,39 +48,54 @@ const OnboardingFlow = ({ currentUser, onUpdate, onComplete }) => {
         });
     };
 
-    const handleFileUpload = async (e, index) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const handleFileUpload = async (e, startIndex) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
 
-        // File size validation (10MB limit)
-        const MAX_FILE_SIZE = 10 * 1024 * 1024;
-        if (file.size > MAX_FILE_SIZE) {
-            showNotification('Image is too large! Please choose an image smaller than 10MB. 📸', 'error');
-            e.target.value = ''; // Reset input
+        // Total slots available are 6
+        const availableSlots = 6 - startIndex;
+        const filesToUpload = files.slice(0, availableSlots);
+
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        const oversizedFiles = filesToUpload.filter(f => f.size > MAX_FILE_SIZE);
+
+        if (oversizedFiles.length > 0) {
+            showNotification(`${oversizedFiles.length} images are too large! Max 10MB per image. 📸`, 'error');
+            e.target.value = '';
             return;
         }
 
         setUploading(true);
         showLoading();
-        const data = new FormData();
-        data.append('file', file);
 
         try {
-            const response = await client.post('/users/upload', data);
-            const url = response.data;
+            const uploadPromises = filesToUpload.map(async (file, i) => {
+                const data = new FormData();
+                data.append('file', file);
+                const response = await client.post('/users/upload', data);
+                return { index: startIndex + i, url: response.data };
+            });
+
+            const results = await Promise.all(uploadPromises);
 
             setFormData(prev => {
                 const newPhotos = [...prev.photos];
-                newPhotos[index] = url;
+                while (newPhotos.length < 6) newPhotos.push(null);
+
+                results.forEach(res => {
+                    newPhotos[res.index] = res.url;
+                });
                 return { ...prev, photos: newPhotos };
             });
-            showNotification('Image uploaded successfully!', 'success');
+
+            showNotification(`Successfully uploaded ${results.length} photo(s)! ✨`, 'success');
         } catch (error) {
             console.error(error);
-            showNotification('Upload failed.', 'error');
+            showNotification('Some uploads failed. Please try again.', 'error');
         } finally {
             setUploading(false);
             hideLoading();
+            e.target.value = '';
         }
     };
 
@@ -91,11 +106,26 @@ const OnboardingFlow = ({ currentUser, onUpdate, onComplete }) => {
 
         showLoading();
         try {
+            // Request GPS coordinates (fallback to central HCMC if denied)
+            let latitude = 10.7769;
+            let longitude = 106.7009;
+            try {
+                const pos = await new Promise((resolve, reject) =>
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 })
+                );
+                latitude = pos.coords.latitude;
+                longitude = pos.coords.longitude;
+            } catch {
+                showNotification('Location not available — using default HCMC.', 'info');
+            }
+
             await onUpdate({
                 ...formData,
                 interests: formData.interests.join(','),
                 photos: formData.photos.filter(p => p).join(','),
-                avatarUrl: formData.photos[0] // Set first photo as avatar
+                avatarUrl: formData.photos[0],
+                latitude,
+                longitude
             });
             showNotification('Awesome! Your profile is ready.', 'success');
             onComplete();
@@ -253,11 +283,12 @@ const OnboardingFlow = ({ currentUser, onUpdate, onComplete }) => {
                                         <label className={`w-full h-full border-4 border-dashed rounded-[2rem] flex flex-col items-center justify-center cursor-pointer transition-all ${uploading ? 'opacity-50 bg-gray-50' : 'hover:bg-pink-50 hover:border-pink-300 bg-gray-50 border-gray-200'}`}>
                                             <span className="text-4xl text-gray-300 font-light mb-2">+</span>
                                             <span className="text-[12px] font-black uppercase text-gray-400 tracking-widest text-center px-4">
-                                                {uploading ? 'Uploading...' : 'Add Photo'}
+                                                {uploading ? 'Uploading...' : 'Add Photos'}
                                             </span>
                                             <input
                                                 type="file"
                                                 accept="image/*"
+                                                multiple
                                                 className="hidden"
                                                 disabled={uploading}
                                                 onChange={(e) => handleFileUpload(e, idx)}

@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useFeed } from '../hooks/useFeed';
-import FeedCard from './FeedCard';
+import { useWebSocket } from '../../../hooks/useWebSocket';
+import { useNotification } from '../../../context/NotificationContext';
 import SkeletonCard from './SkeletonCard';
+import FeedCard from './FeedCard';
 
 const MatchFeed = ({ currentUser }) => {
     const [genderFilter, setGenderFilter] = useState('All');
@@ -38,8 +40,29 @@ const MatchFeed = ({ currentUser }) => {
         handleLike,
         handleSkip,
         loading,
-        fetchFeed
+        error,
+        fetchFeed,
+        addProfile
     } = useFeed(currentUser.id, feedFilters);
+
+    const { showNotification } = useNotification();
+
+    const handleNewUser = useCallback((newUser) => {
+        // 1. Don't show yourself
+        if (newUser.id === currentUser.id) return;
+
+        // 2. Check filters
+        const matchesGender = feedFilters.gender === 'All' || newUser.gender === feedFilters.gender;
+        const matchesAge = newUser.age >= feedFilters.minAge && newUser.age <= feedFilters.maxAge;
+        const matchesInterest = !feedFilters.interest || (newUser.interests && newUser.interests.toLowerCase().includes(feedFilters.interest.toLowerCase()));
+
+        if (matchesGender && matchesAge && matchesInterest) {
+            addProfile(newUser);
+            showNotification(`✨ A new potential match just joined: ${newUser.name}!`, 'success');
+        }
+    }, [currentUser.id, feedFilters, addProfile, showNotification]);
+
+    useWebSocket('/topic/public/new-users', handleNewUser, true);
 
     if (loading && profiles.length === 0) {
         return (
@@ -69,7 +92,7 @@ const MatchFeed = ({ currentUser }) => {
             </div>
 
             {/* Horizontal Filter Bar */}
-            <div className="w-full max-w-6xl mx-auto mb-16 px-4">
+            <div className="w-full max-w-6xl mx-auto mb-16 px-4 relative z-30">
                 <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-4 lg:p-6 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-white flex flex-col lg:flex-row items-center gap-6 lg:gap-0 animate-fade-in divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
 
                     {/* Seeking Section - Dropdown */}
@@ -166,13 +189,15 @@ const MatchFeed = ({ currentUser }) => {
                 profiles.length === 0 ? (
                     <div className="w-full max-w-4xl text-center p-20 glass-card rounded-[3rem] border-2 border-dashed border-slate-200/50 bg-white/20 animate-fade-in">
                         <div className="relative inline-block mb-10">
-                            <div className="text-8xl animate-float">😴</div>
-                            <div className="absolute -top-4 -right-4 text-4xl animate-pulse">🌙</div>
+                            <div className="text-8xl animate-float">{error ? '🚫' : '😴'}</div>
+                            {error && <div className="absolute -top-4 -right-4 text-4xl animate-pulse">⚠️</div>}
                         </div>
                         <div className="space-y-3">
-                            <h3 className="text-3xl font-black text-slate-800 italic">You're out of turns today!</h3>
+                            <h3 className="text-3xl font-black text-slate-800 italic">
+                                {error ? 'Access Restricted' : "You're out of turns today!"}
+                            </h3>
                             <p className="text-slate-500 font-medium max-w-md mx-auto">
-                                Take some time to rest or care for yourself. New people will appear tomorrow! ✨
+                                {error || "Take some time to rest or care for yourself. New people will appear tomorrow! ✨"}
                             </p>
                             <button
                                 type="button"

@@ -20,4 +20,8 @@ public class NotificationService {
     public void broadcastMatchUpdate(Long userId, Map<String, Object> notification) {
         messagingTemplate.convertAndSend("/topic/matches/" + userId, notification);
     }
+
+    public void broadcastNewUser(Object userDto) {
+        messagingTemplate.convertAndSend("/topic/public/new-users", userDto);
+    }
 }

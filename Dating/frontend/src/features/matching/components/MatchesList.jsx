@@ -70,6 +70,7 @@ const MatchesList = ({ currentUser }) => {
                             id: isUser1 ? match.user2Id : match.user1Id,
                             name: isUser1 ? match.user2Name : match.user1Name,
                             avatarUrl: isUser1 ? match.user2Avatar : match.user1Avatar,
+                            photos: isUser1 ? match.user2Photos : match.user1Photos,
                         };
 
                         if (!otherUser.id) return null;
@@ -80,7 +81,7 @@ const MatchesList = ({ currentUser }) => {
                                     <div className="relative shrink-0">
                                         <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] overflow-hidden border-[6px] border-white shadow-2xl transform rotate-3 group-hover:rotate-0 transition-transform duration-500">
                                             <img
-                                                src={otherUser.avatarUrl || getDefaultAvatar(otherUser.id)}
+                                                src={otherUser.avatarUrl || (otherUser.photos ? otherUser.photos.split(',')[0] : null) || getDefaultAvatar(otherUser.id)}
                                                 alt={otherUser.name}
                                                 className="w-full h-full object-cover"
                                             />

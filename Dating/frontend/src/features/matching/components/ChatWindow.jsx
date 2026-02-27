@@ -83,7 +83,7 @@ const ChatWindow = ({ currentUser, otherUser, onClose }) => {
 
     // --- WebSocket: Real-time messages ---
     const handleIncomingMessage = useCallback((receivedMsg) => {
-        if (receivedMsg.sender.id === otherUser.id || receivedMsg.receiver.id === otherUser.id) {
+        if (receivedMsg.senderId === otherUser.id || receivedMsg.receiverId === otherUser.id) {
             setMessages(prev => {
                 if (prev.find(m => m.id === receivedMsg.id)) return prev;
                 return [...prev, receivedMsg];
@@ -123,7 +123,7 @@ const ChatWindow = ({ currentUser, otherUser, onClose }) => {
                     <div className="flex items-center space-x-4">
                         <div className="relative shrink-0">
                             <img
-                                src={otherUser.avatarUrl || getDefaultAvatar(otherUser.id)}
+                                src={otherUser.avatarUrl || otherUser.avatar || getDefaultAvatar(otherUser.id)}
                                 alt={otherUser.name}
                                 className="w-14 h-14 rounded-2xl border-2 border-white/30 object-cover shadow-md"
                             />
@@ -162,7 +162,7 @@ const ChatWindow = ({ currentUser, otherUser, onClose }) => {
                         </div>
                     ) : (
                         messages.map((m, idx) => {
-                            const isMe = m.sender.id === currentUser.id;
+                            const isMe = m.senderId === currentUser.id;
                             return (
                                 <div key={m.id || idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'} items-end space-x-3 animate-fade-in`}>
                                     <div className={`max-w-[75%] rounded-[1.5rem] px-5 py-3.5 shadow-sm ${isMe

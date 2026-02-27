@@ -4,8 +4,10 @@
 // ============================================================
 
 // --- Network ---
-export const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:8080/ws';
-export const API_TIMEOUT = 30000; // 30 seconds
+export const WS_URL = import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/ws`
+    : 'http://localhost:8080/ws';
+export const API_TIMEOUT = 60000; // 60 seconds (to handle Render cold starts)
 
 // --- Scheduling ---
 export const MIN_SLOT_DURATION_MINUTES = 90;
@@ -18,7 +20,7 @@ export const MODAL_Z_INDEX = 9999;
 export const TOAST_Z_INDEX = 99999;
 
 // --- Helpers ---
-export const getDefaultAvatar = (id) => `https://i.pravatar.cc/300?u=${id}`;
+export const getDefaultAvatar = (id) => `https://api.dicebear.com/7.x/avataaars/svg?seed=${id || 'default'}`;
 
 // --- Date Formatting ---
 export const DATE_FORMAT_OPTIONS = {

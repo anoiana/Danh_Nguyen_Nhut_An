@@ -29,4 +29,6 @@ public class UserDto {
     private String avatarUrl;
     private String interests;
     private String photos;
+    private Double latitude;
+    private Double longitude;
 }

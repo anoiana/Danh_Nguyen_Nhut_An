@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNotification } from '../../../context/NotificationContext';
 import { useLoading } from '../../../context/LoadingContext';
 import { getDefaultAvatar } from '../../../lib/constants';
+import { client } from '../../../lib/axios';
 
 /**
  * Predefined interests list — extracted from inline constant to be reusable.
@@ -88,16 +89,8 @@ export const useProfileEditor = (currentUser, onUpdate, error) => {
                 const formData = new FormData();
                 formData.append('file', file);
 
-                const response = await fetch('/api/users/upload', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Authorization': `Bearer ${currentUser.token}`,
-                    },
-                });
-
-                if (!response.ok) throw new Error('Upload failed');
-                return await response.text();
+                const response = await client.post('/users/upload', formData);
+                return response.data;
             });
 
             const uploadedUrls = await Promise.all(uploadPromises);

@@ -4,6 +4,7 @@ import { getFeed, likeUser as likeUserApi, skipUser, getWaitingMatches } from '.
 export const useFeed = (userId, filters = {}) => {
     const [profiles, setProfiles] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (userId) {
@@ -13,11 +14,16 @@ export const useFeed = (userId, filters = {}) => {
 
     const fetchFeed = async () => {
         setLoading(true);
+        setError(null);
         try {
             const response = await getFeed(userId, filters);
             setProfiles(response.data);
-        } catch (error) {
-            console.error('Error fetching feed:', error);
+        } catch (err) {
+            console.error('Error fetching feed:', err);
+            if (err.response?.data?.errorCode === 'USER_PENALIZED') {
+                setError(err.response.data.message);
+                setProfiles([]);
+            }
         } finally {
             setLoading(false);
         }
@@ -45,11 +51,20 @@ export const useFeed = (userId, filters = {}) => {
         }
     };
 
+    const addProfile = (profile) => {
+        setProfiles(prev => {
+            if (prev.find(p => p.id === profile.id)) return prev;
+            return [profile, ...prev];
+        });
+    };
+
     return {
         profiles,
         handleLike,
         handleSkip,
         loading,
-        fetchFeed
+        error,
+        fetchFeed,
+        addProfile
     };
 };

@@ -2,6 +2,7 @@ package com.example.demo.features.scheduling.dto;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 public class DateBookingDto {
@@ -10,7 +11,11 @@ public class DateBookingDto {
     private String requesterName;
     private Long recipientId;
     private String recipientName;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime startTime;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime endTime;
     private String status;
     private String venue;
@@ -21,4 +26,8 @@ public class DateBookingDto {
     private Boolean requesterWantsContact;
     private Boolean recipientWantsContact;
     private Boolean contactExchanged;
+    private String requesterAvatar;
+    private String recipientAvatar;
+    private String requesterEmail;
+    private String recipientEmail;
 }

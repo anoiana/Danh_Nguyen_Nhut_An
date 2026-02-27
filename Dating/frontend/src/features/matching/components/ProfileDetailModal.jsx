@@ -2,6 +2,7 @@ import React from 'react';
 import { getDefaultAvatar } from '../../../lib/constants';
 
 const ProfileDetailModal = ({ profile, isOpen, onClose, onLike, onSkip, currentUser }) => {
+    const [selectedImage, setSelectedImage] = React.useState(null);
     if (!isOpen || !profile) return null;
 
     const userInts = currentUser?.interests ? currentUser.interests.split(',').map(i => i.trim().toLowerCase()) : [];
@@ -27,6 +28,30 @@ const ProfileDetailModal = ({ profile, isOpen, onClose, onLike, onSkip, currentU
 
     return (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+            {/* Fullscreen Lightbox Overlay */}
+            {selectedImage && (
+                <div
+                    className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-6 md:p-12 animate-fade-in cursor-zoom-out"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <button
+                        className="absolute top-8 right-8 w-14 h-14 bg-white/10 hover:bg-white/20 text-white rounded-2xl flex items-center justify-center text-2xl transition-all z-[1010] border border-white/10"
+                        onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
+                    >
+                        ✕
+                    </button>
+                    <img
+                        src={selectedImage}
+                        alt="Profile full view"
+                        className="max-w-full max-h-full rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] object-contain animate-bounce-in ring-1 ring-white/20"
+                    />
+
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-6 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">
+                        Click anywhere to close
+                    </div>
+                </div>
+            )}
+
             {/* Backdrop */}
             <div className="absolute inset-0" onClick={onClose}></div>
 
@@ -70,7 +95,11 @@ const ProfileDetailModal = ({ profile, isOpen, onClose, onLike, onSkip, currentU
                 <div className="p-6 bg-white overflow-x-auto">
                     <div className="flex gap-4 min-w-max pb-2">
                         {photos.map((url, idx) => (
-                            <div key={idx} className="w-[340px] h-[450px] rounded-lg overflow-hidden relative shadow-md shrink-0 group">
+                            <div
+                                key={idx}
+                                onClick={() => setSelectedImage(url)}
+                                className="w-[340px] h-[450px] rounded-lg overflow-hidden relative shadow-md shrink-0 group cursor-zoom-in"
+                            >
                                 <img
                                     src={url}
                                     alt={`${profile.name} ${idx}`}

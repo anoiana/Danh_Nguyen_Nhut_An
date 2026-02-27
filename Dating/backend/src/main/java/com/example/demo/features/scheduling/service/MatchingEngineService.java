@@ -7,6 +7,7 @@ import com.example.demo.features.scheduling.dto.SchedulingNotification;
 import com.example.demo.features.scheduling.repository.AvailabilityRepository;
 import com.example.demo.features.scheduling.repository.DateBookingRepository;
 import com.example.demo.features.matching.entity.Match;
+import com.example.demo.features.scheduling.entity.Venue;
 import com.example.demo.features.user.entity.User;
 import com.example.demo.features.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Core engine responsible for finding common time slots between two users
@@ -29,15 +29,7 @@ public class MatchingEngineService {
     private final UserService userService;
     private final ActivityService activityService;
     private final NotificationService notificationService;
-
-    // Curated list of partner venues to provide a premium dating experience.
-    private static final String[] VENUES = {
-            "The Coffee House - Tran Cao Van",
-            "Cong Caphe - Truong Sa",
-            "Phuc Long Coffee & Tea - Le Loi",
-            "Starbucks - New World",
-            "Highlands Coffee - Nguyen Hue"
-    };
+    private final VenueService venueService;
 
     /**
      * Orchestrates the matching process after both users have submitted their
@@ -47,18 +39,19 @@ public class MatchingEngineService {
         User u1 = match.getUser1();
         User u2 = match.getUser2();
 
-        // 1. Algorithmic Search: Attempt to find the first overlapping slot of at least
-        // 90 mins.
         Availability common = findFirstCommonSlot(u1.getId(), u2.getId());
 
         if (common != null) {
-            String venue = VENUES[new Random().nextInt(VENUES.length)];
+            // GPS Midpoint Algorithm: select the venue closest to both users
+            Venue venue = venueService.findBestVenue(u1, u2);
+            String venueName = (venue != null) ? venue.getName() + " - " + venue.getAddress() : "TBD";
+
             DateBooking booking = new DateBooking();
             booking.setRequester(u1);
             booking.setRecipient(u2);
             booking.setStartTime(common.getStartTime());
             booking.setEndTime(common.getEndTime());
-            booking.setVenue(venue);
+            booking.setVenue(venueName);
             booking.setStatus("PROPOSED");
 
             match.setStatus(Match.Status.PROPOSED);

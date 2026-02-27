@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useWebSocket } from '../../../hooks/useWebSocket';
 import { getMyBookings, cancelBooking as cancelBookingApi } from '../api/matchApi';
 import { createPaymentUrl } from '../../payment/api/paymentApi';
 import { useNotification } from '../../../context/NotificationContext';
@@ -7,6 +8,7 @@ import FeedbackModal from './FeedbackModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import EmptyState from '../../../components/common/EmptyState';
 import BookingCard from './bookings/BookingCard';
+import ConfirmModal from '../../../components/common/ConfirmModal';
 
 /**
  * BookingsList — Refactored with extracted BookingCard sub-component.
@@ -20,6 +22,25 @@ const BookingsList = ({ currentUser }) => {
     const [selectedChatUser, setSelectedChatUser] = useState(null);
     const [feedbackBooking, setFeedbackBooking] = useState(null);
     const { showNotification } = useNotification();
+    const [lastNotificationId, setLastNotificationId] = useState(null);
+    const [bookingToCancel, setBookingToCancel] = useState(null);
+
+    const handleBookingUpdate = useCallback((notification) => {
+        if (notification.type === 'BOOKING_UPDATE' || notification.type === 'MATCHING_FAILED') {
+            // Content-based deduplication
+            if (lastNotificationId === notification.message) return;
+            setLastNotificationId(notification.message);
+
+            showNotification(notification.message, notification.type === 'BOOKING_UPDATE' ? 'success' : 'warning');
+            fetchBookings();
+        }
+    }, [showNotification]);
+
+    useWebSocket(
+        `/topic/scheduling/${currentUser.id}`,
+        handleBookingUpdate,
+        !!currentUser
+    );
 
     const fetchBookings = async () => {
         try {
@@ -48,14 +69,20 @@ const BookingsList = ({ currentUser }) => {
         }
     };
 
-    const handleCancel = async (bookingId) => {
-        if (!window.confirm("Are you sure? Cancelling a confirmed date will penalize your account for 24h. ⚠️")) return;
+    const handleCancel = (bookingId) => {
+        setBookingToCancel(bookingId);
+    };
+
+    const executeCancel = async () => {
+        if (!bookingToCancel) return;
         try {
-            await cancelBookingApi(bookingId, currentUser.id);
+            await cancelBookingApi(bookingToCancel, currentUser.id);
             showNotification("Date cancelled. Penalty applied.", "warning");
             fetchBookings();
         } catch (error) {
             showNotification("Error cancelling.", "error");
+        } finally {
+            setBookingToCancel(null);
         }
     };
 
@@ -122,6 +149,17 @@ const BookingsList = ({ currentUser }) => {
                     onSuccess={fetchBookings}
                 />
             )}
+
+            <ConfirmModal
+                isOpen={!!bookingToCancel}
+                onClose={() => setBookingToCancel(null)}
+                onConfirm={executeCancel}
+                title="Cancel confirmed date?"
+                message="Are you sure? Cancelling a confirmed date will penalize your account for 24h. You won't be able to see new profiles during this period. ⚠️"
+                confirmText="Yes, Cancel anyway"
+                cancelText="No, Keep it"
+                type="danger"
+            />
         </div>
     );
 };

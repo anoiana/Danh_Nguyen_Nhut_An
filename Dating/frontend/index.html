@@ -1,12 +1,26 @@
 <!doctype html>
+<!-- Build: 2026-02-25T17:22 - force cache bust -->
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mini Dating App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Dating App</title>
+  <script>
+    window.global = window;
+    if (typeof window.process === 'undefined') {
+      window.process = { env: {} };
+    }
+    // Polyfills for Fetch API objects to prevent "Cannot destructure property 'Request' of 'undefined'"
+    window.Request = window.Request || class { };
+    window.Response = window.Response || class { };
+    window.Headers = window.Headers || class { };
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

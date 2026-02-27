@@ -95,6 +95,8 @@ public class DiscoveryService {
         dto.setAvatarUrl(user.getAvatarUrl());
         dto.setInterests(user.getInterests());
         dto.setPhotos(user.getPhotos());
+        dto.setLatitude(user.getLatitude());
+        dto.setLongitude(user.getLongitude());
         return dto;
     }
 }

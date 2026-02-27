@@ -11,12 +11,15 @@ import com.example.demo.features.user.repository.UserRepository;
 
 import com.example.demo.infra.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -33,14 +36,14 @@ public class PaymentService {
     private final DateBookingService dateBookingService;
 
     @Transactional
-    public String createPaymentUrl(Long bookingId, Long userId, Long amount) {
+    public String createPaymentUrl(Long bookingId, Long userId, Long amount, HttpServletRequest request) {
         DateBooking booking = dateBookingRepo.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found: " + bookingId));
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
         // Create transaction record
-        String txnRef = VNPayConfig.getRandomNumber(8);
+        String txnRef = "VNP" + System.currentTimeMillis(); // Mã bắt đầu bằng VNP
         PaymentTransaction txn = new PaymentTransaction();
         txn.setBooking(booking);
         txn.setUser(user);
@@ -61,37 +64,44 @@ public class PaymentService {
         vnp_Params.put("vnp_OrderType", "other");
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getVnpReturnUrl() + "?bookingId=" + bookingId);
-        vnp_Params.put("vnp_IpAddr", "127.0.0.1"); // Dummy IP for local
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String vnp_CreateDate = formatter.format(cld.getTime());
+        String ipAddr = request.getHeader("X-Forwarded-For");
+        if (ipAddr == null || ipAddr.isEmpty()) {
+            ipAddr = request.getRemoteAddr();
+        }
+        vnp_Params.put("vnp_IpAddr", ipAddr);
+
+        // Lấy thời gian hiện tại theo múi giờ Việt Nam
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String vnp_CreateDate = now.format(formatter);
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
-        cld.add(Calendar.MINUTE, 15);
-        String vnp_ExpireDate = formatter.format(cld.getTime());
-        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+        // Bỏ vnp_ExpireDate để VNPay tự tính (hoặc dùng mặc định 15p) cho an toàn
+        // vnp_Params.put("vnp_ExpireDate", now.plusMinutes(15).format(formatter));
 
         // Sort and build query
         List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
         Collections.sort(fieldNames);
+
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
-        Iterator<String> itr = fieldNames.iterator();
 
-        while (itr.hasNext()) {
-            String fieldName = itr.next();
+        // Theo chuẩn VNPay 2.1.0: hashData VÀ query đều phải URL-encode
+        for (String fieldName : fieldNames) {
             String fieldValue = vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if (fieldValue != null && !fieldValue.isEmpty()) {
                 try {
-                    hashData.append(fieldName).append('=')
-                            .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()))
-                            .append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                    if (itr.hasNext()) {
-                        query.append('&');
+                    String encodedName = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString());
+                    String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString());
+
+                    // hashData và query string là GIỐNG NHAU (đều encode)
+                    if (hashData.length() > 0) {
                         hashData.append('&');
+                        query.append('&');
                     }
+                    hashData.append(encodedName).append('=').append(encodedValue);
+                    query.append(encodedName).append('=').append(encodedValue);
                 } catch (Exception e) {
                 }
             }
@@ -109,22 +119,21 @@ public class PaymentService {
         String secureHash = params.get("vnp_SecureHash");
         params.remove("vnp_SecureHashType");
         params.remove("vnp_SecureHash");
+        params.remove("bookingId"); // Remove non-VNPay param before verification
 
-        // Hash data again
+        // Hash data again — phải URL-encode giống lúc tạo URL
         List<String> fieldNames = new ArrayList<>(params.keySet());
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
-        Iterator<String> itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = itr.next();
+        for (String fieldName : fieldNames) {
             String fieldValue = params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if (fieldValue != null && !fieldValue.isEmpty()) {
                 try {
-                    hashData.append(fieldName).append('=')
-                            .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                    if (itr.hasNext()) {
+                    String encodedName = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString());
+                    String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString());
+                    if (hashData.length() > 0)
                         hashData.append('&');
-                    }
+                    hashData.append(encodedName).append('=').append(encodedValue);
                 } catch (Exception e) {
                 }
             }

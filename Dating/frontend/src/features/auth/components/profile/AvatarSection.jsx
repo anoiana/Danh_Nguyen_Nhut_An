@@ -20,7 +20,7 @@ const AvatarSection = ({ avatarUrl, currentUser, name, onFileChange }) => {
                     <div className="relative group shrink-0">
                         <div className="w-40 h-40 md:w-48 md:h-48 rounded-[3rem] overflow-hidden border-[8px] border-white shadow-2xl rotate-3 group-hover:rotate-0 transition-transform duration-500">
                             <img
-                                src={avatarUrl || getDefaultAvatar(currentUser.id)}
+                                src={avatarUrl || (currentUser.photos ? currentUser.photos.split(',')[0] : null) || getDefaultAvatar(currentUser.id)}
                                 alt="Avatar"
                                 className="w-full h-full object-cover"
                             />

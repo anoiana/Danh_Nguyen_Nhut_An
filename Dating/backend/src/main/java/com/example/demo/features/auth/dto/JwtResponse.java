@@ -16,10 +16,12 @@ public class JwtResponse {
     private String avatarUrl;
     private String interests;
     private String photos;
+    private Double latitude;
+    private Double longitude;
     private List<String> roles;
 
     public JwtResponse(String accessToken, Long id, String email, String name, Integer age, String gender, String bio,
-            String avatarUrl, String interests, String photos, List<String> roles) {
+            String avatarUrl, String interests, String photos, Double latitude, Double longitude, List<String> roles) {
         this.token = accessToken;
         this.id = id;
         this.email = email;
@@ -30,6 +32,8 @@ public class JwtResponse {
         this.avatarUrl = avatarUrl;
         this.interests = interests;
         this.photos = photos;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.roles = roles;
     }
 }

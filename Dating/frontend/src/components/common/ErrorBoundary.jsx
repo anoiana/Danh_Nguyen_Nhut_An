@@ -35,7 +35,7 @@ class ErrorBoundary extends Component {
                         Refresh Page ✨
                     </button>
 
-                    {process.env.NODE_ENV === 'development' && (
+                    {import.meta.env.DEV && (
                         <div className="mt-12 p-6 bg-gray-50 rounded-2xl text-left max-w-2xl w-full border border-gray-100 overflow-auto">
                             <p className="text-red-500 font-bold text-xs uppercase tracking-widest mb-2">Debug Info</p>
                             <pre className="text-slate-600 text-sm font-mono whitespace-pre-wrap">

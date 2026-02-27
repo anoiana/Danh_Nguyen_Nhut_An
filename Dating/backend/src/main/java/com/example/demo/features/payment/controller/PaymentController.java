@@ -26,13 +26,14 @@ public class PaymentController {
     @GetMapping("/create-url")
     public ResponseEntity<PaymentUrlResponse> createPaymentUrl(
             @RequestParam Long bookingId,
-            Authentication authentication) {
+            Authentication authentication,
+            jakarta.servlet.http.HttpServletRequest request) {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         Long userId = userDetails.getId();
 
         // 100,000 VND fixed price for the date token
-        String url = paymentService.createPaymentUrl(bookingId, userId, 100000L);
+        String url = paymentService.createPaymentUrl(bookingId, userId, 100000L, request);
         return ResponseEntity.ok(new PaymentUrlResponse(url));
     }
 

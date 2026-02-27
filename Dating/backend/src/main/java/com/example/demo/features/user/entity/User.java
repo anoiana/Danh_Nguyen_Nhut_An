@@ -43,6 +43,9 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String photos;
 
+    private Double latitude;
+    private Double longitude;
+
     // Anti-flaker protection: The user is blocked from the discovery feed
     // until this timestamp if they cancel confirmed dates.
     private java.time.LocalDateTime penalizedUntil;

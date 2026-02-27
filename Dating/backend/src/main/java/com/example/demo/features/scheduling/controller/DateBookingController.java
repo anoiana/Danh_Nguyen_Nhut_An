@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -27,8 +28,8 @@ public class DateBookingController {
             @RequestParam Long recipientId,
             @RequestParam String startTime,
             @RequestParam String endTime) {
-        LocalDateTime start = LocalDateTime.parse(startTime);
-        LocalDateTime end = LocalDateTime.parse(endTime);
+        LocalDateTime start = OffsetDateTime.parse(startTime).toLocalDateTime();
+        LocalDateTime end = OffsetDateTime.parse(endTime).toLocalDateTime();
         return ResponseEntity.ok(dateBookingService.createRequest(requesterId, recipientId, start, end));
     }
 

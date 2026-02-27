@@ -100,10 +100,8 @@ export const useAvailability = (currentUser, matchedUser, isOpen) => {
             return showNotification('Please select a date within the next 3 weeks!', 'error');
         }
 
-        const startStr = `${date}T${startTime}:00`;
-        const endStr = `${date}T${endTime}:00`;
-        const start = new Date(startStr);
-        const end = new Date(endStr);
+        const start = new Date(`${date}T${startTime}:00`);
+        const end = new Date(`${date}T${endTime}:00`);
 
         if (date === minDateStr && start < new Date()) {
             return showNotification('Availability cannot be in the past!', 'error');
@@ -126,6 +124,9 @@ export const useAvailability = (currentUser, matchedUser, isOpen) => {
         if (isOverlap) {
             return showNotification('This slot overlaps with an existing one! ⚠️', 'warning');
         }
+
+        const startStr = start.toISOString();
+        const endStr = end.toISOString();
 
         showLoading();
         try {
@@ -177,11 +178,10 @@ export const useAvailability = (currentUser, matchedUser, isOpen) => {
 
     const handleCancelBooking = async () => {
         if (!proposedBooking) return;
-        if (!window.confirm('Are you sure you want to cancel and reschedule?')) return;
 
         showLoading();
         try {
-            await cancelBooking(proposedBooking.id);
+            await cancelBooking(proposedBooking.id, currentUser.id);
             setProposedBooking(null);
             setSubmissionStatus(null);
             setUserAvailabilities([]);

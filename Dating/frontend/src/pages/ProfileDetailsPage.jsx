@@ -13,6 +13,7 @@ const ProfileDetailsPage = () => {
     const { currentUser } = useAuth();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -89,7 +90,31 @@ const ProfileDetailsPage = () => {
     const matchScore = null;
 
     return (
-        <main className="flex-1 pb-20 animate-fade-in">
+        <main className="flex-1 pb-20 animate-fade-in relative">
+            {/* Fullscreen Lightbox Overlay */}
+            {selectedImage && (
+                <div
+                    className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 md:p-12 animate-fade-in cursor-zoom-out"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <button
+                        className="absolute top-8 right-8 w-14 h-14 bg-white/10 hover:bg-white/20 text-white rounded-2xl flex items-center justify-center text-2xl transition-all z-[1010] border border-white/10"
+                        onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
+                    >
+                        ✕
+                    </button>
+                    <img
+                        src={selectedImage}
+                        alt="Profile full view"
+                        className="max-w-full max-h-full rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] object-contain animate-bounce-in ring-1 ring-white/20"
+                    />
+
+                    {/* Caption / Hint */}
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-6 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">
+                        Click anywhere to close
+                    </div>
+                </div>
+            )}
             {/* Navigation Header */}
             <div className="max-w-6xl mx-auto px-6 mt-12 flex justify-between items-center">
                 <button
@@ -135,7 +160,10 @@ const ProfileDetailsPage = () => {
                     {/* Hero Section */}
                     <div className="p-10 md:p-16 flex flex-col md:flex-row items-center gap-12 bg-gradient-to-b from-white/40 to-transparent">
                         <div className="relative shrink-0">
-                            <div className="w-48 h-48 md:w-64 md:h-64 rounded-[3.5rem] overflow-hidden border-[8px] border-white shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700">
+                            <div
+                                onClick={() => setSelectedImage(profile.avatarUrl || photos[0])}
+                                className="w-48 h-48 md:w-64 md:h-64 rounded-[3.5rem] overflow-hidden border-[8px] border-white shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700 cursor-zoom-in"
+                            >
                                 <img src={profile.avatarUrl || photos[0]} alt={profile.name} className="w-full h-full object-cover" />
                             </div>
                             {profile.id !== currentUser.id && (
@@ -174,7 +202,11 @@ const ProfileDetailsPage = () => {
                             style={{ scrollbarWidth: 'none' }}
                         >
                             {photos.slice(0, 5).map((url, idx) => (
-                                <div key={idx} className="w-[300px] h-[400px] md:w-[450px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl shrink-0 border-[6px] border-white relative group">
+                                <div
+                                    key={idx}
+                                    onClick={() => setSelectedImage(url)}
+                                    className="w-[300px] h-[400px] md:w-[450px] md:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl shrink-0 border-[6px] border-white relative group cursor-zoom-in"
+                                >
                                     <img
                                         src={url}
                                         className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110"

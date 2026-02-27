@@ -16,6 +16,8 @@ const BookingCard = ({ booking, currentUser, onConfirm, onCancel, onChat, onFeed
     const otherUser = {
         id: isRequester ? booking.recipientId : booking.requesterId,
         name: isRequester ? booking.recipientName : booking.requesterName,
+        avatarUrl: isRequester ? booking.recipientAvatar : booking.requesterAvatar,
+        email: isRequester ? booking.recipientEmail : booking.requesterEmail,
     };
 
     const startTime = new Date(booking.startTime);
@@ -51,7 +53,7 @@ const BookingCard = ({ booking, currentUser, onConfirm, onCancel, onChat, onFeed
                 {/* Left Photo Strip */}
                 <div className="w-full md:w-48 bg-gray-100 relative overflow-hidden">
                     <img
-                        src={getDefaultAvatar(otherUser.id)}
+                        src={otherUser.avatarUrl || otherUser.avatar || getDefaultAvatar(otherUser.id)}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         alt={otherUser.name}
                     />
@@ -81,7 +83,13 @@ const BookingCard = ({ booking, currentUser, onConfirm, onCancel, onChat, onFeed
                             <label className="text-[10px] font-black text-pink-400 uppercase tracking-widest block mb-1">
                                 Mutual Interest revealed!
                             </label>
-                            <p className="text-[8px] text-slate-400 font-medium mt-1">
+                            <div className="flex items-center gap-2 mt-2">
+                                <span className="text-xl">📧</span>
+                                <p className="text-sm font-black text-slate-700 underline decoration-pink-300 decoration-2 underline-offset-4">
+                                    {otherUser.email || 'Hidden'}
+                                </p>
+                            </div>
+                            <p className="text-[8px] text-slate-400 font-medium mt-3">
                                 Both of you want to stay connected! ✨
                             </p>
                         </div>

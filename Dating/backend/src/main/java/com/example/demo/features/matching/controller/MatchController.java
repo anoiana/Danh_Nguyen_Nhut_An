@@ -72,9 +72,11 @@ public class MatchController {
         dto.setUser1Id(entity.getUser1().getId());
         dto.setUser1Name(entity.getUser1().getName());
         dto.setUser1Avatar(entity.getUser1().getAvatarUrl());
+        dto.setUser1Photos(entity.getUser1().getPhotos());
         dto.setUser2Id(entity.getUser2().getId());
         dto.setUser2Name(entity.getUser2().getName());
         dto.setUser2Avatar(entity.getUser2().getAvatarUrl());
+        dto.setUser2Photos(entity.getUser2().getPhotos());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         return dto;

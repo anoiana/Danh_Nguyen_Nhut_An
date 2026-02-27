@@ -8,6 +8,8 @@ import SlotList from './availability/SlotList';
 import WaitingState from './availability/WaitingState';
 import ProposedBookingCard from './availability/ProposedBookingCard';
 import ConfirmedTicket from './availability/ConfirmedTicket';
+import ConfirmModal from '../../../components/common/ConfirmModal';
+import { useState } from 'react';
 
 /**
  * AvailabilityModal — Thin orchestrator component.
@@ -39,6 +41,8 @@ const AvailabilityModal = ({ isOpen, onClose, currentUser, matchedUser }) => {
         handleCancelBooking,
         handleDeleteAvailability,
     } = useAvailability(currentUser, matchedUser, isOpen);
+
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
     if (!isOpen) return null;
 
@@ -122,7 +126,7 @@ const AvailabilityModal = ({ isOpen, onClose, currentUser, matchedUser }) => {
                             booking={proposedBooking}
                             isConfirmedByMe={isConfirmedByMe}
                             onConfirm={handleConfirmBooking}
-                            onCancel={handleCancelBooking}
+                            onCancel={() => setShowCancelConfirm(true)}
                         />
                     )}
 
@@ -130,6 +134,18 @@ const AvailabilityModal = ({ isOpen, onClose, currentUser, matchedUser }) => {
                         <ConfirmedTicket booking={proposedBooking} onClose={onClose} />
                     )}
                 </div>
+
+                {/* Confirm Cancel Modal */}
+                <ConfirmModal
+                    isOpen={showCancelConfirm}
+                    onClose={() => setShowCancelConfirm(false)}
+                    onConfirm={handleCancelBooking}
+                    title="Cancel this date?"
+                    message="Are you sure you want to cancel and reschedule? This will clear your currently selected time slots."
+                    confirmText="Yes, Cancel"
+                    cancelText="Keep Date"
+                    type="danger"
+                />
 
                 {/* Decorative blurs */}
                 <div className="absolute -top-20 -right-20 w-48 h-48 bg-pink-100/30 rounded-full blur-3xl -z-10" />

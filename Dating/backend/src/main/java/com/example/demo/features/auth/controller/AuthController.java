@@ -121,6 +121,8 @@ public class AuthController {
                 userDetails.getAvatarUrl(),
                 userDetails.getInterests(),
                 userDetails.getPhotos(),
+                userDetails.getLatitude(),
+                userDetails.getLongitude(),
                 roles);
     }
 }

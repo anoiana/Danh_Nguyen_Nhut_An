@@ -79,7 +79,7 @@ const Header = () => {
                             </div>
                             <div className="relative group">
                                 <img
-                                    src={currentUser.avatarUrl || getDefaultAvatar(currentUser.id)}
+                                    src={currentUser.avatarUrl || (currentUser.photos ? currentUser.photos.split(',')[0] : null) || getDefaultAvatar(currentUser.id)}
                                     className="w-11 h-11 rounded-full border-2 border-white shadow-xl cursor-pointer hover:scale-105 transition-transform object-cover"
                                     alt="Profile"
                                 />

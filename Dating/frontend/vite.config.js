@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   define: {
     global: 'window',
+    'process.env': {},
   },
   server: {
     port: 3000,

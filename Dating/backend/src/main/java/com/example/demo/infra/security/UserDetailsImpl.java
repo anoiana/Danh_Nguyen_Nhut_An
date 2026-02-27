@@ -23,6 +23,8 @@ public class UserDetailsImpl implements UserDetails {
     private String avatarUrl;
     private String interests;
     private String photos;
+    private Double latitude;
+    private Double longitude;
 
     @JsonIgnore
     private String password;
@@ -31,6 +33,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public UserDetailsImpl(Long id, String email, String name, String password,
             Integer age, String gender, String bio, String avatarUrl, String interests, String photos,
+            Double latitude, Double longitude,
             Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
@@ -42,6 +45,8 @@ public class UserDetailsImpl implements UserDetails {
         this.avatarUrl = avatarUrl;
         this.interests = interests;
         this.photos = photos;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.authorities = authorities;
     }
 
@@ -59,6 +64,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getAvatarUrl(),
                 user.getInterests(),
                 user.getPhotos(),
+                user.getLatitude(),
+                user.getLongitude(),
                 authorities);
     }
 
@@ -101,6 +108,14 @@ public class UserDetailsImpl implements UserDetails {
 
     public String getPhotos() {
         return photos;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
     }
 
     @Override

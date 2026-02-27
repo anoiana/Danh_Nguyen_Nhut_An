@@ -5,6 +5,7 @@ import com.example.demo.features.user.entity.User;
 import com.example.demo.features.user.service.UserService;
 import com.example.demo.features.user.service.DiscoveryService;
 import com.example.demo.features.user.service.CloudinaryService;
+import com.example.demo.features.scheduling.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class UserController {
     private final UserService userService;
     private final DiscoveryService discoveryService;
     private final CloudinaryService cloudinaryService;
+    private final NotificationService notificationService;
 
     /**
      * Handles profile image uploads to Cloudinary.
@@ -51,9 +53,18 @@ public class UserController {
         user.setAvatarUrl(userDto.getAvatarUrl());
         user.setInterests(userDto.getInterests());
         user.setPhotos(userDto.getPhotos());
+        user.setLatitude(userDto.getLatitude());
+        user.setLongitude(userDto.getLongitude());
 
         User updated = userService.save(user);
-        return ResponseEntity.ok(mapToDto(updated));
+        UserDto result = mapToDto(updated);
+
+        // Broadcast to all users in the feed if the profile is "ready" (has photos)
+        if (result.getPhotos() != null && !result.getPhotos().isEmpty()) {
+            notificationService.broadcastNewUser(result);
+        }
+
+        return ResponseEntity.ok(result);
     }
 
     /**
@@ -96,6 +107,8 @@ public class UserController {
         dto.setAvatarUrl(user.getAvatarUrl());
         dto.setInterests(user.getInterests());
         dto.setPhotos(user.getPhotos());
+        dto.setLatitude(user.getLatitude());
+        dto.setLongitude(user.getLongitude());
         return dto;
     }
 }

@@ -20,6 +20,7 @@ const GlobalMatchPopup = ({ currentUser }) => {
                     id: match.user1Id === currentUser.id ? match.user2Id : match.user1Id,
                     name: match.user1Id === currentUser.id ? match.user2Name : match.user1Name,
                     avatarUrl: match.user1Id === currentUser.id ? match.user2Avatar : match.user1Avatar,
+                    photos: match.user1Id === currentUser.id ? match.user2Photos : match.user1Photos,
                 };
                 setMatchedUser(otherUser);
                 setIsMatchPopupOpen(true);
@@ -79,12 +80,12 @@ const GlobalMatchPopup = ({ currentUser }) => {
 
                             <div className="flex justify-center -space-x-6">
                                 <img
-                                    src={currentUser.avatarUrl || getDefaultAvatar(currentUser.id)}
+                                    src={currentUser.avatarUrl || (currentUser.photos ? currentUser.photos.split(',')[0] : null) || getDefaultAvatar(currentUser.id)}
                                     alt="You"
                                     className="w-24 h-24 rounded-full border-4 border-white shadow-xl object-cover"
                                 />
                                 <img
-                                    src={matchedUser.avatarUrl || getDefaultAvatar(matchedUser.id)}
+                                    src={matchedUser.avatarUrl || (matchedUser.photos ? matchedUser.photos.split(',')[0] : null) || getDefaultAvatar(matchedUser.id)}
                                     alt={matchedUser.name}
                                     className="w-24 h-24 rounded-full border-4 border-white shadow-xl object-cover"
                                 />

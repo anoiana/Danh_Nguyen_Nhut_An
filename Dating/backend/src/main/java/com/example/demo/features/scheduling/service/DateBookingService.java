@@ -72,6 +72,7 @@ public class DateBookingService {
                                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
                 return dateBookingRepository.findByRequesterOrRecipient(user, user)
                                 .stream()
+                                .filter(b -> !"CANCELLED".equals(b.getStatus()) && !"REJECTED".equals(b.getStatus()))
                                 .map(this::convertToDto)
                                 .collect(Collectors.toList());
         }
@@ -235,7 +236,8 @@ public class DateBookingService {
                                 "The booking with " + booking.getRequester().getName() + " has been cancelled.",
                                 "SCHEDULING_CANCELED");
 
-                dateBookingRepository.delete(booking);
+                booking.setStatus("CANCELLED");
+                dateBookingRepository.save(booking);
         }
 
         /**
@@ -303,6 +305,15 @@ public class DateBookingService {
                 dto.setRequesterWantsContact(entity.getRequesterWantsContact());
                 dto.setRecipientWantsContact(entity.getRecipientWantsContact());
                 dto.setContactExchanged(entity.getContactExchanged());
+                dto.setRequesterAvatar(entity.getRequester().getAvatarUrl());
+                dto.setRecipientAvatar(entity.getRecipient().getAvatarUrl());
+
+                // Reveal contact info only after mutual consent
+                if (Boolean.TRUE.equals(entity.getContactExchanged())) {
+                        dto.setRequesterEmail(entity.getRequester().getEmail());
+                        dto.setRecipientEmail(entity.getRecipient().getEmail());
+                }
+
                 return dto;
         }
 }
