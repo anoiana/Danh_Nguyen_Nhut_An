@@ -62,13 +62,18 @@ public class GameController {
     @PostMapping("/start")
     public ResponseEntity<?> startGame(@RequestBody GameDTO.GameStartRequestDTO request) {
         try {
+            System.out.println("Received startGame request: " + request);
             Object session = gameService.startGame(request);
             return ResponseEntity.ok(session);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
+            System.err.println("RuntimeException in startGame: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            String errorMsg = e.getMessage() != null ? e.getMessage() : "Lỗi hệ thống không xác định (RuntimeException)";
+            return ResponseEntity.badRequest().body(errorMsg);
+        } catch (Exception e) {
+            System.err.println("Exception in startGame: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Lỗi máy chủ: " + e.getClass().getSimpleName());
         }
     }
 

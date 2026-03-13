@@ -383,10 +383,15 @@ public class GameService {
         List<Vocabulary> shuffledList = new ArrayList<>(allVocabularies);
         Collections.shuffle(shuffledList);
 
-        List<String> allWords = shuffledList.stream().map(Vocabulary::getWord).collect(Collectors.toList());
+        // Lọc ra danh sách các từ có nội dung hợp lệ để làm đáp án trộn
+        List<String> allWords = shuffledList.stream()
+                .map(Vocabulary::getWord)
+                .filter(w -> w != null && !w.isEmpty())
+                .collect(Collectors.toList());
 
         return shuffledList.stream()
-                .filter(v -> v.getUserDefinedMeaning() != null && !v.getUserDefinedMeaning().isEmpty())
+                .filter(v -> v.getWord() != null && !v.getWord().isEmpty() && 
+                            v.getUserDefinedMeaning() != null && !v.getUserDefinedMeaning().isEmpty())
                 .map(correctVocab -> {
                     List<String> options = new ArrayList<>();
                     options.add(correctVocab.getWord());
@@ -398,29 +403,36 @@ public class GameService {
                     for (int i = 0; i < 3 && i < wrongWords.size(); i++) {
                         options.add(wrongWords.get(i));
                     }
+                    
+                    // Đảm bảo luôn có 4 lựa chọn nếu có thể
+                    while (options.size() < 4 && !wrongWords.isEmpty()) {
+                         // Dự phòng nếu shuffle có vấn đề
+                         options.add(wrongWords.get(0));
+                    }
+                    
                     Collections.shuffle(options);
-            List<String> optionPhonetics = new ArrayList<>();
-            for (String optWord : options) {
-                // Find phonetic for this word from allVocabularies
-                String phonetic = allVocabularies.stream()
-                        .filter(v -> v.getWord().equals(optWord))
-                        .map(Vocabulary::getPhoneticText)
-                        .findFirst()
-                        .orElse("");
-                optionPhonetics.add(phonetic != null ? phonetic : "");
-            }
+                    
+                    List<String> optionPhonetics = new ArrayList<>();
+                    for (String optWord : options) {
+                        String phonetic = allVocabularies.stream()
+                                .filter(v -> optWord.equals(v.getWord()))
+                                .map(Vocabulary::getPhoneticText)
+                                .findFirst()
+                                .orElse("");
+                        optionPhonetics.add(phonetic != null ? phonetic : "");
+                    }
 
-            String partOfSpeech = resolvePartOfSpeech(correctVocab);
-            return new GameDTO.ReverseQuizQuestionDTO(
-                    correctVocab.getId(),
-                    correctVocab.getUserDefinedMeaning(),
-                    correctVocab.getPhoneticText(),
-                    partOfSpeech,
-                    options,
-                    optionPhonetics,
-                    correctVocab.getWord(),
-                    correctVocab.getUserImageBase64());
-        }).collect(Collectors.toList());
+                    String partOfSpeech = resolvePartOfSpeech(correctVocab);
+                    return new GameDTO.ReverseQuizQuestionDTO(
+                            correctVocab.getId(),
+                            correctVocab.getUserDefinedMeaning(),
+                            correctVocab.getPhoneticText(),
+                            partOfSpeech,
+                            options,
+                            optionPhonetics,
+                            correctVocab.getWord(),
+                            correctVocab.getUserImageBase64());
+                }).collect(Collectors.toList());
     }
 
     /**
