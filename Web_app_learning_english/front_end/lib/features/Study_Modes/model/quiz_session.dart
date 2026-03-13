@@ -17,6 +17,26 @@ class QuizQuestionV2 {
     this.userImageBase64,
   });
 
+  QuizQuestionV2 copyWith({
+    int? vocabularyId,
+    String? word,
+    String? phoneticText,
+    String? partOfSpeech,
+    List<String>? options,
+    String? correctAnswer,
+    String? userImageBase64,
+  }) {
+    return QuizQuestionV2(
+      vocabularyId: vocabularyId ?? this.vocabularyId,
+      word: word ?? this.word,
+      phoneticText: phoneticText ?? this.phoneticText,
+      partOfSpeech: partOfSpeech ?? this.partOfSpeech,
+      options: options ?? this.options,
+      correctAnswer: correctAnswer ?? this.correctAnswer,
+      userImageBase64: userImageBase64 ?? this.userImageBase64,
+    );
+  }
+
   factory QuizQuestionV2.fromJson(Map<String, dynamic> json) {
     return QuizQuestionV2(
       vocabularyId: json['vocabularyId'] ?? 0,

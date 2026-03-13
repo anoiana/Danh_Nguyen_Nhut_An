@@ -4,6 +4,7 @@ import '../../../core/base_view_model.dart';
 import '../../Study_Modes/model/quiz_session.dart';
 import '../service/study_mode_service.dart';
 import '../../../api/sound_service.dart';
+import '../../Dictionary/service/dictionary_service.dart';
 
 class QuizViewModel extends BaseViewModel {
   final SoundService _soundService = SoundService();
@@ -44,6 +45,43 @@ class QuizViewModel extends BaseViewModel {
         folderId,
         subType: subType,
       );
+
+      if (_session != null) {
+        // Fetch missing phonetics in parallel
+        final List<Future<QuizQuestionV2>> fetchFutures = [];
+
+        for (int i = 0; i < _session!.questions.length; i++) {
+          final question = _session!.questions[i];
+          if (question.phoneticText == null || question.phoneticText!.isEmpty) {
+            // Determine the English word to look up
+            final String englishWord =
+                subType == 'en_vi' ? question.word : question.correctAnswer;
+
+            fetchFutures.add(() async {
+              try {
+                final results = await DictionaryService.lookupWord(englishWord);
+                if (results.isNotEmpty && results.first.phonetic != null) {
+                  return question.copyWith(
+                    phoneticText: results.first.phonetic,
+                  );
+                }
+              } catch (e) {
+                debugPrint("Error fetching phonetic for $englishWord: $e");
+              }
+              return question;
+            }());
+          } else {
+            fetchFutures.add(Future.value(question));
+          }
+        }
+
+        final updatedQuestions = await Future.wait(fetchFutures);
+        _session = QuizSessionV2(
+          gameResultId: _session!.gameResultId,
+          questions: updatedQuestions,
+        );
+      }
+
       _resetState();
       setBusy(false);
     } catch (e) {

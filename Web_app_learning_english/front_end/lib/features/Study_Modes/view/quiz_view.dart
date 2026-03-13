@@ -377,7 +377,7 @@ class _QuizViewState extends State<QuizView>
             ),
           ),
           const SizedBox(height: 8),
-          if (question.phoneticText != null && widget.subType == 'en_vi')
+          if (question.phoneticText != null)
             Text(
               question.phoneticText!,
               style: TextStyle(
