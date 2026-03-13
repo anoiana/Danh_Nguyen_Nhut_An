@@ -1,6 +1,6 @@
 class AppConstants {
-  // TODO: Change back to Railway URL after deploying the new AI Dictionary endpoint
-  static const String baseUrl = "https://danhnguyennhutan-production.up.railway.app/api";
+  // Render production URL
+  static const String baseUrl = "https://danh-nguyen-nhut-an.onrender.com/api";
   // static const String baseUrl =
-  //     "http://localhost:8080/api"; // localhost for Android emulator
+  //     "http://localhost:8080/api"; // localhost for development
 }
