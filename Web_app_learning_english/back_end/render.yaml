@@ -1,0 +1,21 @@
+# Render Blueprint - Auto-configure deployment
+# Docs: https://docs.render.com/blueprint-spec
+
+services:
+  - type: web
+    name: learning-vocabulary-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # Set manually after creating MySQL
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: PORT
+        value: 8080
