@@ -191,6 +191,7 @@ public class GameService {
             throw new RuntimeException("Cần ít nhất 4 từ vựng trong thư mục để chơi trắc nghiệm.");
         }
         String fullGameType = request.gameType() + (request.subType() != null ? "_" + request.subType() : "");
+        System.out.println("Starting game: " + fullGameType + " for user: " + request.userId());
         GameResult gameResult = gameResultRepository
                 .findByUserIdAndFolderIdAndGameType(request.userId(), request.folderId(), fullGameType)
                 .orElse(new GameResult());
@@ -200,7 +201,15 @@ public class GameService {
         gameResult.setCorrectCount(0);
         gameResult.setWrongCount(0);
         gameResult.setWrongAnswers("[]");
-        GameResult savedGameResult = gameResultRepository.save(gameResult);
+        
+        GameResult savedGameResult;
+        try {
+            savedGameResult = gameResultRepository.save(gameResult);
+        } catch (Exception e) {
+            System.err.println("Error saving game result: " + e.getMessage());
+            throw new RuntimeException("Không thể khởi tạo phiên học. Vui lòng kiểm tra lại tài khoản.");
+        }
+
         if ("quiz".equals(request.gameType())) {
             if ("vi_en".equals(request.subType())) {
                 return new GameDTO.ReverseQuizSessionDTO(savedGameResult.getId(),
