@@ -205,6 +205,9 @@ public class GameService {
         GameResult savedGameResult;
         try {
             savedGameResult = gameResultRepository.save(gameResult);
+            if (savedGameResult == null) {
+                throw new RuntimeException("Lưu kết quả game thất bại (null)");
+            }
         } catch (Exception e) {
             System.err.println("Error saving game result: " + e.getMessage());
             throw new RuntimeException("Không thể khởi tạo phiên học. Vui lòng kiểm tra lại tài khoản.");
@@ -212,10 +215,11 @@ public class GameService {
 
         if ("quiz".equals(request.gameType())) {
             if ("vi_en".equals(request.subType())) {
-                return new GameDTO.ReverseQuizSessionDTO(savedGameResult.getId(),
-                        createReverseQuizQuestions(vocabularies));
+                List<GameDTO.ReverseQuizQuestionDTO> questions = createReverseQuizQuestions(vocabularies);
+                return new GameDTO.ReverseQuizSessionDTO(savedGameResult.getId(), questions);
             } else {
-                return new GameDTO.QuizSessionDTO(savedGameResult.getId(), createQuizQuestions(vocabularies));
+                List<GameDTO.QuizQuestionDTO> questions = createQuizQuestions(vocabularies);
+                return new GameDTO.QuizSessionDTO(savedGameResult.getId(), questions);
             }
         } else {
             List<GameDTO.VocabularyDetailDTO> vocabDTOs = vocabularies.stream()
@@ -416,10 +420,10 @@ public class GameService {
                     for (String optWord : options) {
                         String phonetic = allVocabularies.stream()
                                 .filter(v -> optWord.equals(v.getWord()))
-                                .map(Vocabulary::getPhoneticText)
+                                .map(v -> v.getPhoneticText() != null ? v.getPhoneticText() : "")
                                 .findFirst()
                                 .orElse("");
-                        optionPhonetics.add(phonetic != null ? phonetic : "");
+                        optionPhonetics.add(phonetic);
                     }
 
                     String partOfSpeech = resolvePartOfSpeech(correctVocab);
