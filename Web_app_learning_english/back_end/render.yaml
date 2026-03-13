@@ -1,10 +1,12 @@
 # Render Blueprint - Auto-configure deployment
 # Docs: https://docs.render.com/blueprint-spec
+# NOTE: Root Directory on Render must be set to: Web_app_learning_english/back_end
 
 services:
   - type: web
     name: learning-vocabulary-api
     runtime: docker
+    rootDir: Web_app_learning_english/back_end
     dockerfilePath: ./Dockerfile
     region: singapore
     plan: free
