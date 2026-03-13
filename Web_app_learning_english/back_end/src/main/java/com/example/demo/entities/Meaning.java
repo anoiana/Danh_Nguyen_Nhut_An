@@ -23,9 +23,13 @@ public class Meaning {
     private List<Definition> definitions;
 
     @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "meaning_synonyms", joinColumns = @JoinColumn(name = "meaning_id"))
+    @Column(name = "synonym")
     private List<String> synonyms;
 
     @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "meaning_antonyms", joinColumns = @JoinColumn(name = "meaning_id"))
+    @Column(name = "antonym")
     private List<String> antonyms;
 
     @ManyToOne(fetch = FetchType.LAZY)
