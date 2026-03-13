@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,14 +24,14 @@ public class Meaning {
     private List<Definition> definitions;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "meaning_synonyms", joinColumns = @JoinColumn(name = "meaning_id"))
-    @Column(name = "synonym")
-    private List<String> synonyms;
+    @CollectionTable(name = "meaning_synonym_list", joinColumns = @JoinColumn(name = "meaning_id"))
+    @Column(name = "synonym_word")
+    private List<String> synonyms = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "meaning_antonyms", joinColumns = @JoinColumn(name = "meaning_id"))
-    @Column(name = "antonym")
-    private List<String> antonyms;
+    @CollectionTable(name = "meaning_antonym_list", joinColumns = @JoinColumn(name = "meaning_id"))
+    @Column(name = "antonym_word")
+    private List<String> antonyms = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vocabulary_id", nullable = false)
