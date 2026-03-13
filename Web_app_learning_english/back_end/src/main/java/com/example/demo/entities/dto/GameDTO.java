@@ -48,6 +48,7 @@ public class GameDTO {
                         String phoneticText,
                         String partOfSpeech,
                         List<String> options,
+                        List<String> optionPhonetics,
                         String correctAnswer,
                         String userImageBase64) {
         }
@@ -58,6 +59,7 @@ public class GameDTO {
                         String phoneticText,
                         String partOfSpeech,
                         List<String> options,
+                        List<String> optionPhonetics,
                         String correctAnswer,
                         String userImageBase64) {
         }

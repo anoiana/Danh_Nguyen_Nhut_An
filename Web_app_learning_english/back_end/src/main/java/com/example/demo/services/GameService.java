@@ -352,6 +352,11 @@ public class GameService {
                 options.add(wrongMeanings.get(i));
             }
             Collections.shuffle(options);
+            List<String> optionPhonetics = new ArrayList<>();
+            for (int i = 0; i < options.size(); i++) {
+                optionPhonetics.add(""); // Meanings don't have phonetics
+            }
+
             String partOfSpeech = resolvePartOfSpeech(correctVocab);
             return new GameDTO.QuizQuestionDTO(
                     correctVocab.getId(),
@@ -359,6 +364,7 @@ public class GameService {
                     correctVocab.getPhoneticText(),
                     partOfSpeech,
                     options,
+                    optionPhonetics,
                     correctVocab.getUserDefinedMeaning(),
                     correctVocab.getUserImageBase64());
         }).collect(Collectors.toList());
@@ -384,16 +390,28 @@ public class GameService {
                         options.add(wrongWords.get(i));
                     }
                     Collections.shuffle(options);
-                    String partOfSpeech = resolvePartOfSpeech(correctVocab);
-                    return new GameDTO.ReverseQuizQuestionDTO(
-                            correctVocab.getId(),
-                            correctVocab.getUserDefinedMeaning(),
-                            correctVocab.getPhoneticText(),
-                            partOfSpeech,
-                            options,
-                            correctVocab.getWord(),
-                            correctVocab.getUserImageBase64());
-                }).collect(Collectors.toList());
+            List<String> optionPhonetics = new ArrayList<>();
+            for (String optWord : options) {
+                // Find phonetic for this word from allVocabularies
+                String phonetic = allVocabularies.stream()
+                        .filter(v -> v.getWord().equals(optWord))
+                        .map(Vocabulary::getPhoneticText)
+                        .findFirst()
+                        .orElse("");
+                optionPhonetics.add(phonetic != null ? phonetic : "");
+            }
+
+            String partOfSpeech = resolvePartOfSpeech(correctVocab);
+            return new GameDTO.ReverseQuizQuestionDTO(
+                    correctVocab.getId(),
+                    correctVocab.getUserDefinedMeaning(),
+                    correctVocab.getPhoneticText(),
+                    partOfSpeech,
+                    options,
+                    optionPhonetics,
+                    correctVocab.getWord(),
+                    correctVocab.getUserImageBase64());
+        }).collect(Collectors.toList());
     }
 
     /**
