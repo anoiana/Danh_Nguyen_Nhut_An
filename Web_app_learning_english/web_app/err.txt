@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-13T08:19:57.631+00:00","status":500,"error":"Internal Server Error","path":"/api/vocabularies/folder/3"}

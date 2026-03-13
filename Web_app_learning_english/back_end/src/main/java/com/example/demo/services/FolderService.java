@@ -13,6 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import jakarta.transaction.Transactional;
+import com.example.demo.repositories.VocabularyRepository;
+
 @Service
 public class FolderService {
 
@@ -21,6 +25,12 @@ public class FolderService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private VocabularyRepository vocabularyRepository;
+
+    @Autowired
+    private VocabularyService vocabularyService;
 
     /**
      * Creates a new folder for a user.
@@ -88,15 +98,22 @@ public class FolderService {
     }
 
     /**
-     * Deletes a folder by ID.
+     * Deletes a folder by ID. First removes all associated vocabularies safely.
      *
      * @param folderId The ID of the folder to delete.
      * @return true if deleted, false if not found.
      */
+    @Transactional
     public boolean deleteFolder(Long folderId) {
         if (!folderRepository.existsById(folderId)) {
             return false;
         }
+
+        List<Long> vocabIds = vocabularyRepository.findVocabularyIdsByFolderId(folderId);
+        if (vocabIds != null && !vocabIds.isEmpty()) {
+            vocabularyService.deleteBatchVocabularies(vocabIds);
+        }
+
         folderRepository.deleteById(folderId);
         return true;
     }
