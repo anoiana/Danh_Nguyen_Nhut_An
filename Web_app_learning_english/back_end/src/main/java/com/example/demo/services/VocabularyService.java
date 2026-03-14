@@ -17,9 +17,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @Service
 public class VocabularyService {
@@ -198,5 +202,134 @@ public class VocabularyService {
         }
         vocabularyRepository.saveAll(vocabulariesToMove);
         return vocabulariesToMove.size();
+    }
+
+    /**
+     * Imports vocabularies from an Excel (.xlsx) file into a specific folder.
+     * Expected columns: Word (required), Meaning (required), Part of Speech (optional), Phonetic (optional).
+     *
+     * @param folderId    The target folder ID.
+     * @param inputStream The input stream of the uploaded Excel file.
+     * @return An ImportResultDTO with success/skip counts and error messages.
+     */
+    @Transactional
+    public ImportResultDTO importFromExcel(Long folderId, InputStream inputStream) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found with id: " + folderId));
+
+        long currentCount = vocabularyRepository.countByFolderId(folderId);
+        int totalRows = 0;
+        int successCount = 0;
+        int skippedCount = 0;
+        List<String> errors = new ArrayList<>();
+
+        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            if (sheet == null) {
+                errors.add("File Excel không có sheet nào.");
+                return new ImportResultDTO(0, 0, 0, errors);
+            }
+
+            // Detect header row to find column indices
+            Row headerRow = sheet.getRow(0);
+            if (headerRow == null) {
+                errors.add("File Excel không có dòng tiêu đề.");
+                return new ImportResultDTO(0, 0, 0, errors);
+            }
+
+            int wordCol = -1, meaningCol = -1, posCol = -1, phoneticCol = -1;
+            for (int c = 0; c < headerRow.getLastCellNum(); c++) {
+                String header = getCellStringValue(headerRow.getCell(c)).trim().toLowerCase();
+                if (header.equals("word") || header.equals("từ") || header.equals("từ vựng")
+                        || header.equals("english")) {
+                    wordCol = c;
+                } else if (header.equals("meaning") || header.equals("nghĩa") || header.equals("nghia")
+                        || header.equals("vietnamese") || header.equals("tiếng việt")) {
+                    meaningCol = c;
+                } else if (header.equals("part of speech") || header.equals("pos") || header.equals("loại từ")
+                        || header.equals("loai tu")) {
+                    posCol = c;
+                } else if (header.equals("phonetic") || header.equals("phiên âm") || header.equals("phien am")
+                        || header.equals("pronunciation")) {
+                    phoneticCol = c;
+                }
+            }
+
+            if (wordCol == -1 || meaningCol == -1) {
+                errors.add(
+                        "Không tìm thấy cột 'Word' và/hoặc 'Meaning' trong file Excel. Cần có ít nhất 2 cột: Word, Meaning.");
+                return new ImportResultDTO(0, 0, 0, errors);
+            }
+
+            // Iterate data rows (skip header)
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) {
+                    continue;
+                }
+
+                totalRows++;
+                String word = getCellStringValue(row.getCell(wordCol)).trim();
+                String meaning = getCellStringValue(row.getCell(meaningCol)).trim();
+
+                if (word.isEmpty() || meaning.isEmpty()) {
+                    skippedCount++;
+                    errors.add("Dòng " + (i + 1) + ": Bỏ qua - thiếu 'Word' hoặc 'Meaning'.");
+                    continue;
+                }
+
+                if (currentCount + successCount >= 100) {
+                    skippedCount++;
+                    errors.add("Dòng " + (i + 1) + ": Bỏ qua - thư mục đã đạt giới hạn 100 từ.");
+                    continue;
+                }
+
+                String pos = posCol >= 0 ? getCellStringValue(row.getCell(posCol)).trim() : "";
+                String phonetic = phoneticCol >= 0 ? getCellStringValue(row.getCell(phoneticCol)).trim() : "";
+
+                Vocabulary vocab = new Vocabulary();
+                vocab.setWord(word);
+                vocab.setUserDefinedMeaning(meaning);
+                vocab.setUserDefinedPartOfSpeech(pos.isEmpty() ? null : pos);
+                vocab.setPhoneticText(phonetic.isEmpty() ? null : phonetic);
+                vocab.setFolder(folder);
+                vocab.setMeanings(new ArrayList<>());
+
+                vocabularyRepository.save(vocab);
+                successCount++;
+            }
+        } catch (Exception e) {
+            errors.add("Lỗi khi đọc file Excel: " + e.getMessage());
+        }
+
+        return new ImportResultDTO(totalRows, successCount, skippedCount, errors);
+    }
+
+    /**
+     * Safely extracts a string value from an Excel cell, handling different cell types.
+     */
+    private String getCellStringValue(Cell cell) {
+        if (cell == null)
+            return "";
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                double numVal = cell.getNumericCellValue();
+                if (numVal == Math.floor(numVal)) {
+                    return String.valueOf((long) numVal);
+                }
+                return String.valueOf(numVal);
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                try {
+                    return cell.getStringCellValue();
+                } catch (Exception e) {
+                    return String.valueOf(cell.getNumericCellValue());
+                }
+            default:
+                return "";
+        }
     }
 }

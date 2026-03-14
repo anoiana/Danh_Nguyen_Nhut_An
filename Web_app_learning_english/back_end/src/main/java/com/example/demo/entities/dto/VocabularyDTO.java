@@ -40,4 +40,11 @@ public class VocabularyDTO {
 
         public record BatchMoveRequestDTO(List<Long> vocabularyIds, Long targetFolderId) {
         }
+
+        public record ImportResultDTO(
+                        int totalRows,
+                        int successCount,
+                        int skippedCount,
+                        List<String> errors) {
+        }
 }

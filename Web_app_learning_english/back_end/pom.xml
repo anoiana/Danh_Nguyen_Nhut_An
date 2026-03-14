@@ -69,6 +69,13 @@
 			<version>4.12.0</version> <!-- Đây là một phiên bản ổn định và phổ biến -->
 		</dependency>
 
+		<!-- Apache POI for reading Excel files -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.5</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

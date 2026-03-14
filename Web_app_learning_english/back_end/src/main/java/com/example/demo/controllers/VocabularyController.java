@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/vocabularies")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -83,6 +83,25 @@ public class VocabularyController {
             return ResponseEntity.ok("Successfully moved " + count + " vocabularies.");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/import/{folderId}")
+    public ResponseEntity<?> importFromExcel(
+            @PathVariable Long folderId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("File is empty.");
+            }
+            String filename = file.getOriginalFilename();
+            if (filename == null || !filename.toLowerCase().endsWith(".xlsx")) {
+                return ResponseEntity.badRequest().body("Only .xlsx files are supported.");
+            }
+            ImportResultDTO result = vocabularyService.importFromExcel(folderId, file.getInputStream());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Import failed: " + e.getMessage());
         }
     }
 }
