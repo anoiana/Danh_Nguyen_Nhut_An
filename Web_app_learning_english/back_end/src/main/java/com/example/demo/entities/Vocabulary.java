@@ -38,6 +38,12 @@ public class Vocabulary {
 
     private String userDefinedPartOfSpeech;
 
+    @Column(columnDefinition = "TEXT")
+    private String example;
+
+    @Column(columnDefinition = "TEXT")
+    private String englishMeaning;
+
     @Column(columnDefinition = "LONGTEXT")
     private String userImageBase64;
 }

@@ -26,9 +26,7 @@ public class GrammarService {
             return aiGrammarService.analyzeSentence(text);
         } catch (IOException e) {
             e.printStackTrace();
-            List<String> errors = new ArrayList<>();
-            errors.add("Không thể kiểm tra ngữ pháp lúc này do lỗi hệ thống.");
-            return new AiGrammarService.GrammarAnalysisResult(true, errors, null);
+            return new AiGrammarService.GrammarAnalysisResult(false, "Không thể kiểm tra ngữ pháp lúc này do lỗi hệ thống.", null);
         }
     }
 }

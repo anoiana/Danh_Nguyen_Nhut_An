@@ -299,17 +299,11 @@ public class GameService {
         AiGrammarService.GrammarAnalysisResult analysisResult = grammarService
                 .analyze(userAnswer);
 
-        if (!analysisResult.isCompleteSentence()) {
-            return new GameDTO.SentenceCheckResponseDTO(false,
-                    "Đây dường như không phải là một câu hoàn chỉnh. Một câu cần có động từ.", null);
+        if (!analysisResult.isCorrect()) {
+            return new GameDTO.SentenceCheckResponseDTO(false, analysisResult.feedback(), analysisResult.correctedSentence());
         }
-        if (analysisResult.errors() != null && !analysisResult.errors().isEmpty()) {
-            String feedback = "Câu có vẻ đúng cấu trúc nhưng vẫn còn lỗi ngữ pháp. Gợi ý: "
-                    + analysisResult.errors().get(0);
-            return new GameDTO.SentenceCheckResponseDTO(false, feedback, analysisResult.correctedSentence());
-        }
-        return new GameDTO.SentenceCheckResponseDTO(true, "Tuyệt vời! Câu của bạn rất hay.",
-                analysisResult.correctedSentence());
+        
+        return new GameDTO.SentenceCheckResponseDTO(true, analysisResult.feedback(), analysisResult.correctedSentence());
     }
 
     // --- Private Helper Methods ---

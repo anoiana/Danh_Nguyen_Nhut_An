@@ -93,26 +93,8 @@ public class GameController {
     @PostMapping("/check-sentence")
     public ResponseEntity<?> checkWritingSentence(@RequestBody GameDTO.SentenceCheckRequestDTO request) {
         try {
-            // Use GrammarService to analyze the sentence
-            AiGrammarService.GrammarAnalysisResult analysisResult = grammarService.analyze(request.userAnswer());
-
-            boolean isCorrect = analysisResult.isCompleteSentence()
-                    && (analysisResult.errors() == null || analysisResult.errors().isEmpty());
-            String corrected = analysisResult.correctedSentence();
-            String feedback;
-
-            // Combine errors into feedback
-            if (analysisResult.errors() != null && !analysisResult.errors().isEmpty()) {
-                feedback = "Errors: " + String.join("; ", analysisResult.errors());
-            } else if (!analysisResult.isCompleteSentence()) {
-                feedback = "Sentence is incomplete.";
-            } else {
-                feedback = "Sentence is grammatically correct and complete.";
-            }
-
-            GameDTO.SentenceCheckResponseDTO response = new GameDTO.SentenceCheckResponseDTO(isCorrect, feedback,
-                    corrected);
-
+            // Use GameService to check sentence (includes keyword validation and AI grammar check)
+            GameDTO.SentenceCheckResponseDTO response = gameService.checkWritingSentence(request);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

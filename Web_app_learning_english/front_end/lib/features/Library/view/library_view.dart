@@ -154,11 +154,12 @@ class _LibraryViewState extends State<LibraryView> {
                 final folderName = folderNameController.text.trim();
                 if (folderName.isNotEmpty) {
                   Navigator.of(context).pop();
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
                   setState(() => _isGlobalLoading = true);
                   try {
                     bool success = await _viewModel.createFolder(folderName);
                     if (success && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      scaffoldMessenger.showSnackBar(
                         const SnackBar(
                           content: Text('Tạo thư mục thành công!'),
                         ),
@@ -216,6 +217,7 @@ class _LibraryViewState extends State<LibraryView> {
                 final newName = editController.text.trim();
                 if (newName.isNotEmpty && newName != folder.name) {
                   Navigator.of(context).pop();
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
                   setState(() => _isGlobalLoading = true);
                   try {
                     bool success = await _viewModel.updateFolder(
@@ -223,7 +225,7 @@ class _LibraryViewState extends State<LibraryView> {
                       newName,
                     );
                     if (success && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      scaffoldMessenger.showSnackBar(
                         const SnackBar(content: Text('Cập nhật thành công!')),
                       );
                     }
@@ -271,11 +273,12 @@ class _LibraryViewState extends State<LibraryView> {
               label: const Text('Xóa'),
               onPressed: () async {
                 Navigator.of(context).pop();
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
                 setState(() => _isGlobalLoading = true);
                 try {
                   bool success = await _viewModel.deleteFolder(folderId);
                   if (success && mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    scaffoldMessenger.showSnackBar(
                       const SnackBar(content: Text('Đã xóa thư mục.')),
                     );
                   }

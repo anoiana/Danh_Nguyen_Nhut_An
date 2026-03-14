@@ -206,7 +206,8 @@ public class VocabularyService {
 
     /**
      * Imports vocabularies from an Excel (.xlsx) file into a specific folder.
-     * Expected columns: Word (required), Meaning (required), Part of Speech (optional), Phonetic (optional).
+     * Expected columns: Word (required), Meaning (required), Part of Speech
+     * (optional), Phonetic (optional).
      *
      * @param folderId    The target folder ID.
      * @param inputStream The input stream of the uploaded Excel file.
@@ -237,7 +238,7 @@ public class VocabularyService {
                 return new ImportResultDTO(0, 0, 0, errors);
             }
 
-            int wordCol = -1, meaningCol = -1, posCol = -1, phoneticCol = -1;
+            int wordCol = -1, meaningViCol = -1, meaningEnCol = -1, posCol = -1, phoneticCol = -1, exampleCol = -1;
             List<String> foundHeaders = new ArrayList<>();
             for (int c = 0; c < headerRow.getLastCellNum(); c++) {
                 String header = getCellStringValue(headerRow.getCell(c)).trim().toLowerCase();
@@ -246,41 +247,64 @@ public class VocabularyService {
                         || header.equals("english") || header.contains("word") || header.contains("english")
                         || header.contains("từ vựng") || header.contains("tu vung"))) {
                     wordCol = c;
-                } else if (meaningCol == -1 && (header.equals("meaning") || header.equals("nghĩa") || header.equals("nghia")
-                        || header.equals("vietnamese") || header.equals("tiếng việt")
-                        || header.contains("meaning") || header.contains("nghĩa") || header.contains("nghia")
-                        || header.contains("vietnamese") || header.contains("việt"))) {
-                    meaningCol = c;
-                } else if (posCol == -1 && (header.equals("part of speech") || header.equals("pos") || header.equals("loại từ")
+                } else if (meaningEnCol == -1 && (header.equals("english meaning") || header.equals("nghĩa tiếng anh")
+                        || header.equals("nghia tieng anh")
+                        || header.contains("english meaning") || header.contains("nghĩa tiếng anh")
+                        || header.contains("nghĩa anh") || header.contains("meaning in english")
+                        || header.equals("tiếng anh"))) {
+                    meaningEnCol = c;
+                } else if (meaningViCol == -1
+                        && (header.equals("meaning") || header.equals("nghĩa") || header.equals("nghia")
+                                || header.equals("vietnamese meaning") || header.equals("nghĩa tiếng việt")
+                                || header.equals("tiếng việt") || header.equals("nghia tieng viet")
+                                || header.contains("meaning") || header.contains("nghĩa") || header.contains("nghia")
+                                || header.contains("vietnamese") || header.contains("việt"))) {
+                    meaningViCol = c;
+                } else if (posCol == -1 && (header.equals("part of speech") || header.equals("pos")
+                        || header.equals("loại từ")
                         || header.equals("loai tu") || header.contains("part of speech") || header.contains("pos")
                         || header.contains("loại từ") || header.contains("loai tu") || header.contains("type"))) {
                     posCol = c;
-                } else if (phoneticCol == -1 && (header.equals("phonetic") || header.equals("phiên âm") || header.equals("phien am")
+                } else if (phoneticCol == -1 && (header.equals("phonetic") || header.equals("phiên âm")
+                        || header.equals("phien am")
                         || header.equals("pronunciation") || header.contains("phonetic") || header.contains("phiên âm")
                         || header.contains("phien am") || header.contains("pronunciation") || header.contains("ipa"))) {
                     phoneticCol = c;
+                } else if (exampleCol == -1
+                        && (header.equals("example") || header.equals("ví dụ") || header.equals("vi du")
+                                || header.contains("example") || header.contains("ví dụ") || header.contains("vi du")
+                                || header.contains("câu mẫu"))) {
+                    exampleCol = c;
                 }
             }
 
-            // Fallback: if no Word/Meaning columns found, assume positional order
-            if (wordCol == -1 || meaningCol == -1) {
+            // Fallback: if no Word/Meaning(vi) columns found, assume positional order
+            if (wordCol == -1 || meaningViCol == -1) {
                 int totalCols = headerRow.getLastCellNum();
                 if (totalCols >= 2) {
-                    // Auto-assign: col 0 = word, col 1 = meaning, col 2 = pos, col 3 = phonetic
+                    // Auto-assign: col 0 = word, col 1 = meaning(vi), col 2 = pos, col 3 =
+                    // phonetic, col 4 = example
                     wordCol = 0;
-                    meaningCol = 1;
-                    if (totalCols >= 3) posCol = 2;
-                    if (totalCols >= 4) phoneticCol = 3;
-                    errors.add("Không nhận diện được header, tự gán: Cột 1=Word, Cột 2=Meaning. Dòng đầu tiên cũng sẽ được import.");
+                    meaningViCol = 1;
+                    if (totalCols >= 3)
+                        posCol = 2;
+                    if (totalCols >= 4)
+                        phoneticCol = 3;
+                    if (totalCols >= 5)
+                        exampleCol = 4;
+                    errors.add(
+                            "Không nhận diện được header, tự gán: Cột 1=Word, Cột 2=Meaning(vi). Dòng đầu tiên cũng sẽ được import.");
                     // Since no header was recognized, treat row 0 as data too
                     // We'll handle this by starting from row 0 instead of row 1
                 } else {
-                    errors.add("Không tìm thấy cột 'Word' và/hoặc 'Meaning'. Đã tìm thấy header: [" + String.join(", ", foundHeaders) + "]. Cần có ít nhất 2 cột.");
+                    errors.add("Không tìm thấy cột 'Word' và/hoặc 'Meaning'. Đã tìm thấy header: ["
+                            + String.join(", ", foundHeaders) + "]. Cần có ít nhất 2 cột.");
                     return new ImportResultDTO(0, 0, 0, errors);
                 }
             }
 
-            // Determine start row (skip header if headers were recognized, include row 0 if fallback)
+            // Determine start row (skip header if headers were recognized, include row 0 if
+            // fallback)
             int startRow = (errors.isEmpty()) ? 1 : 0;
 
             // Iterate data rows (skip header if recognized)
@@ -292,11 +316,11 @@ public class VocabularyService {
 
                 totalRows++;
                 String word = getCellStringValue(row.getCell(wordCol)).trim();
-                String meaning = getCellStringValue(row.getCell(meaningCol)).trim();
+                String meaningVi = getCellStringValue(row.getCell(meaningViCol)).trim();
 
-                if (word.isEmpty() || meaning.isEmpty()) {
+                if (word.isEmpty() || meaningVi.isEmpty()) {
                     skippedCount++;
-                    errors.add("Dòng " + (i + 1) + ": Bỏ qua - thiếu 'Word' hoặc 'Meaning'.");
+                    errors.add("Dòng " + (i + 1) + ": Bỏ qua - thiếu 'Word' hoặc 'Meaning' (Việt).");
                     continue;
                 }
 
@@ -306,14 +330,18 @@ public class VocabularyService {
                     continue;
                 }
 
+                String meaningEn = meaningEnCol >= 0 ? getCellStringValue(row.getCell(meaningEnCol)).trim() : "";
                 String pos = posCol >= 0 ? getCellStringValue(row.getCell(posCol)).trim() : "";
                 String phonetic = phoneticCol >= 0 ? getCellStringValue(row.getCell(phoneticCol)).trim() : "";
+                String example = exampleCol >= 0 ? getCellStringValue(row.getCell(exampleCol)).trim() : "";
 
                 Vocabulary vocab = new Vocabulary();
                 vocab.setWord(word);
-                vocab.setUserDefinedMeaning(meaning);
+                vocab.setUserDefinedMeaning(meaningVi);
+                vocab.setEnglishMeaning(meaningEn.isEmpty() ? null : meaningEn);
                 vocab.setUserDefinedPartOfSpeech(pos.isEmpty() ? null : pos);
                 vocab.setPhoneticText(phonetic.isEmpty() ? null : phonetic);
+                vocab.setExample(example.isEmpty() ? null : example);
                 vocab.setFolder(folder);
                 vocab.setMeanings(new ArrayList<>());
 
@@ -328,7 +356,8 @@ public class VocabularyService {
     }
 
     /**
-     * Safely extracts a string value from an Excel cell, handling different cell types.
+     * Safely extracts a string value from an Excel cell, handling different cell
+     * types.
      */
     private String getCellStringValue(Cell cell) {
         if (cell == null)

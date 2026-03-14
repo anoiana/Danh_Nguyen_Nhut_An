@@ -368,13 +368,40 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
                           if (vocab.userDefinedMeaning != null &&
                               vocab.userDefinedMeaning!.isNotEmpty) ...[
                             _buildSectionHeader(
-                              'Nghĩa của bạn',
-                              Icons.lightbulb_outline_rounded,
+                              'Nghĩa Tiếng Việt',
+                              Icons.g_translate_rounded,
                               isLargeScreen,
                             ),
                             _buildUserMeaning(
                               vocab.userDefinedMeaning!,
                               viewModel,
+                              color: accentPink,
+                            ),
+                          ],
+                          if (vocab.englishMeaning != null &&
+                              vocab.englishMeaning!.isNotEmpty) ...[
+                            _buildSectionHeader(
+                              'Nghĩa Tiếng Anh',
+                              Icons.language_rounded,
+                              isLargeScreen,
+                            ),
+                            _buildUserMeaning(
+                              vocab.englishMeaning!,
+                              viewModel,
+                              color: Colors.blueAccent,
+                            ),
+                          ],
+                          if (vocab.example != null &&
+                              vocab.example!.isNotEmpty) ...[
+                            _buildSectionHeader(
+                              'Câu ví dụ',
+                              Icons.format_quote_rounded,
+                              isLargeScreen,
+                            ),
+                            _buildUserMeaning(
+                              vocab.example!,
+                              viewModel,
+                              color: Colors.deepPurpleAccent,
                             ),
                           ],
                           if (vocab.meanings != null &&
@@ -434,16 +461,18 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
 
   Widget _buildUserMeaning(
     String meaning,
-    VocabularyDetailViewModel viewModel,
-  ) {
+    VocabularyDetailViewModel viewModel, {
+    Color? color,
+  }) {
+    final themeColor = color ?? accentPink;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.only(top: 8.0),
       decoration: BoxDecoration(
-        color: accentPink.withOpacity(0.1),
+        color: themeColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: accentPink.withOpacity(0.3)),
+        border: Border.all(color: themeColor.withOpacity(0.3)),
       ),
       child: SelectableText(
         '"$meaning"',
@@ -451,7 +480,7 @@ class _VocabularyDetailViewState extends State<VocabularyDetailView> {
         style: TextStyle(
           fontSize: 18,
           fontStyle: FontStyle.italic,
-          color: primaryPink.withOpacity(0.9),
+          color: themeColor.withOpacity(0.9),
           fontWeight: FontWeight.w500,
         ),
         contextMenuBuilder:

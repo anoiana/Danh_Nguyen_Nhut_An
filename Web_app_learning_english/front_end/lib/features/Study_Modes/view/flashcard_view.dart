@@ -822,18 +822,96 @@ class _FlashcardViewState extends State<FlashcardView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (vocab.userDefinedMeaning != null)
+                  if (vocab.userDefinedMeaning != null &&
+                      vocab.userDefinedMeaning!.isNotEmpty) ...[
+                    Row(
+                      children: [
+                        Icon(Icons.g_translate_rounded,
+                            size: 16, color: Colors.pink.shade300),
+                        const SizedBox(width: 8),
+                        const Text('Tiếng Việt',
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
                     Text(
                       vocab.userDefinedMeaning!,
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w600,
-                        color:
-                            Theme.of(context).textTheme.bodyLarge?.color ??
+                        color: Theme.of(context).textTheme.bodyLarge?.color ??
                             const Color(0xFF333333),
                         height: 1.3,
                       ),
                     ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (vocab.englishMeaning != null &&
+                      vocab.englishMeaning!.isNotEmpty) ...[
+                    Row(
+                      children: [
+                        Icon(Icons.language_rounded,
+                            size: 16, color: Colors.blue.shade300),
+                        const SizedBox(width: 8),
+                        const Text('English',
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      vocab.englishMeaning!,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        fontStyle: FontStyle.italic,
+                        color: Theme.of(context).colorScheme.primary,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (vocab.example != null && vocab.example!.isNotEmpty) ...[
+                    Row(
+                      children: [
+                        Icon(Icons.format_quote_rounded,
+                            size: 16, color: Colors.purple.shade300),
+                        const SizedBox(width: 8),
+                        const Text('Ví dụ',
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.purple.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.purple.withOpacity(0.1)),
+                      ),
+                      child: Text(
+                        vocab.example!,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.color
+                              ?.withOpacity(0.8),
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                   const SizedBox(height: 24),
                   if (vocab.meanings != null)
                     ...vocab.meanings!.map(

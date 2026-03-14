@@ -7,6 +7,8 @@ class Vocabulary {
   final String? phoneticText;
   final String? audioUrl;
   final String? userDefinedMeaning;
+  final String? englishMeaning;
+  final String? example;
   final String? userDefinedPartOfSpeech;
   final String? userImageBase64;
   final List<Meaning>? meanings;
@@ -18,6 +20,8 @@ class Vocabulary {
     this.phoneticText,
     this.audioUrl,
     this.userDefinedMeaning,
+    this.englishMeaning,
+    this.example,
     this.userDefinedPartOfSpeech,
     this.userImageBase64,
     this.meanings,
@@ -40,6 +44,8 @@ class Vocabulary {
       phoneticText: json['phoneticText'],
       audioUrl: json['audioUrl'],
       userDefinedMeaning: json['userDefinedMeaning'],
+      englishMeaning: json['englishMeaning'],
+      example: json['example'],
       userDefinedPartOfSpeech: json['userDefinedPartOfSpeech'],
       userImageBase64: json['userImageBase64'],
       meanings: meanings,

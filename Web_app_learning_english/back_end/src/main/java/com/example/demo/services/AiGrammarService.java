@@ -28,14 +28,14 @@ public class AiGrammarService {
             .readTimeout(60, TimeUnit.SECONDS)
             .build();
 
-    public record GrammarAnalysisResult(boolean isCompleteSentence, List<String> errors, String correctedSentence) {
+    public record GrammarAnalysisResult(boolean isCorrect, String feedback, String correctedSentence) {
     }
 
     /**
      * Analyzes a sentence for completeness and grammar mistakes using AI.
      *
      * @param sentence The sentence to check.
-     * @return An AnalysisResult containing completeness status, list of errors, and
+     * @return An AnalysisResult containing completeness status, feedback, and
      *         corrected sentence.
      * @throws IOException If the API interaction fails.
      */
@@ -49,14 +49,14 @@ public class AiGrammarService {
         ArrayNode messages = payload.putArray("messages");
         ObjectNode systemMessage = messages.addObject();
         systemMessage.put("role", "system");
-        systemMessage.put("content", "You are an expert English grammar assistant. Check the provided text. " +
-                "1. Determine if it is a complete English sentence (has subject and verb, makes sense mainly). " +
-                "2. Identify any grammar or severe spelling mistakes. " +
-                "3. Provide a corrected version of the sentence if there are errors. " +
+        systemMessage.put("content", "You are a friendly and helpful English teacher. Check the student's English sentence. " +
+                "1. If the sentence is perfectly correct grammatically and makes logical sense, set 'isCorrect' to true. " +
+                "2. If correct, write a short, encouraging praise in the 'feedback' using basic English. " +
+                "3. If the sentence has grammar, vocabulary, spelling mistakes, or is incomplete, set 'isCorrect' to false. " +
+                "4. If there are mistakes, explain them clearly in the 'feedback' using VERY BASIC ENGLISH so a beginner can understand easily. Give helpful advice. " +
+                "5. If there are mistakes, provide a perfectly grammatical and natural 'correctedSentence'. " +
                 "Respond ONLY with a valid JSON object in this format: " +
-                "{ \"isCompleteSentence\": boolean, \"errors\": [\"string error 1\", \"string error 2\"], \"correctedSentence\": \"string\" }. "
-                +
-                "If correct and complete, \"errors\" should be empty and \"correctedSentence\" should be null or the original sentence.");
+                "{ \"isCorrect\": boolean, \"feedback\": \"string\", \"correctedSentence\": \"string\" }.");
 
         ObjectNode userMessage = messages.addObject();
         userMessage.put("role", "user");
@@ -90,20 +90,14 @@ public class AiGrammarService {
             String contentString = choices.get(0).path("message").path("content").asText();
             JsonNode contentJson = objectMapper.readTree(contentString);
 
-            boolean isComplete = contentJson.path("isCompleteSentence").asBoolean(false);
-            List<String> errors = new java.util.ArrayList<>();
-            JsonNode errorNode = contentJson.path("errors");
-            if (errorNode.isArray()) {
-                for (JsonNode error : errorNode) {
-                    errors.add(error.asText());
-                }
-            }
+            boolean isCorrect = contentJson.path("isCorrect").asBoolean(false);
+            String feedback = contentJson.has("feedback") ? contentJson.get("feedback").asText() : "";
             String correctedSentence = contentJson.has("correctedSentence")
                     && !contentJson.get("correctedSentence").isNull()
                             ? contentJson.get("correctedSentence").asText()
                             : null;
 
-            return new GrammarAnalysisResult(isComplete, errors, correctedSentence);
+            return new GrammarAnalysisResult(isCorrect, feedback, correctedSentence);
         }
     }
 }
