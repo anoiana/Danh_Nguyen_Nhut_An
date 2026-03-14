@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import '../model/vocabulary.dart';
 import '../view_model/vocabulary_view_model.dart';
 import '../../Study_Modes/view/study_mode_selection_view.dart';
@@ -346,6 +347,169 @@ class _VocabularyListViewState extends State<VocabularyListView> {
     }
   }
 
+  Future<void> _showImportExcelDialog() async {
+    // 1. Pick file
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+    );
+
+    if (result == null || result.files.isEmpty) return;
+    final file = result.files.first;
+    final filePath = file.path;
+
+    if (filePath == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Không thể đọc file. Hãy thử lại.')),
+        );
+      }
+      return;
+    }
+
+    // 2. Show loading dialog
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              const CustomLoadingWidget(color: primaryPink, size: 50),
+              const SizedBox(height: 20),
+              Text(
+                'Đang import "${file.name}"...',
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Vui lòng đợi',
+                style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // 3. Call API
+    final importResult = await _viewModel.importFromExcel(filePath);
+
+    // 4. Close loading dialog
+    if (mounted) Navigator.of(context).pop();
+
+    // 5. Show result dialog
+    if (!mounted) return;
+    final totalRows = importResult['totalRows'] ?? 0;
+    final successCount = importResult['successCount'] ?? 0;
+    final skippedCount = importResult['skippedCount'] ?? 0;
+    final errors = (importResult['errors'] as List<dynamic>?)?.cast<String>() ?? [];
+    final hasSuccess = successCount > 0;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(
+              hasSuccess ? Icons.check_circle_rounded : Icons.error_rounded,
+              color: hasSuccess ? Colors.green : Colors.red,
+              size: 28,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              hasSuccess ? 'Import thành công!' : 'Import thất bại',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Stats row
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: hasSuccess
+                    ? Colors.green.withOpacity(0.08)
+                    : Colors.red.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatColumn('Tổng', totalRows, Colors.blue),
+                  _buildStatColumn('Thành công', successCount, Colors.green),
+                  _buildStatColumn('Bỏ qua', skippedCount, Colors.orange),
+                ],
+              ),
+            ),
+            // Error details
+            if (errors.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '⚠️ Chi tiết (${errors.length} thông báo):',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ),
+              const SizedBox(height: 6),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 120),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: errors.map((e) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        '• $e',
+                        style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                      ),
+                    )).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Đóng'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatColumn(String label, int value, Color color) {
+    return Column(
+      children: [
+        Text(
+          '$value',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -454,6 +618,11 @@ class _VocabularyListViewState extends State<VocabularyListView> {
       ),
       actions: [
         if (!_viewModel.isSelectionMode) ...[
+          IconButton(
+            icon: const Icon(Icons.upload_file_rounded, color: Colors.white),
+            tooltip: 'Import Excel',
+            onPressed: _showImportExcelDialog,
+          ),
           IconButton(
             icon: const Icon(Icons.checklist, color: Colors.white),
             onPressed: _viewModel.toggleSelectionMode,

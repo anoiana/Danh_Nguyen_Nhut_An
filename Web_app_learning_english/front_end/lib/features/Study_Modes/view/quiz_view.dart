@@ -207,16 +207,22 @@ class _QuizViewState extends State<QuizView>
                               _buildQuestionCard(question),
                               const SizedBox(height: 40),
 
-                              // Options
-                              ...question.options.map(
-                                (opt) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: _buildOptionButton(
-                                    opt,
-                                    question.correctAnswer,
-                                  ),
-                                ),
-                              ),
+                               // Options
+                               ...List.generate(question.options.length, (index) {
+                                 final opt = question.options[index];
+                                 final optPhonetic = (question.optionPhonetics != null && index < question.optionPhonetics!.length)
+                                     ? question.optionPhonetics![index]
+                                     : null;
+                                 
+                                 return Padding(
+                                   padding: const EdgeInsets.only(bottom: 16),
+                                   child: _buildOptionButton(
+                                     opt,
+                                     question.correctAnswer,
+                                     phonetic: optPhonetic,
+                                   ),
+                                 );
+                               }),
                             ],
                           ),
                         ),
@@ -377,7 +383,8 @@ class _QuizViewState extends State<QuizView>
             ),
           ),
           const SizedBox(height: 8),
-          if (question.phoneticText != null)
+          // Phonetic hidden from card as requested
+          /*if (question.phoneticText != null)
             Text(
               question.phoneticText!,
               style: TextStyle(
@@ -385,7 +392,7 @@ class _QuizViewState extends State<QuizView>
                 color: Colors.grey[600],
                 fontStyle: FontStyle.italic,
               ),
-            ),
+            ),*/
           if (question.partOfSpeech != null &&
               question.partOfSpeech!.isNotEmpty)
             Padding(
@@ -428,7 +435,7 @@ class _QuizViewState extends State<QuizView>
     );
   }
 
-  Widget _buildOptionButton(String option, String correctAnswer) {
+  Widget _buildOptionButton(String option, String correctAnswer, {String? phonetic}) {
     bool isSelected = option == _viewModel.selectedAnswer;
     bool isCorrect = option == correctAnswer;
 
@@ -493,13 +500,27 @@ class _QuizViewState extends State<QuizView>
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    option,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        option,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                      ),
+                      if (phonetic != null && phonetic.isNotEmpty)
+                        Text(
+                          phonetic,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: textColor.withOpacity(0.7),
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 if (icon != null) Icon(icon, color: iconColor, size: 28),

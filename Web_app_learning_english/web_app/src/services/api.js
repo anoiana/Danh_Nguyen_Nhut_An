@@ -1,4 +1,6 @@
-const BASE_URL = 'https://danh-nguyen-nhut-an.onrender.com/api';
+const BASE_URL = import.meta.env.DEV 
+    ? 'http://localhost:8080/api' 
+    : 'https://danh-nguyen-nhut-an.onrender.com/api';
 
 // Helper for API calls
 async function request(url, options = {}) {
@@ -70,6 +72,19 @@ export const vocabAPI = {
             method: 'POST',
             body: JSON.stringify({ vocabularyIds }),
         }),
+    importExcel: async (folderId, file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch(`${BASE_URL}/vocabularies/import/${folderId}`, {
+            method: 'POST',
+            body: formData,
+        });
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || `HTTP ${res.status}`);
+        }
+        return res.json();
+    },
 };
 
 // Translation

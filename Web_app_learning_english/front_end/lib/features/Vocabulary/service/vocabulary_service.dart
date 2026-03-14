@@ -175,4 +175,20 @@ class VocabularyService {
       throw Exception('Failed to move vocabularies: ${response.body}');
     }
   }
+
+  /// Import vocabularies from Excel file
+  static Future<Map<String, dynamic>> importExcel(int folderId, String filePath) async {
+    final url = Uri.parse('$_baseUrl/vocabularies/import/$folderId');
+    final request = http.MultipartRequest('POST', url);
+    request.files.add(await http.MultipartFile.fromPath('file', filePath));
+
+    final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+    } else {
+      throw Exception('Import failed: ${response.body}');
+    }
+  }
 }

@@ -4,6 +4,7 @@ class QuizQuestionV2 {
   final String? phoneticText;
   final String? partOfSpeech;
   final List<String> options;
+  final List<String>? optionPhonetics;
   final String correctAnswer;
   final String? userImageBase64;
 
@@ -13,6 +14,7 @@ class QuizQuestionV2 {
     this.phoneticText,
     this.partOfSpeech,
     required this.options,
+    this.optionPhonetics,
     required this.correctAnswer,
     this.userImageBase64,
   });
@@ -23,6 +25,7 @@ class QuizQuestionV2 {
     String? phoneticText,
     String? partOfSpeech,
     List<String>? options,
+    List<String>? optionPhonetics,
     String? correctAnswer,
     String? userImageBase64,
   }) {
@@ -32,6 +35,7 @@ class QuizQuestionV2 {
       phoneticText: phoneticText ?? this.phoneticText,
       partOfSpeech: partOfSpeech ?? this.partOfSpeech,
       options: options ?? this.options,
+      optionPhonetics: optionPhonetics ?? this.optionPhonetics,
       correctAnswer: correctAnswer ?? this.correctAnswer,
       userImageBase64: userImageBase64 ?? this.userImageBase64,
     );
@@ -45,6 +49,9 @@ class QuizQuestionV2 {
       partOfSpeech: json['partOfSpeech'],
       options:
           (json['options'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      optionPhonetics: (json['optionPhonetics'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
       correctAnswer: json['correctAnswer'] ?? "",
       userImageBase64: json['userImageBase64'],
     );
@@ -74,6 +81,7 @@ class QuizQuestion {
   final String? phoneticText;
   final String? partOfSpeech;
   final List<String> options;
+  final List<String>? optionPhonetics;
   final String correctAnswer;
   final String? userImageBase64;
 
@@ -83,6 +91,7 @@ class QuizQuestion {
     this.phoneticText,
     this.partOfSpeech,
     required this.options,
+    this.optionPhonetics,
     required this.correctAnswer,
     this.userImageBase64,
   });
@@ -94,6 +103,9 @@ class QuizQuestion {
       phoneticText: json['phoneticText'],
       partOfSpeech: json['partOfSpeech'],
       options: List<String>.from(json['options']),
+      optionPhonetics: (json['optionPhonetics'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
       correctAnswer: json['correctAnswer'],
       userImageBase64: json['userImageBase64'],
     );
@@ -106,6 +118,7 @@ class ReverseQuizQuestion {
   final String? phoneticText;
   final String? partOfSpeech;
   final List<String> options;
+  final List<String>? optionPhonetics;
   final String correctAnswer;
   final String? userImageBase64;
 
@@ -115,6 +128,7 @@ class ReverseQuizQuestion {
     this.phoneticText,
     this.partOfSpeech,
     required this.options,
+    this.optionPhonetics,
     required this.correctAnswer,
     this.userImageBase64,
   });
@@ -126,6 +140,9 @@ class ReverseQuizQuestion {
       phoneticText: json['phoneticText'],
       partOfSpeech: json['partOfSpeech'],
       options: List<String>.from(json['options']),
+      optionPhonetics: (json['optionPhonetics'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
       correctAnswer: json['correctAnswer'],
       userImageBase64: json['userImageBase64'],
     );

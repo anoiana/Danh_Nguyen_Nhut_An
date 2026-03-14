@@ -186,4 +186,24 @@ class VocabularyViewModel extends BaseViewModel {
       return false;
     }
   }
+
+  /// Import vocabularies from Excel file
+  Future<Map<String, dynamic>> importFromExcel(String filePath) async {
+    try {
+      final result = await VocabularyService.importExcel(_folderId, filePath);
+      final successCount = result['successCount'] ?? 0;
+      if (successCount > 0) {
+        _hasChanges = true;
+        fetchVocabularies(refresh: true);
+      }
+      return result;
+    } catch (e) {
+      return {
+        'totalRows': 0,
+        'successCount': 0,
+        'skippedCount': 0,
+        'errors': [e.toString()],
+      };
+    }
+  }
 }

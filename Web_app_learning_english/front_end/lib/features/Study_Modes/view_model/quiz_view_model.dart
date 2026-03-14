@@ -47,32 +47,49 @@ class QuizViewModel extends BaseViewModel {
       );
 
       if (_session != null) {
-        // Fetch missing phonetics in parallel
+        // Fetch missing phonetics in parallel for both question word and options
         final List<Future<QuizQuestionV2>> fetchFutures = [];
 
         for (int i = 0; i < _session!.questions.length; i++) {
           final question = _session!.questions[i];
-          if (question.phoneticText == null || question.phoneticText!.isEmpty) {
-            // Determine the English word to look up
-            final String englishWord =
-                subType == 'en_vi' ? question.word : question.correctAnswer;
-
-            fetchFutures.add(() async {
+          
+          fetchFutures.add(() async {
+            QuizQuestionV2 updatedQuestion = question;
+            
+            // 1. Check main phonetic
+            if (updatedQuestion.phoneticText == null || updatedQuestion.phoneticText!.isEmpty) {
+              final String englishWord = subType == 'en_vi' ? updatedQuestion.word : updatedQuestion.correctAnswer;
               try {
                 final results = await DictionaryService.lookupWord(englishWord);
                 if (results.isNotEmpty && results.first.phonetic != null) {
-                  return question.copyWith(
-                    phoneticText: results.first.phonetic,
-                  );
+                  updatedQuestion = updatedQuestion.copyWith(phoneticText: results.first.phonetic);
                 }
-              } catch (e) {
-                debugPrint("Error fetching phonetic for $englishWord: $e");
+              } catch (_) {}
+            }
+
+            // 2. Check option phonetics (especially for vi_en mode)
+            if (subType == 'vi_en' && updatedQuestion.optionPhonetics != null) {
+              List<String> updatedOptionPhonetics = List.from(updatedQuestion.optionPhonetics!);
+              bool changed = false;
+              
+              for (int j = 0; j < updatedQuestion.options.length; j++) {
+                if (j < updatedOptionPhonetics.length && (updatedOptionPhonetics[j] == "")) {
+                  try {
+                    final results = await DictionaryService.lookupWord(updatedQuestion.options[j]);
+                    if (results.isNotEmpty && results.first.phonetic != null) {
+                      updatedOptionPhonetics[j] = results.first.phonetic!;
+                      changed = true;
+                    }
+                  } catch (_) {}
+                }
               }
-              return question;
-            }());
-          } else {
-            fetchFutures.add(Future.value(question));
-          }
+              if (changed) {
+                updatedQuestion = updatedQuestion.copyWith(optionPhonetics: updatedOptionPhonetics);
+              }
+            }
+            
+            return updatedQuestion;
+          }());
         }
 
         final updatedQuestions = await Future.wait(fetchFutures);

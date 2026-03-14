@@ -25,6 +25,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
   late Folder? _selectedFolder;
   late TextEditingController _meaningController;
   late TextEditingController _partOfSpeechController;
+  late TextEditingController _phoneticController;
 
   String? _selectedPartOfSpeech;
   bool _showOptions = false;
@@ -53,12 +54,14 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
       text: _allDefinitions.isNotEmpty ? _allDefinitions.first : '',
     );
     _partOfSpeechController = TextEditingController();
+    _phoneticController = TextEditingController(text: widget.entry.phonetic ?? '');
   }
 
   @override
   void dispose() {
     _meaningController.dispose();
     _partOfSpeechController.dispose();
+    _phoneticController.dispose();
     super.dispose();
   }
 
@@ -84,6 +87,7 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
         entry: widget.entry,
         folderId: _selectedFolder!.id,
         userDefinedMeaning: _meaningController.text.trim(),
+        userDefinedPhonetic: _phoneticController.text.trim().isEmpty ? null : _phoneticController.text.trim(),
         userDefinedPartOfSpeech:
             _allPartsOfSpeech.isNotEmpty
                 ? _selectedPartOfSpeech
@@ -210,6 +214,21 @@ class _VocabularySavingDialogState extends State<VocabularySavingDialog> {
                     ),
                   ),
                 ],
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _phoneticController,
+                  decoration: InputDecoration(
+                    labelText: 'Phát âm (tùy chọn)',
+                    hintText: 'ví dụ: /həˈləʊ/',
+                    prefixIcon: Icon(
+                      Icons.record_voice_over_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -27,6 +27,13 @@ export default function VocabularyPage({ folder, onBack, onStudy }) {
     const [allFolders, setAllFolders] = useState([]);
     const [imageBase64, setImageBase64] = useState('');
 
+    // Import Excel state
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [importFile, setImportFile] = useState(null);
+    const [importLoading, setImportLoading] = useState(false);
+    const [importResult, setImportResult] = useState(null);
+    const [dragOver, setDragOver] = useState(false);
+
     const fetchVocabs = useCallback(async () => {
         setLoading(true);
         try {
@@ -210,6 +217,62 @@ export default function VocabularyPage({ folder, onBack, onStudy }) {
         return '';
     };
 
+    // Import Excel handlers
+    const handleImportFile = (e) => {
+        const file = e.target.files[0];
+        if (file) { setImportFile(file); setImportResult(null); }
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setDragOver(false);
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.xlsx')) {
+            setImportFile(file);
+            setImportResult(null);
+        } else {
+            setImportResult({ totalRows: 0, successCount: 0, skippedCount: 0, errors: ['Chỉ chấp nhận file .xlsx'] });
+        }
+    };
+
+    const handleImportSubmit = async () => {
+        if (!importFile) return;
+        setImportLoading(true);
+        setImportResult(null);
+        try {
+            const result = await vocabAPI.importExcel(folder.id, importFile);
+            setImportResult(result);
+            if (result.successCount > 0) {
+                fetchVocabs();
+            }
+        } catch (err) {
+            setImportResult({ totalRows: 0, successCount: 0, skippedCount: 0, errors: [err.message] });
+        } finally {
+            setImportLoading(false);
+        }
+    };
+
+    const handleDownloadTemplate = () => {
+        const header = 'Word\tMeaning\tPart of Speech\tPhonetic';
+        const example1 = 'happiness\thạnh phúc\tnoun\t/ˈhæp.i.nəs/';
+        const example2 = 'beautiful\tđẹp\tadjective\t/ˈbjuː.tɪ.fəl/';
+        const content = [header, example1, example2].join('\n');
+        const blob = new Blob([content], { type: 'text/tab-separated-values' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'vocabulary_template.tsv';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const closeImportModal = () => {
+        setShowImportModal(false);
+        setImportFile(null);
+        setImportResult(null);
+        setDragOver(false);
+    };
+
     return (
         <div className="fade-in">
             <div className="breadcrumb">
@@ -234,6 +297,9 @@ export default function VocabularyPage({ folder, onBack, onStudy }) {
                     <button className="btn btn-secondary" onClick={() => setShowAddModal(true)}>
                         ➕ Thêm từ
                     </button>
+                    <button className="btn btn-secondary" onClick={() => setShowImportModal(true)} style={{ background: 'linear-gradient(135deg, #10b981, #059669)', border: 'none', color: 'white' }}>
+                        📥 Import Excel
+                    </button>
                     {totalElements > 0 && (
                         <button className="btn btn-primary" onClick={handleStudy}>
                             🎮 Học ngay
@@ -251,9 +317,14 @@ export default function VocabularyPage({ folder, onBack, onStudy }) {
                     <div className="empty-icon">📝</div>
                     <h3>Chưa có từ vựng</h3>
                     <p>Thêm từ vựng đầu tiên để bắt đầu học</p>
-                    <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-                        ➕ Thêm từ vựng
-                    </button>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
+                        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+                            ➕ Thêm từ vựng
+                        </button>
+                        <button className="btn btn-primary" onClick={() => setShowImportModal(true)} style={{ background: 'linear-gradient(135deg, #10b981, #059669)', border: 'none' }}>
+                            📥 Import Excel
+                        </button>
+                    </div>
                 </div>
             ) : (
                 <>
@@ -510,6 +581,123 @@ export default function VocabularyPage({ folder, onBack, onStudy }) {
                                 <button type="submit" className="btn btn-primary" disabled={targetFolderId === ''}>Chuyển</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Import Excel Modal */}
+            {showImportModal && (
+                <div className="modal-overlay" onClick={closeImportModal}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520 }}>
+                        <div className="modal-header">
+                            <h3 className="modal-title">📥 Import từ vựng từ Excel</h3>
+                            <button className="modal-close" onClick={closeImportModal}>✕</button>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+                                Cần có cột <b>Word</b> và <b>Meaning</b>. Tùy chọn: <b>Part of Speech</b>, <b>Phonetic</b>
+                            </p>
+                            <button className="btn btn-ghost btn-sm" onClick={handleDownloadTemplate} style={{ whiteSpace: 'nowrap' }}>
+                                ⬇️ Tải mẫu
+                            </button>
+                        </div>
+
+                        {/* Drag & Drop zone */}
+                        <div
+                            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                            onDragLeave={() => setDragOver(false)}
+                            onDrop={handleDrop}
+                            onClick={() => document.getElementById('excel-file-input').click()}
+                            style={{
+                                border: `2px dashed ${dragOver ? 'var(--primary-light)' : 'var(--border)'}`,
+                                borderRadius: 'var(--radius-md)',
+                                padding: '32px 16px',
+                                textAlign: 'center',
+                                cursor: 'pointer',
+                                background: dragOver ? 'rgba(99,102,241,0.08)' : 'transparent',
+                                transition: 'all 0.2s ease',
+                                marginBottom: 16
+                            }}
+                        >
+                            <input
+                                id="excel-file-input"
+                                type="file"
+                                accept=".xlsx"
+                                onChange={handleImportFile}
+                                style={{ display: 'none' }}
+                            />
+                            {importFile ? (
+                                <div>
+                                    <div style={{ fontSize: 32, marginBottom: 8 }}>📄</div>
+                                    <div style={{ fontWeight: 600, color: 'var(--primary-light)' }}>{importFile.name}</div>
+                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+                                        {(importFile.size / 1024).toFixed(1)} KB • Bấm để chọn file khác
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    <div style={{ fontSize: 40, marginBottom: 8, opacity: 0.5 }}>📁</div>
+                                    <div style={{ fontWeight: 600 }}>Kéo thả file Excel vào đây</div>
+                                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+                                        hoặc bấm để chọn file (.xlsx)
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Import result */}
+                        {importResult && (
+                            <div style={{
+                                background: importResult.successCount > 0 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                                border: `1px solid ${importResult.successCount > 0 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                                borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 16
+                            }}>
+                                <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
+                                    {importResult.successCount > 0 ? '✅' : '❌'} Kết quả Import
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
+                                    <div style={{ textAlign: 'center', padding: 8, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)' }}>
+                                        <div style={{ fontSize: 20, fontWeight: 700 }}>{importResult.totalRows}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Tổng dòng</div>
+                                    </div>
+                                    <div style={{ textAlign: 'center', padding: 8, borderRadius: 'var(--radius-sm)', background: 'rgba(16,185,129,0.15)' }}>
+                                        <div style={{ fontSize: 20, fontWeight: 700, color: '#10b981' }}>{importResult.successCount}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Thành công</div>
+                                    </div>
+                                    <div style={{ textAlign: 'center', padding: 8, borderRadius: 'var(--radius-sm)', background: 'rgba(245,158,11,0.15)' }}>
+                                        <div style={{ fontSize: 20, fontWeight: 700, color: '#f59e0b' }}>{importResult.skippedCount}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Bỏ qua</div>
+                                    </div>
+                                </div>
+                                {importResult.errors && importResult.errors.length > 0 && (
+                                    <details style={{ fontSize: 12 }}>
+                                        <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', marginBottom: 4 }}>
+                                            ⚠️ Chi tiết ({importResult.errors.length} thông báo)
+                                        </summary>
+                                        <div style={{ maxHeight: 120, overflowY: 'auto', padding: 8, background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-sm)', fontSize: 11, lineHeight: 1.6 }}>
+                                            {importResult.errors.map((err, i) => (
+                                                <div key={i} style={{ color: 'var(--text-muted)' }}>• {err}</div>
+                                            ))}
+                                        </div>
+                                    </details>
+                                )}
+                            </div>
+                        )}
+
+                        <div className="modal-footer" style={{ padding: 0 }}>
+                            <button type="button" className="btn btn-secondary" onClick={closeImportModal}>Đóng</button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={handleImportSubmit}
+                                disabled={!importFile || importLoading}
+                                style={{ minWidth: 140 }}
+                            >
+                                {importLoading ? (
+                                    <><span className="spinner" style={{ width: 16, height: 16, marginRight: 8 }}></span> Đang import...</>
+                                ) : '📥 Bắt đầu Import'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

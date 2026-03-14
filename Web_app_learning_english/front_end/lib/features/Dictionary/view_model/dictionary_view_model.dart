@@ -40,6 +40,7 @@ class DictionaryViewModel extends BaseViewModel {
     required DictionaryEntry entry,
     required int folderId,
     required String userDefinedMeaning,
+    String? userDefinedPhonetic,
     String? userDefinedPartOfSpeech,
     String? userImageBase64,
     double? imageAlignmentX,
@@ -47,7 +48,7 @@ class DictionaryViewModel extends BaseViewModel {
   }) async {
     try {
       await VocabularyService.createVocabulary(
-        entry: entry,
+        entry: entry.copyWith(phonetic: userDefinedPhonetic),
         folderId: folderId,
         userDefinedMeaning: userDefinedMeaning,
         userDefinedPartOfSpeech: userDefinedPartOfSpeech,

@@ -238,31 +238,53 @@ public class VocabularyService {
             }
 
             int wordCol = -1, meaningCol = -1, posCol = -1, phoneticCol = -1;
+            List<String> foundHeaders = new ArrayList<>();
             for (int c = 0; c < headerRow.getLastCellNum(); c++) {
                 String header = getCellStringValue(headerRow.getCell(c)).trim().toLowerCase();
-                if (header.equals("word") || header.equals("từ") || header.equals("từ vựng")
-                        || header.equals("english")) {
+                foundHeaders.add(header);
+                if (wordCol == -1 && (header.equals("word") || header.equals("từ") || header.equals("từ vựng")
+                        || header.equals("english") || header.contains("word") || header.contains("english")
+                        || header.contains("từ vựng") || header.contains("tu vung"))) {
                     wordCol = c;
-                } else if (header.equals("meaning") || header.equals("nghĩa") || header.equals("nghia")
-                        || header.equals("vietnamese") || header.equals("tiếng việt")) {
+                } else if (meaningCol == -1 && (header.equals("meaning") || header.equals("nghĩa") || header.equals("nghia")
+                        || header.equals("vietnamese") || header.equals("tiếng việt")
+                        || header.contains("meaning") || header.contains("nghĩa") || header.contains("nghia")
+                        || header.contains("vietnamese") || header.contains("việt"))) {
                     meaningCol = c;
-                } else if (header.equals("part of speech") || header.equals("pos") || header.equals("loại từ")
-                        || header.equals("loai tu")) {
+                } else if (posCol == -1 && (header.equals("part of speech") || header.equals("pos") || header.equals("loại từ")
+                        || header.equals("loai tu") || header.contains("part of speech") || header.contains("pos")
+                        || header.contains("loại từ") || header.contains("loai tu") || header.contains("type"))) {
                     posCol = c;
-                } else if (header.equals("phonetic") || header.equals("phiên âm") || header.equals("phien am")
-                        || header.equals("pronunciation")) {
+                } else if (phoneticCol == -1 && (header.equals("phonetic") || header.equals("phiên âm") || header.equals("phien am")
+                        || header.equals("pronunciation") || header.contains("phonetic") || header.contains("phiên âm")
+                        || header.contains("phien am") || header.contains("pronunciation") || header.contains("ipa"))) {
                     phoneticCol = c;
                 }
             }
 
+            // Fallback: if no Word/Meaning columns found, assume positional order
             if (wordCol == -1 || meaningCol == -1) {
-                errors.add(
-                        "Không tìm thấy cột 'Word' và/hoặc 'Meaning' trong file Excel. Cần có ít nhất 2 cột: Word, Meaning.");
-                return new ImportResultDTO(0, 0, 0, errors);
+                int totalCols = headerRow.getLastCellNum();
+                if (totalCols >= 2) {
+                    // Auto-assign: col 0 = word, col 1 = meaning, col 2 = pos, col 3 = phonetic
+                    wordCol = 0;
+                    meaningCol = 1;
+                    if (totalCols >= 3) posCol = 2;
+                    if (totalCols >= 4) phoneticCol = 3;
+                    errors.add("Không nhận diện được header, tự gán: Cột 1=Word, Cột 2=Meaning. Dòng đầu tiên cũng sẽ được import.");
+                    // Since no header was recognized, treat row 0 as data too
+                    // We'll handle this by starting from row 0 instead of row 1
+                } else {
+                    errors.add("Không tìm thấy cột 'Word' và/hoặc 'Meaning'. Đã tìm thấy header: [" + String.join(", ", foundHeaders) + "]. Cần có ít nhất 2 cột.");
+                    return new ImportResultDTO(0, 0, 0, errors);
+                }
             }
 
-            // Iterate data rows (skip header)
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            // Determine start row (skip header if headers were recognized, include row 0 if fallback)
+            int startRow = (errors.isEmpty()) ? 1 : 0;
+
+            // Iterate data rows (skip header if recognized)
+            for (int i = startRow; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) {
                     continue;

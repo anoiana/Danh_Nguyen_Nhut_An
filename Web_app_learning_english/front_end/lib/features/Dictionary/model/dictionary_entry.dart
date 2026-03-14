@@ -48,6 +48,20 @@ class DictionaryEntry {
     required this.meanings,
   });
 
+  DictionaryEntry copyWith({
+    String? word,
+    String? phonetic,
+    String? audioUrl,
+    List<Meaning>? meanings,
+  }) {
+    return DictionaryEntry(
+      word: word ?? this.word,
+      phonetic: phonetic ?? this.phonetic,
+      audioUrl: audioUrl ?? this.audioUrl,
+      meanings: meanings ?? this.meanings,
+    );
+  }
+
   factory DictionaryEntry.fromJson(Map<String, dynamic> json) {
     String? audio = '';
     if (json['phonetics'] != null && (json['phonetics'] as List).isNotEmpty) {
